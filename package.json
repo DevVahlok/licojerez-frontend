@@ -1,6 +1,6 @@
 {
   "name": "licojerez-frontend",
-  "version": "0.0.0",
+  "version": "0.1.0-SNAPSHOT",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -11,14 +11,21 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "^16.2.0",
+    "@angular/cdk": "^16.2.14",
     "@angular/common": "^16.2.0",
     "@angular/compiler": "^16.2.0",
     "@angular/core": "^16.2.0",
     "@angular/forms": "^16.2.0",
+    "@angular/material": "^16.2.14",
     "@angular/platform-browser": "^16.2.0",
     "@angular/platform-browser-dynamic": "^16.2.0",
     "@angular/router": "^16.2.0",
+    "@types/tabulator-tables": "^6.2.6",
+    "echarts": "^5.4.2",
+    "moment": "^2.30.1",
+    "ngx-echarts": "^7.1.0",
     "rxjs": "~7.8.0",
+    "tabulator-tables": "^6.3.1",
     "tslib": "^2.3.0",
     "zone.js": "~0.13.0"
   },
