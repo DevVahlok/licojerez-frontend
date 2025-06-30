@@ -18,11 +18,22 @@ body {
         border: 1px solid $texto_alt;
     }
 
+    .mat-mdc-form-field-required-marker {
+        color: $texto;
+    }
+
     mat-label {
         color: $texto;
     }
 
     .mdc-line-ripple::after {
         border-bottom-color: $acento !important;
+    }
+}
+
+.mat-mdc-menu-content {
+
+    .mat-mdc-menu-item-text {
+        margin: auto;
     }
 }
