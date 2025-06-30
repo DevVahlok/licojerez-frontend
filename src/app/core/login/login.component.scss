@@ -1,0 +1,48 @@
+@import './../../../styles/variables';
+
+.container-general__login {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+    background-color: $fondo;
+    color: $texto_alt;
+    height: 100%;
+    width: 100%;
+
+    .container-formulario {
+        align-self: center;
+
+        img {
+            width: 600px;
+            height: 273px;
+        }
+
+        form {
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: flex-start;
+
+            .mat-mdc-form-field {
+                width: 500px;
+                margin: 0 auto;
+
+                .mat-icon {
+                    color: $fondo;
+                }
+            }
+
+            .boton-inicio-sesion {
+                width: 500px;
+                background-color: $acento;
+                color: $texto;
+                margin: 0 auto;
+            }
+        }
+    }
+
+    .datos-proyecto {
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: flex-start;
+    }
+}
