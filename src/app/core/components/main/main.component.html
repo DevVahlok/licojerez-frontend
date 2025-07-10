@@ -1,0 +1,92 @@
+<div class="container-general__main">
+
+    <mat-toolbar>
+
+        <div class="container-izquierda-toolbar">
+            <div class="agrupador-menu-izq">
+                <img src="../../../assets/img/logo_licojerez.jpg">
+            </div>
+        </div>
+
+        <div class="container-central-toolbar">
+            <span>Licojerez</span>
+        </div>
+
+        <div class="container-derecha-toolbar">
+            <div class="agrupador-menu-der">
+                <div [matMenuTriggerFor]="menuUsuario" class="boton-usuario">
+                    <mat-icon>person</mat-icon>
+                    <span *ngIf="user">{{user.full_name}}</span>
+                    <span *ngIf="!user">Usuario desconocido</span>
+                </div>
+            </div>
+        </div>
+    </mat-toolbar>
+
+    <mat-sidenav-container autosize>
+
+        <mat-sidenav #menuLateral mode="over" opened [disableClose]="true">
+
+            <div class="lista-iconos">
+
+                <ng-container *ngFor="let item of opcionesMenuLateral; let index = index">
+
+                    <ng-container [ngTemplateOutlet]="opcionMenu" [ngTemplateOutletContext]="{item}">
+                    </ng-container>
+
+                </ng-container>
+
+                <a mat-list-item (click)="abrirDialogMenuLateral()" [matTooltip]="'Más'" matTooltipPosition="right"
+                    *ngIf="user" class="elemento-menu-lateral">
+                    <div class="encapsulador-icono-menu-lateral">
+                        <mat-icon>apps</mat-icon>
+                        <span class="titulo-icono">Más</span>
+                    </div>
+                </a>
+
+                <mat-divider></mat-divider>
+
+                <a mat-list-item (click)="cerrarSesion()" [matTooltip]="'Cerrar sesión'" matTooltipPosition="right"
+                    class="elemento-menu-lateral">
+                    <div class="encapsulador-icono-menu-lateral">
+                        <mat-icon>exit_to_app</mat-icon>
+                        <span class="titulo-icono">Cerrar sesión</span>
+                    </div>
+                </a>
+
+            </div>
+
+        </mat-sidenav>
+        <mat-sidenav-content #matSidenav>
+            <div>
+                <ng-container *ngIf="user">
+                    <router-outlet></router-outlet>
+                </ng-container>
+            </div>
+        </mat-sidenav-content>
+    </mat-sidenav-container>
+</div>
+
+<mat-menu #menuUsuario="matMenu">
+
+    <div class="menu-usuario">
+        <button mat-menu-item routerLink="/perfil" (click)="_dialog.closeAll()" disabled>Editar Perfil</button>
+        <button mat-menu-item (click)="cerrarSesion()">Cerrar sesión</button>
+    </div>
+
+</mat-menu>
+
+<ng-template #opcionMenu let-item="item">
+
+    <a mat-list-item routerLinkActive="elemento-menu-lateral-actual" [routerLink]="item.url" [matTooltip]="item.title"
+        matTooltipPosition="right" class="elemento-menu-lateral" (click)="_dialog.closeAll()">
+
+        <div class="encapsulador-icono-menu-lateral">
+            <span [ngClass]="item.iconFont">
+                {{item.icon}}</span>
+            <span class="titulo-icono">{{item.title}}</span>
+        </div>
+
+    </a>
+
+</ng-template>
