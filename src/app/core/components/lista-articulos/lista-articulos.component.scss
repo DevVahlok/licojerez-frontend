@@ -1,0 +1,17 @@
+@import './../../../../styles/variables';
+
+.container-general__lista-articulos {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+
+    h1 {
+        width: 100%;
+        text-align: center;
+        color: $acento;
+    }
+
+    .container-input-excel {
+        visibility: hidden;
+    }
+}
