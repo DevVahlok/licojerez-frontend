@@ -15,7 +15,6 @@ import { SupabaseService } from '../../services/supabase/supabase.service';
 export class LoginComponent {
   public datosProyecto = {
     fe_angular: packageJson.version,
-    be_rest: 'desconocido',
     entorno: environment.entorno
   }
   public formLogin = new FormGroup({
