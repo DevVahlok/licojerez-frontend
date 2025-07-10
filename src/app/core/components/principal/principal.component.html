@@ -1,0 +1,32 @@
+<div class="container__menu-principal">
+    <div class="banner-superior">
+        <div class="container-logo">
+            <img src="../../../assets/img/logo_licojerez_login.jpg">
+        </div>
+        <div class="container-usuario" [matMenuTriggerFor]="menuUsuario">
+            <mat-icon>account_circle</mat-icon>
+            <span class="nombre">
+                <span>Bienvenid</span>
+                <ng-container *ngIf="user.genero === 'Hombre'">o</ng-container>
+                <ng-container *ngIf="user.genero === 'Mujer'">a</ng-container>
+                <ng-container *ngIf="!user.genero">e</ng-container>
+                <span>, {{user.full_name}}</span>
+            </span>
+        </div>
+    </div>
+
+    <div class="lista-menu">
+        <ng-container *ngFor="let opcion of listaOpciones">
+            <div class="opcion" (click)="redirigirPantalla(opcion.redirect)">
+                <mat-icon>{{opcion.icono}}</mat-icon>
+                <h2>{{opcion.titulo}}</h2>
+            </div>
+        </ng-container>
+    </div>
+    <div class="fill"></div>
+</div>
+
+<mat-menu #menuUsuario="matMenu">
+    <button mat-menu-item disabled>Perfil</button>
+    <button mat-menu-item (click)="cerrarSesion()">Cerrar sesión</button>
+</mat-menu>
