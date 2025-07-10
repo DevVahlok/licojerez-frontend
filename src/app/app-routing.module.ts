@@ -1,21 +1,23 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { MainComponent } from './core/main/main.component';
-import { LoginComponent } from './core/login/login.component';
-import { PrincipalComponent } from './core/principal/principal.component';
+import { MainComponent } from './core/components/main/main.component';
+import { LoginComponent } from './core/components/login/login.component';
+import { PrincipalComponent } from './core/components/principal/principal.component';
+import { ListaArticulosComponent } from './core/components/lista-articulos/lista-articulos.component';
+import { AuthGuard } from './core/services/guard/auth.guard';
 
 const routes: Routes = [
   {
-    path: '', component: MainComponent,
+    path: '', canActivate: [AuthGuard], component: MainComponent,
     children: [
       {
-        path: '',
-        redirectTo: 'principal',
-        pathMatch: 'full'
-      }
+        path: 'articulos',
+        canActivate: [AuthGuard],
+        component: ListaArticulosComponent
+      },
     ]
   },
-  { path: 'principal', component: PrincipalComponent },
+  { path: 'principal', canActivate: [AuthGuard], component: PrincipalComponent },
   { path: 'login', component: LoginComponent },
   { path: '**', component: LoginComponent }
 ];
