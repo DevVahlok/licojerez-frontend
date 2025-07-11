@@ -2,6 +2,7 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { DataTablaTabulator, DataUnitTablaTabulator, TablaTabulatorEvent } from 'src/app/shared/components/tabla-tabulator/tabla-tabulator.component';
 import * as XLSX from 'xlsx';
 import { SupabaseService } from '../../services/supabase/supabase.service';
+import { UtilsService } from '../../services/utils-v2/utils.service';
 
 @Component({
   selector: 'app-lista-articulos',
@@ -9,7 +10,7 @@ import { SupabaseService } from '../../services/supabase/supabase.service';
   styleUrls: ['./lista-articulos.component.scss']
 })
 export class ListaArticulosComponent {
-  public datosTabla: DataTablaTabulator;
+  public datosTabla: DataTablaTabulator | null;
   public columnMap: { [key: string]: string } = {
     'descripcion': 'nombre',
     'codigo': 'codigo',
@@ -23,9 +24,10 @@ export class ListaArticulosComponent {
   public dateFields = ['fecha_alta'];
   @ViewChild('inputArchivo') inputArchivo: ElementRef;
 
-  constructor(private _supabase: SupabaseService) { }
+  constructor(private _supabase: SupabaseService, private _utils: UtilsService) { }
 
   async ngOnInit() {
+    console.log('entra');
 
     const { data, error } = await this._supabase.supabase.from('articulos').select('*');
 
@@ -132,6 +134,9 @@ export class ListaArticulosComponent {
         console.error('Error al insertar en Supabase:', error);
       } else {
         console.log('Datos insertados correctamente');
+        this.datosTabla = null;
+        await this._utils.delay(200);
+        this.ngOnInit();
       }
     };
 
