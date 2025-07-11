@@ -1,4 +1,4 @@
-import { Component, NgZone } from '@angular/core';
+import { Component, NgZone, ViewEncapsulation } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import packageJson from '../../../../../package.json';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
@@ -10,7 +10,8 @@ import { SupabaseService } from '../../services/supabase/supabase.service';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class LoginComponent {
   public datosProyecto = {
@@ -35,7 +36,7 @@ export class LoginComponent {
 
     if (data?.session) {
       await this._supabase.setUser(data.session?.user!);
-      this._router.navigate(['/principal']);
+      this._router.navigate(['/oficina/articulos']);
     }
   }
 
@@ -51,6 +52,8 @@ export class LoginComponent {
         this.formLogin.get('password')?.markAsTouched();
       } else {
         await this._supabase.setUser(data.user);
+        console.log(data.user);
+
         this._router.navigate(['/principal']);
       }
     }

@@ -1,14 +1,14 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { MainComponent } from './core/components/main/main.component';
+import { MainComponent } from './core/components/oficina/main/main.component';
 import { LoginComponent } from './core/components/login/login.component';
 import { PrincipalComponent } from './core/components/principal/principal.component';
-import { ListaArticulosComponent } from './core/components/lista-articulos/lista-articulos.component';
+import { ListaArticulosComponent } from './core/components/oficina/lista-articulos/lista-articulos.component';
 import { AuthGuard } from './core/services/guard/auth.guard';
 
 const routes: Routes = [
   {
-    path: '', canActivate: [AuthGuard], component: MainComponent,
+    path: 'oficina', canActivate: [AuthGuard], component: MainComponent,
     children: [
       {
         path: 'articulos',

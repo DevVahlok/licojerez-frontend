@@ -35,22 +35,28 @@
 }
 
 .mat-mdc-button {
-    color: $texto_alt;
+    border: 1px solid $fondo !important;
+
+    * {
+        color: $fondo !important;
+    }
 
     .mdc-button__label {
-        color: $texto_alt;
         font-size: 14px;
     }
 
     &:hover {
-        color: $acento;
+        border: 1px solid $acento !important;
+
+        * {
+            color: $acento !important;
+        }
     }
 
     .mat-icon {
         margin-left: 0 !important;
         margin-right: 0 !important;
         font-size: 18px !important;
-        color: $texto_alt;
     }
 }
 
@@ -394,8 +400,12 @@
     }
 }
 
+.mat-mdc-progress-bar {
+    border-radius: 5px;
+}
+
 .mdc-linear-progress__buffer-bar {
-    background-color: $texto_alt !important;
+    background-color: $fondo !important;
 }
 
 .mdc-linear-progress__bar-inner {

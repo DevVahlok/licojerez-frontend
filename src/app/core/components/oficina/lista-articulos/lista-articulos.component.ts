@@ -1,17 +1,26 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { DataTablaTabulator, DataUnitTablaTabulator, TablaTabulatorEvent } from 'src/app/shared/components/tabla-tabulator/tabla-tabulator.component';
+import { Component, ElementRef, ViewChild, ViewEncapsulation } from '@angular/core';
+import { DataTablaTabulator, TablaTabulatorComponent, TablaTabulatorEvent } from 'src/app/shared/components/tabla-tabulator/tabla-tabulator.component';
 import * as XLSX from 'xlsx';
-import { SupabaseService } from '../../services/supabase/supabase.service';
-import { UtilsService } from '../../services/utils-v2/utils.service';
+import { SupabaseService } from '../../../services/supabase/supabase.service';
+import { UtilsService } from '../../../services/utils-v2/utils.service';
 import { Title } from '@angular/platform-browser';
+import { LoadingManagerEvent } from 'src/app/shared/layers/component-loading-manager/component-loading-manager.component';
+import { forkJoin, from, Observable, tap } from 'rxjs';
 
 @Component({
   selector: 'app-lista-articulos',
   templateUrl: './lista-articulos.component.html',
-  styleUrls: ['./lista-articulos.component.scss']
+  styleUrls: ['./lista-articulos.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class ListaArticulosComponent {
-  public datosTabla: DataTablaTabulator | null;
+  public datosTabla: DataTablaTabulator;
+  public cargaTablaArticulos: number = 0;
+  @ViewChild('inputArchivo') inputArchivo: ElementRef;
+  @ViewChild('componenteTabla') componenteTabla: TablaTabulatorComponent;
+
+
+
   public columnMap: { [key: string]: string } = {
     'descripcion': 'nombre',
     'codigo': 'codigo',
@@ -23,60 +32,54 @@ export class ListaArticulosComponent {
   // Campos que deben ser convertidos a número
   public numericFields = ['precio_coste', 'ean13', 'stock'];
   public dateFields = ['fecha_alta'];
-  @ViewChild('inputArchivo') inputArchivo: ElementRef;
+
+
 
   constructor(private _title: Title, private _supabase: SupabaseService, private _utils: UtilsService) { }
 
-  async ngOnInit() {
-
-    //TODO: ver en minos cómo se guardan las cookies
-
+  ngOnInit() {
     this._title.setTitle('Artículos');
+    this.cargarTablaArticulos();
+  }
 
-    const { data, error } = await this._supabase.supabase.from('articulos').select('*');
+  cargarTablaArticulos() {
+    this.cargaTablaArticulos = 0;
 
-    //TODO: aplicar loading manager
-    let filas: DataUnitTablaTabulator[][] = []
+    const listaLlamadas: Array<Observable<any>> = [
+      from(this._supabase.supabase.from('articulos').select('*'))
+    ]
 
-    data?.forEach(row => {
-
-      let fila: DataUnitTablaTabulator[] = [];
-
-      for (let key in row) {
-        fila.push({ field: key, value: row[key] })
-      }
-
-      filas.push(fila)
-    })
-
-    this.datosTabla = {
-      cabecera: [
-        { title: 'Código', field: 'codigo', headerFilter: true, headerFilterPlaceholder: 'Filtrar por Código...' },
-        { title: 'Nombre', field: 'nombre', headerFilter: true, headerFilterPlaceholder: 'Filtrar por Nombre...' },
-        { title: 'EAN13', field: 'ean13' },
-        { title: 'Fecha Alta', field: 'fecha_alta' },
-        { title: 'Stock', field: 'stock' },
-        { title: 'Precio coste', field: 'precio_coste' },
-        //{ title: 'Tipo', field: 'tipo' },
-      ],
-      tableData: filas,
-      options: {
-        title: 'Lista de Artículos',
-        height: '500px',
-        layout: 'fitDataStretch',
-        actionBar: {
-          config: false,
-          download: false,
-          upload: true
+    forkJoin(listaLlamadas.map((obs$) => obs$.pipe(tap(() => { if (this.cargaTablaArticulos !== -1) this.cargaTablaArticulos += 100 / listaLlamadas.length })))).subscribe({
+      next: ([{ data }]) => {
+        this.datosTabla = {
+          cabecera: [
+            { title: 'Código', field: 'codigo', headerFilter: true, headerFilterPlaceholder: 'Filtrar por Código...' },
+            { title: 'Nombre', field: 'nombre', headerFilter: true, headerFilterPlaceholder: 'Filtrar por Nombre...' },
+            { title: 'EAN13', field: 'ean13' },
+            { title: 'Fecha Alta', field: 'fecha_alta' },
+            { title: 'Stock', field: 'stock' },
+            { title: 'Precio coste', field: 'precio_coste' },
+            //{ title: 'Tipo', field: 'tipo' },
+          ],
+          tableData: this._utils.convertirEnFormatoTabla(data),
+          options: {
+            title: 'Lista de Artículos',
+            height: '500px',
+            layout: 'fitDataStretch',
+            actionBar: { config: true, download: true, upload: false }
+          },
+          styles: { theme: 'dark' }
         }
       },
-      styles: {
-        theme: 'dark'
+      error: (err) => {
+        this.cargaTablaArticulos = -1;
       }
-    }
+    });
   }
 
   async onFileChange(evt: any) {
+
+    this.componenteTabla.visibilidadSpinner = true;
 
     const file = evt.target.files[0];
     const reader: FileReader = new FileReader();
@@ -138,13 +141,14 @@ export class ListaArticulosComponent {
         console.error('Error al insertar en Supabase:', error);
       } else {
         console.log('Datos insertados correctamente');
-        this.datosTabla = null;
-        await this._utils.delay(200);
-        this.ngOnInit();
       }
     };
 
     reader.readAsBinaryString(file);
+  }
+
+  abrirDialogAdjuntarArchivo() {
+    this.inputArchivo.nativeElement.click()
   }
 
   recibirEventosTabulator(evento: TablaTabulatorEvent) {
@@ -159,10 +163,10 @@ export class ListaArticulosComponent {
       case 'cellContext':
         // this.clickDerechoCelda(evento)
         break;
-
-      case 'upload':
-        this.inputArchivo.nativeElement.click()
-        break;
     }
+  }
+
+  eventosLoadingManager(evento: LoadingManagerEvent) {
+    if (evento.type === 'reload') this.cargarTablaArticulos();
   }
 }

@@ -38,8 +38,21 @@
             .boton-inicio-sesion {
                 width: 500px;
                 background-color: $acento;
-                color: $texto;
+                color: $texto !important;
                 margin: 15px auto 0 auto;
+                border: none !important;
+
+                * {
+                    color: $texto !important;
+                }
+
+                &:hover {
+                    color: $texto !important;
+
+                    * {
+                        color: $texto !important;
+                    }
+                }
             }
         }
     }

@@ -1,0 +1,92 @@
+@import '../../../../styles/variables';
+
+.component__component-loading-manager {
+    border: 1px solid $fondo;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    border-radius: 5px;
+    color: $texto;
+
+    &.minimized {
+        border: 1px solid $fondo !important;
+
+        .component-content__component-loading-manager {
+            position: absolute;
+            visibility: hidden;
+            pointer-events: none;
+        }
+    }
+
+    .action-bar__component-loading-manager {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-end;
+        margin-right: 5px;
+
+        button {
+            padding: 0;
+            border: none;
+            background-color: transparent;
+            color: $texto;
+            cursor: pointer;
+        }
+
+        button:hover {
+            color: $acento;
+        }
+    }
+
+    &.loaded {
+        border: none;
+        padding: 0 !important;
+    }
+
+    .component-content__component-loading-manager {
+
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+        min-height: 75px;
+
+        .component-loaded__component-loading-manager {
+            width: 100%;
+
+            .container-template__component-loading-manager {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-flow: column nowrap;
+                justify-content: center;
+            }
+        }
+
+        .component-loading__component-loading-manager {
+            width: 50%;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: center;
+            margin: auto auto;
+        }
+
+        .component-loading-fail__component-loading-manager {
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: center;
+            text-align: center;
+
+            button {
+                width: 100px;
+                margin: 0 auto;
+                margin-top: 20px;
+                border: 1px solid $fondo;
+                border-radius: 5px;
+                text-align: center;
+            }
+        }
+
+    }
+
+}

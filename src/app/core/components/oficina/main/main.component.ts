@@ -1,7 +1,7 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { SupabaseService } from '../../services/supabase/supabase.service';
+import { SupabaseService } from '../../../services/supabase/supabase.service';
 
 interface Usuario {
   name: string,
@@ -24,7 +24,7 @@ interface OpcionMenuLateral {
 export class MainComponent {
 
   public user: any;
-  public opcionesMenuLateral: OpcionMenuLateral[] = [{ title: 'Artículos', icon: 'liquor', iconFont: 'material-symbols-outlined', url: '/articulos' }]
+  public opcionesMenuLateral: OpcionMenuLateral[] = [{ title: 'Artículos', icon: 'liquor', iconFont: 'material-symbols-outlined', url: '/oficina/articulos' }]
 
   constructor(private _router: Router, public _dialog: MatDialog, private _supabase: SupabaseService) { }
 

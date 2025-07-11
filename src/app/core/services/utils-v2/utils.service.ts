@@ -1,6 +1,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import html2canvas from 'html2canvas';
 import { saveAs } from 'file-saver';
+import { DataUnitTablaTabulator } from 'src/app/shared/components/tabla-tabulator/tabla-tabulator.component';
 
 @Injectable({
   providedIn: 'root'
@@ -34,5 +35,19 @@ export class UtilsService {
 
   delay(ms: number): Promise<any> {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  convertirEnFormatoTabla(listaObjetos: any[]): DataUnitTablaTabulator[][] {
+    let filas: DataUnitTablaTabulator[][] = []
+
+    listaObjetos?.forEach(row => {
+      let fila: DataUnitTablaTabulator[] = [];
+      for (let key in row) {
+        fila.push({ field: key, value: row[key] })
+      }
+      filas.push(fila);
+    });
+
+    return filas;
   }
 }

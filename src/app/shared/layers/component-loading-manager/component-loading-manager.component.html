@@ -1,0 +1,43 @@
+<div class="component__component-loading-manager"
+    [ngClass]=" {'loaded': !firstLoad || progress >= 100, 'minimized': minimized,'minimizedEnabled': actionBar.minimized}">
+
+    <div class="action-bar__component-loading-manager">
+
+        <button (click)="minimizarComponente()" *ngIf="actionBar.minimized"
+            [matTooltip]="minimized ? 'Maximizar' : 'Minimizar'" [matTooltipPosition]="'left'">
+            <mat-icon>
+                <ng-container *ngIf="minimized">expand_more</ng-container>
+                <ng-container *ngIf="!minimized">expand_less</ng-container>
+            </mat-icon>
+        </button>
+
+    </div>
+
+    <div class="component-content__component-loading-manager"
+        [ngStyle]="{height: this.size.height, width: this.size.width}">
+        <div *ngIf="firstLoad && progress >= 100">
+            <ng-template [ngTemplateOutlet]="template"></ng-template>
+        </div>
+
+        <div *ngIf="!firstLoad" class="component-loaded__component-loading-manager">
+            <mat-progress-bar
+                [ngStyle]="progress < 100 && progress >= 0 ? {'visibility':'visible'} : {'visibility':'hidden'}"
+                mode="determinate" [value]="progress">
+            </mat-progress-bar>
+            <div class="container-template__component-loading-manager">
+                <ng-template [ngTemplateOutlet]="template"></ng-template>
+            </div>
+
+        </div>
+
+        <div *ngIf="firstLoad && progress < 100 && progress >= 0" class="component-loading__component-loading-manager">
+            <mat-progress-bar mode="determinate" [value]="progress"></mat-progress-bar>
+        </div>
+
+        <div *ngIf="progress === -1" class="component-loading-fail__component-loading-manager">
+            <span>Ha habido un error al cargar los datos.</span>
+            <button (click)="reload()" mat-button>Reintentar</button>
+        </div>
+    </div>
+
+</div>

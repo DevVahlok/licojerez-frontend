@@ -1,8 +1,0 @@
-<div class="container-general__lista-articulos">
-    <div class="container-input-excel">
-        <input type="file" (change)="onFileChange($event)" accept=".xls" #inputArchivo />
-    </div>
-    <div *ngIf="datosTabla">
-        <app-tabla-tabulator [data]="datosTabla" (emitter)="recibirEventosTabulator($event)"></app-tabla-tabulator>
-    </div>
-</div>
