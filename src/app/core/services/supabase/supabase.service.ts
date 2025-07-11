@@ -2,13 +2,6 @@ import { Injectable } from '@angular/core'
 import { AuthChangeEvent, AuthSession, createClient, Session, SupabaseClient, User } from '@supabase/supabase-js'
 import { environment } from 'src/environments/environment'
 
-export interface Profile {
-  id?: string
-  username: string
-  website: string
-  avatar_url: string
-}
-
 @Injectable({
   providedIn: 'root',
 })
@@ -21,8 +14,8 @@ export class SupabaseService {
   }
 
   async setUser(user: User) {
-    const e = await this.supabase.from('profiles').select('*').eq('id', user.id).single()
-    this.user = e.data
+    const e = await this.supabase.from('profiles').select('*').eq('id', user.id).single();
+    this.user = e.data;
   }
 
   getUser() {
@@ -35,6 +28,10 @@ export class SupabaseService {
 
   signOut() {
     return this.supabase.auth.signOut()
+  }
+
+  getSession() {
+    return this.supabase.auth.getSession();
   }
 
   getDatosTablaArticulos() {

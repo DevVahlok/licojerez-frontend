@@ -3,6 +3,7 @@ import { DataTablaTabulator, DataUnitTablaTabulator, TablaTabulatorEvent } from 
 import * as XLSX from 'xlsx';
 import { SupabaseService } from '../../services/supabase/supabase.service';
 import { UtilsService } from '../../services/utils-v2/utils.service';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-lista-articulos',
@@ -24,10 +25,13 @@ export class ListaArticulosComponent {
   public dateFields = ['fecha_alta'];
   @ViewChild('inputArchivo') inputArchivo: ElementRef;
 
-  constructor(private _supabase: SupabaseService, private _utils: UtilsService) { }
+  constructor(private _title: Title, private _supabase: SupabaseService, private _utils: UtilsService) { }
 
   async ngOnInit() {
-    console.log('entra');
+
+    //TODO: ver en minos cómo se guardan las cookies
+
+    this._title.setTitle('Artículos');
 
     const { data, error } = await this._supabase.supabase.from('articulos').select('*');
 

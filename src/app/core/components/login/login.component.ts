@@ -27,6 +27,16 @@ export class LoginComponent {
 
   ngOnInit() {
     this._title.setTitle('Licojerez - Login');
+    this.comprobarLoginAnterior();
+  }
+
+  async comprobarLoginAnterior() {
+    const { data, error } = await this._supabase.getSession();
+
+    if (data?.session) {
+      await this._supabase.setUser(data.session?.user!);
+      this._router.navigate(['/principal']);
+    }
   }
 
   async login() {
