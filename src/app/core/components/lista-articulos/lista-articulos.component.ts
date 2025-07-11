@@ -12,7 +12,7 @@ export class ListaArticulosComponent {
   public datosTabla: DataTablaTabulator;
   public columnMap: { [key: string]: string } = {
     'descripcion': 'nombre',
-    'codigo': 'id',
+    'codigo': 'codigo',
     'costo': 'precio_coste',
     'alta': 'fecha_alta',
     'ean13': 'ean13',
