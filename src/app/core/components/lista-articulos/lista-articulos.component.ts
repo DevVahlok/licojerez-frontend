@@ -28,6 +28,7 @@ export class ListaArticulosComponent {
   async ngOnInit() {
 
     const { data, error } = await this._supabase.supabase.from('articulos').select('*');
+
     //TODO: aplicar loading manager
     let filas: DataUnitTablaTabulator[][] = []
 

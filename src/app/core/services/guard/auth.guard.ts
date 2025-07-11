@@ -32,11 +32,11 @@ export class AuthGuard {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
 
-    if (this._supabase.session) {
+    if (this._supabase.getUser()) {
       return true;
+    } else {
+      this._router.navigate(['/login']);
+      return false;
     }
-
-    this._router.navigate(['/login']);
-    return false;
   }
 }
