@@ -1,0 +1,39 @@
+<div class="container-general__login">
+    <div class="fill"></div>
+    <div class="container-formulario">
+
+        <img src="../../../assets/img/logo_licojerez_login.jpg">
+
+        <form [formGroup]="formLogin">
+            <mat-form-field>
+                <mat-label>Usuario</mat-label>
+                <input matInput formControlName="user" (input)="limpiarErroresInputs()" (keyup.enter)="login()">
+                <mat-error *ngIf="formLogin.get('user')?.hasError('required')">El usuario es obligatorio</mat-error>
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Contraseña</mat-label>
+                <input matInput formControlName="password" [type]="ocultarPassword ? 'password' : 'text'"
+                    (keyup.enter)="login()" autocomplete="on" (input)="limpiarErroresInputs()">
+                <button mat-icon-button matSuffix type="button" (keydown)="$event.stopPropagation()"
+                    (click)="ocultarPassword = !ocultarPassword">
+                    <mat-icon class="icono-ver-pass">{{ocultarPassword ? 'visibility_off' :
+                        'visibility'}}</mat-icon>
+                </button>
+                <mat-error *ngIf="formLogin.get('password')?.hasError('required')">La contraseña es
+                    obligatoria</mat-error>
+                <mat-error *ngIf="formLogin.get('password')?.hasError('incorrect')">
+                    El usuario / contraseña es incorrecta
+                </mat-error>
+            </mat-form-field>
+            <button mat-button class="boton-inicio-sesion" (click)="login()">Iniciar
+                sesión</button>
+        </form>
+
+    </div>
+
+    <div class="datos-proyecto">
+        <span>Entorno {{datosProyecto.entorno | uppercase}}</span>
+        <span>Versión {{datosProyecto.fe_angular}}</span>
+    </div>
+</div>

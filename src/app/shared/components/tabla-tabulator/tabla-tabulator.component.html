@@ -1,0 +1,67 @@
+<div class="container-general__tabla-tabulator">
+
+    <div class="container-action-bar">
+
+        <div class="container-buttons-action-bar">
+
+            <button mat-button *ngIf="data?.options?.actionBar?.config" matTooltip="Configuración"
+                (click)="abrirDialogConfigs()">
+                <mat-icon>settings</mat-icon>
+            </button>
+            <button mat-button *ngIf="data?.options?.actionBar?.upload" matTooltip="Subir archivo"
+                (click)="enviarEventoUpload()">
+                <mat-icon>upload</mat-icon>
+            </button>
+            <button mat-button *ngIf="data?.options?.actionBar?.download" matTooltip="Descargar"
+                (click)="descargarTabla($event)" [matMenuTriggerFor]="menuDescargaTabla">
+                <mat-icon>download</mat-icon>
+            </button>
+            <button mat-button *ngIf="filtrosEnUso" matTooltip="Limpiar filtros" (click)="limpiarFiltros()">
+                <mat-icon>search_off</mat-icon>
+            </button>
+            <button mat-button
+                *ngIf="data?.options?.selectable && (numResultadosSeleccionados !== tabla?.getRows()?.length)"
+                matTooltip="Seleccionar todos" (click)="toggleSeleccionarTodos(true)">
+                <mat-icon>select_all</mat-icon>
+            </button>
+            <button mat-button *ngIf="data?.options?.selectable && numResultadosSeleccionados > 0"
+                matTooltip="Deseleccionar todos" (click)="toggleSeleccionarTodos(false)">
+                <mat-icon>deselect</mat-icon>
+            </button>
+
+            <mat-spinner *ngIf="visibilidadSpinner" [diameter]="35"></mat-spinner>
+
+        </div>
+
+        <span class="titulo-tabla">{{data.options.title}}</span>
+
+        <div class="fill-action-bar"></div>
+
+    </div>
+
+    <div class="container-tabla">
+
+        <span class="contador-resultados">
+            {{numResultados}} resultado<ng-container *ngIf="numResultados !==1">s </ng-container>
+            <ng-container *ngIf="numResultadosSeleccionados > 0">({{numResultadosSeleccionados}}
+                seleccionado<ng-container *ngIf="numResultadosSeleccionados !==1">s</ng-container>)</ng-container>
+        </span>
+
+        <div #tablaTabulator class="container-tabulator"></div>
+
+    </div>
+
+</div>
+
+<mat-menu #menuDescargaTabla="matMenu" class="menu-tabla__tabla-tabulator">
+    <button mat-menu-item (click)="descargarTabla('pdf')">
+        PDF
+        <mat-icon *ngIf="contarColumnas() > 8"
+            matTooltip="Para su correcta visualización, es recomendable mostrar 8 o menos columnas."
+            matTooltipPosition="right" class="boton-warning-descarga">warning_amber
+        </mat-icon>
+    </button>
+    <button mat-menu-item (click)="descargarTabla('xlsx')">Excel (xlsx)</button>
+    <button mat-menu-item (click)="descargarTabla('csv')">CSV</button>
+    <!-- <button mat-menu-item (click)="descargarTabla('png')">Imagen (png)</button> -->
+</mat-menu>
