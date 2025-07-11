@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import packageJson from '../../../../../package.json';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
@@ -30,7 +30,6 @@ export class LoginComponent {
   }
 
   async login() {
-
     const datos = this.formLogin.getRawValue();
 
     if (datos.user !== '' && datos.password !== '') {
