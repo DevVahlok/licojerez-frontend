@@ -54,13 +54,13 @@
 </div>
 
 <mat-menu #menuDescargaTabla="matMenu" class="menu-tabla__tabla-tabulator">
-    <button mat-menu-item (click)="descargarTabla('pdf')">
+    <!--     <button mat-menu-item (click)="descargarTabla('pdf')">
         PDF
         <mat-icon *ngIf="contarColumnas() > 8"
             matTooltip="Para su correcta visualización, es recomendable mostrar 8 o menos columnas."
             matTooltipPosition="right" class="boton-warning-descarga">warning_amber
         </mat-icon>
-    </button>
+    </button> -->
     <button mat-menu-item (click)="descargarTabla('xlsx')">Excel (xlsx)</button>
     <button mat-menu-item (click)="descargarTabla('csv')">CSV</button>
     <!-- <button mat-menu-item (click)="descargarTabla('png')">Imagen (png)</button> -->

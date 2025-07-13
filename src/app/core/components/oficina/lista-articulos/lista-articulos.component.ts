@@ -6,6 +6,7 @@ import { Title } from '@angular/platform-browser';
 import { LoadingManagerEvent } from 'src/app/shared/layers/component-loading-manager/component-loading-manager.component';
 import { forkJoin, from, Observable, tap } from 'rxjs';
 import { TabulatorService } from 'src/app/core/services/tabulator/tabulator.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-lista-articulos',
@@ -19,7 +20,7 @@ export class ListaArticulosComponent {
   @ViewChild('inputArchivo') inputArchivo: ElementRef;
   @ViewChild('componenteTabla') componenteTabla: TablaTabulatorComponent;
 
-  constructor(private _title: Title, private _supabase: SupabaseService, private _utils: UtilsService, private _tabulator: TabulatorService) { }
+  constructor(private _title: Title, private _supabase: SupabaseService, private _utils: UtilsService, private _tabulator: TabulatorService, private _snackbar: MatSnackBar) { }
 
   ngOnInit() {
     this._title.setTitle('Artículos');
@@ -55,13 +56,17 @@ export class ListaArticulosComponent {
 
   async onFileChange(evento: any) {
     this.componenteTabla.visibilidadSpinner = true;
-    //const {data,error} = await this._supabase.subirExcelTablaArticulos(evento.target.files[0]);
-    this._supabase.subirExcelTablaArticulos(evento.target.files[0]);
+    const respuesta = await this._supabase.subirExcelTablaArticulos(evento.target.files[0]);
+
+    if (!respuesta.success) {
+      this._snackbar.open(`Ha habido un error al añadir los artículos.`, undefined, { duration: 7000 });
+    }
+
     this.componenteTabla.visibilidadSpinner = false;
   }
 
   abrirDialogAdjuntarArchivo() {
-    this.inputArchivo.nativeElement.click()
+    this.inputArchivo.nativeElement.click();
   }
 
   recibirEventosTabulator(evento: TablaTabulatorEvent) {
