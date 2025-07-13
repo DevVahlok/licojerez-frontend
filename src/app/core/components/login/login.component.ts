@@ -52,8 +52,6 @@ export class LoginComponent {
         this.formLogin.get('password')?.markAsTouched();
       } else {
         await this._supabase.setUser(data.user);
-        console.log(data.user);
-
         this._router.navigate(['/principal']);
       }
     }

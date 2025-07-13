@@ -5,6 +5,7 @@ import { LoginComponent } from './core/components/login/login.component';
 import { PrincipalComponent } from './core/components/principal/principal.component';
 import { ListaArticulosComponent } from './core/components/oficina/lista-articulos/lista-articulos.component';
 import { AuthGuard } from './core/services/guard/auth.guard';
+import { ListaLogsComponent } from './core/components/oficina/lista-logs/lista-logs.component';
 
 const routes: Routes = [
   {
@@ -14,6 +15,11 @@ const routes: Routes = [
         path: 'articulos',
         canActivate: [AuthGuard],
         component: ListaArticulosComponent
+      },
+      {
+        path: 'logs',
+        canActivate: [AuthGuard],
+        component: ListaLogsComponent
       },
     ]
   },

@@ -1,0 +1,68 @@
+@import './../../../../../styles/variables';
+
+.container-general__lista-logs {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+
+    h1 {
+        text-align: center;
+        width: 100%;
+        color: $acento;
+    }
+
+    .container-spinner {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+        margin-top: 50px;
+    }
+
+    .container-error {
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: flex-start;
+
+        .material-symbols-outlined {
+            color: $error;
+            width: 75px;
+            height: 75px;
+            font-size: 75px;
+            margin: 0 auto 25px auto;
+        }
+
+        .texto {
+            margin: 0 auto;
+        }
+
+        button {
+            width: fit-content;
+            margin: 25px auto 0 auto;
+        }
+    }
+
+    .container-lista-logs {
+        height: 80vh;
+        border: 1px solid $fondo;
+        border-radius: 5px;
+        overflow-x: hidden;
+
+        .cdk-virtual-scroll-content-wrapper {
+            padding: 15px;
+        }
+
+        .texto {
+            margin: 0 15px;
+        }
+
+        .boton-detalles {
+            height: 15px;
+            padding: 0 !important;
+            min-width: 30px;
+
+            .mat-mdc-button-touch-target {
+                height: 15px;
+            }
+        }
+    }
+}

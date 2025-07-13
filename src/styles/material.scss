@@ -225,9 +225,28 @@
 }
 
 .mat-mdc-dialog-surface {
-    background-color: grey !important;
+    background-color: $fondo_alt !important;
     padding: 20px 30px 0px 30px;
     overflow-y: hidden !important;
+    color: $texto;
+
+    h1 {
+        text-align: center;
+        width: 100%;
+        color: $texto !important;
+    }
+
+    .container-botones-accion {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+        margin-top: 15px;
+        margin-bottom: 15px;
+
+        button {
+            margin: 0 15px;
+        }
+    }
 }
 
 .mdc-text-field__input::-webkit-calendar-picker-indicator {
