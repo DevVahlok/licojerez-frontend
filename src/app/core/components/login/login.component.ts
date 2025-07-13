@@ -1,4 +1,4 @@
-import { Component, NgZone } from '@angular/core';
+import { Component, NgZone, ViewEncapsulation } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import packageJson from '../../../../../package.json';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
@@ -10,7 +10,8 @@ import { SupabaseService } from '../../services/supabase/supabase.service';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class LoginComponent {
   public datosProyecto = {
@@ -27,6 +28,16 @@ export class LoginComponent {
 
   ngOnInit() {
     this._title.setTitle('Licojerez - Login');
+    this.comprobarLoginAnterior();
+  }
+
+  async comprobarLoginAnterior() {
+    const { data, error } = await this._supabase.getSession();
+
+    if (data?.session) {
+      await this._supabase.setUser(data.session?.user!);
+      this._router.navigate(['/oficina/articulos']);
+    }
   }
 
   async login() {

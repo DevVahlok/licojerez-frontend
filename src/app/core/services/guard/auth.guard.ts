@@ -30,13 +30,13 @@ export class AuthGuard {
    * 
    */
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+  async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
 
-    if (this._supabase.getUser()) {
+    if (await this._supabase.getUser()) {
       return true;
-    } else {
-      this._router.navigate(['/login']);
-      return false;
     }
+
+    this._router.navigate(['/login']);
+    return false;
   }
 }

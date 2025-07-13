@@ -30,7 +30,7 @@ export class PrincipalComponent {
   conseguirOpcionesMenu() {
     this.listaOpciones = [
       // { titulo: 'TPV', icono: 'shopping_cart', redirect: '' },
-      { titulo: 'Oficina', icono: 'business_center', redirect: '/articulos' }
+      { titulo: 'Oficina', icono: 'business_center', redirect: '/oficina/articulos' }
     ]
   }
 

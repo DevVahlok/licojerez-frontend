@@ -1,4 +1,4 @@
-@import './../../../../styles/variables';
+@import './../../../../../styles/variables';
 
 .container-general__main {
     height: 100%;
@@ -49,7 +49,6 @@
                 font-family: 'Minos Logo', Helvetica, Arial, sans-serif !important;
                 color: $acento;
                 font-size: 30px;
-                cursor: pointer;
                 margin-left: 90px;
             }
         }

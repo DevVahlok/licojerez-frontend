@@ -22,6 +22,10 @@
             flex-flow: column nowrap;
             justify-content: flex-start;
 
+            .icono-ver-pass {
+                color: $texto_alt !important;
+            }
+
             .mat-mdc-form-field {
                 width: 500px;
                 margin: 0 auto;
@@ -34,8 +38,21 @@
             .boton-inicio-sesion {
                 width: 500px;
                 background-color: $acento;
-                color: $texto;
+                color: $texto !important;
                 margin: 15px auto 0 auto;
+                border: none !important;
+
+                * {
+                    color: $texto !important;
+                }
+
+                &:hover {
+                    color: $texto !important;
+
+                    * {
+                        color: $texto !important;
+                    }
+                }
             }
         }
     }

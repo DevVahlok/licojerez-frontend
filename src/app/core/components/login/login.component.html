@@ -7,14 +7,16 @@
         <form [formGroup]="formLogin">
             <mat-form-field>
                 <mat-label>Usuario</mat-label>
-                <input matInput formControlName="user" (input)="limpiarErroresInputs()" (keyup.enter)="login()">
+                <input matInput formControlName="user" (input)="limpiarErroresInputs()" (keyup.enter)="login()"
+                    type="text" name="username" autocomplete="username">
                 <mat-error *ngIf="formLogin.get('user')?.hasError('required')">El usuario es obligatorio</mat-error>
             </mat-form-field>
 
             <mat-form-field>
                 <mat-label>Contraseña</mat-label>
                 <input matInput formControlName="password" [type]="ocultarPassword ? 'password' : 'text'"
-                    (keyup.enter)="login()" autocomplete="on" (input)="limpiarErroresInputs()">
+                    (keyup.enter)="login()" autocomplete="on" (input)="limpiarErroresInputs()" type="password"
+                    name="password" autocomplete="current-password">
                 <button mat-icon-button matSuffix type="button" (keydown)="$event.stopPropagation()"
                     (click)="ocultarPassword = !ocultarPassword">
                     <mat-icon class="icono-ver-pass">{{ocultarPassword ? 'visibility_off' :
@@ -26,7 +28,7 @@
                     El usuario / contraseña es incorrecta
                 </mat-error>
             </mat-form-field>
-            <button mat-button class="boton-inicio-sesion" (click)="login()">Iniciar
+            <button mat-button class="boton-inicio-sesion" (click)="login()" type="submit">Iniciar
                 sesión</button>
         </form>
 
