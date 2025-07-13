@@ -23,7 +23,7 @@ export class PrincipalComponent {
 
   async ngOnInit() {
     this._title.setTitle('Menú principal');
-    this.user = this._supabase.getUser();
+    this.user = await this._supabase.getUser();
     this.conseguirOpcionesMenu();
   }
 
