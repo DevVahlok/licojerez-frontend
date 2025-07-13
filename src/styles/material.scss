@@ -596,6 +596,10 @@
     }
 }
 
+.mdc-snackbar__surface {
+    background-color: $fondo !important;
+}
+
 .mat-mdc-paginator {
     color: $texto_alt;
     font-size: 14px;

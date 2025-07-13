@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import moment from 'moment';
 import { CellComponent, ColumnDefinition } from 'tabulator-tables';
 
 interface Columna {
@@ -51,6 +52,7 @@ export class TabulatorService {
         field: col.field,
         headerFilter: true,
         headerFilterPlaceholder: `Filtrar por ${col.title}...`,
+        minWidth: 150
       }
 
       if (col.type === 'number') {
@@ -62,6 +64,7 @@ export class TabulatorService {
       if (col.type === 'date') {
         nuevaCol.sorter = 'datetime';
         nuevaCol.sorterParams = { format: "dd/MM/yyyy" };
+        nuevaCol.formatter = (cell) => moment(cell.getValue()).format('DD-MM-YYYY HH:mm:ss');
       }
 
       if (col.type === 'boolean') {
@@ -92,7 +95,7 @@ export class TabulatorService {
     //create and style inputs
     let start = document.createElement('input');
     start.setAttribute('type', 'number');
-    start.setAttribute('placeholder', 'Min');
+    start.setAttribute('placeholder', 'Mín.');
     start.setAttribute('min', '0');
     start.setAttribute('max', '100');
     start.style.padding = '4px';
@@ -117,7 +120,7 @@ export class TabulatorService {
     }
 
     end = start.cloneNode();
-    end.setAttribute('placeholder', 'Max');
+    end.setAttribute('placeholder', 'Máx.');
 
     start.addEventListener('change', buildValues);
     start.addEventListener('blur', buildValues);
