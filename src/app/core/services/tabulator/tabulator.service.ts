@@ -22,11 +22,11 @@ export class TabulatorService {
     let columnas: Columna[] = [
       { title: 'Código', field: 'codigo', type: 'string' },
       { title: 'Nombre', field: 'nombre', type: 'string' },
-      { title: 'EAN13', field: 'ean13', type: 'string' },
+      { title: 'Precio coste', field: 'precio_coste', type: 'number', formatter: 'money' },
+      { title: 'Precio venta', field: 'precio_venta', type: 'number', formatter: 'money' },
+      { title: 'EAN13', field: 'ean13', type: 'string' }, //TODO: permitir varios (varias cols en bbdd, en tabulator unificar en mismo string separados por comas)
       { title: 'Fecha Alta', field: 'fecha_alta', type: 'date' },
       { title: 'Stock', field: 'stock', type: 'number' },
-      { title: 'Precio coste', field: 'precio_coste', type: 'number' },
-      { title: 'Precio venta', field: 'precio_venta', type: 'number' },
       { title: 'Proveedor', field: 'proveedor', type: 'string', dropdown: true },
       { title: 'Familia', field: 'familia', type: 'string', dropdown: true },
       { title: 'Subfamilia', field: 'subfamilia', type: 'string', dropdown: true },
@@ -36,6 +36,7 @@ export class TabulatorService {
       //{ title: 'Comisión', field: 'comision', type: 'number' },
       { title: 'Referencia', field: 'referencia', type: 'string' },
       { title: 'Nombre TPV', field: 'nombre_tpv', type: 'string' }, //descboton en excel
+      { title: 'Tiene lote', field: 'tiene_lote', type: 'boolean', dropdown: true }, //chasis en excel
     ]
 
     return this.complementarColumnas(columnas);
@@ -72,7 +73,20 @@ export class TabulatorService {
       }
 
       if (col.formatter) {
-        nuevaCol.formatter = (cell) => cell.getValue() ? `${cell.getValue()}${col.formatter}` : '';
+        if (col.formatter === 'money') {
+          nuevaCol.formatter = 'money';
+          nuevaCol.formatterParams = {
+            decimal: ",",
+            thousand: ".",
+            symbol: "€",
+            symbolAfter: true,
+            negativeSign: true,
+            precision: 2,
+          }
+          nuevaCol.hozAlign = 'right';
+        } else {
+          nuevaCol.formatter = (cell) => cell.getValue() ? `${cell.getValue()}${col.formatter}` : '';
+        }
       }
 
       if (col.dropdown) {

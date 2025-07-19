@@ -5,11 +5,10 @@
         </div>
         <div class="container-usuario" [matMenuTriggerFor]="menuUsuario">
             <mat-icon>account_circle</mat-icon>
-            <span class="nombre">
+            <span class="nombre" *ngIf="user">
                 <span>Bienvenid</span>
-                <ng-container *ngIf="user.genero === 'Hombre'">o</ng-container>
+                <ng-container *ngIf="user.genero !== 'Mujer'">o</ng-container>
                 <ng-container *ngIf="user.genero === 'Mujer'">a</ng-container>
-                <ng-container *ngIf="!user.genero">e</ng-container>
                 <span>, {{user.full_name}}</span>
             </span>
         </div>
