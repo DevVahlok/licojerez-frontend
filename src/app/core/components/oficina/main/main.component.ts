@@ -26,6 +26,7 @@ export class MainComponent {
   public user: any;
   public opcionesMenuLateral: OpcionMenuLateral[] = [
     { title: 'Artículos', icon: 'liquor', iconFont: 'material-symbols-outlined', url: '/oficina/articulos' },
+    { title: 'Proveedores', icon: 'local_shipping', iconFont: 'material-symbols-outlined', url: '/oficina/proveedores' },
     { title: 'Logs', icon: 'checkbook', iconFont: 'material-symbols-outlined', url: '/oficina/logs' },
   ]
 
