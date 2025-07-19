@@ -24,7 +24,7 @@ export class TabulatorService {
       { title: 'Nombre', field: 'nombre', type: 'string' },
       { title: 'Precio coste', field: 'precio_coste', type: 'number', formatter: 'money' },
       { title: 'Precio venta', field: 'precio_venta', type: 'number', formatter: 'money' },
-      { title: 'EAN13', field: 'ean13', type: 'string' }, //TODO: permitir varios (varias cols en bbdd, en tabulator unificar en mismo string separados por comas)
+      { title: 'EAN13', field: 'ean13', type: 'string' },
       { title: 'Fecha Alta', field: 'fecha_alta', type: 'date' },
       { title: 'Stock', field: 'stock', type: 'number' },
       { title: 'Proveedor', field: 'proveedor', type: 'string', dropdown: true },

@@ -49,10 +49,10 @@ export class SupabaseService {
       'descripcion': 'nombre',
       'costo': 'precio_coste',
       'venta': 'precio_venta',
-      'ean13': 'ean13',
+      'ean13': 'ean13_1', //TODO: encontrar los otros ean13 (5) en el excel a importar
+      'existencia': 'stock',
+      'proveedor': 'proveedor', //TODO: importar proveedores (pedir excel) y relacionarlo con la tabla de supabase
       //  'alta': 'fecha_alta',
-      //  'existencia': 'stock',
-      // 'proveedor': 'proveedor',
       // 'familia': 'familia',
     };
     const numericFields = ['precio_coste', 'ean13', 'stock'];
@@ -119,7 +119,9 @@ export class SupabaseService {
 
       //Tratamiento datos
 
-      //Convertir todos los códigos a número
+      ///////////Campo código
+
+      //Convertir todos los códigos a número 
       const productosConCodigoNumerico = mappedData.map(p => ({ ...p, codigo: Number(p.codigo) }));
 
       // Paso 2: Contar ocurrencias de cada código
@@ -142,6 +144,16 @@ export class SupabaseService {
         this.anadirLog(`ha tenido un error al intentar añadir ${mappedData.length} artículos a través de un excel`, 'El excel contiene datos duplicados (columna "codigo")');
         return { success: false, error: 'duplicated', data: productosDuplicados, showError: `El excel contiene datos duplicados (columna Código)`, errorField: 'codigo' };
       }
+
+
+      mappedData.forEach(articulo => {
+
+        //Campo stock
+        articulo.stock = Math.trunc(articulo.stock);
+        articulo.ean13_1 = Number(articulo.ean13_1);
+        if (articulo.ean13_1 === 0) articulo.ean13_1 = null;
+      })
+
 
       console.log(mappedData);
 
