@@ -31,12 +31,14 @@ export class TabulatorService {
       { title: 'Familia', field: 'familia', type: 'string', dropdown: true },
       { title: 'Subfamilia', field: 'subfamilia', type: 'string', dropdown: true },
       { title: 'IVA', field: 'iva', type: 'string', dropdown: true, formatter: '%' },
-      { title: 'Tipo', field: 'tipo', type: 'string', dropdown: true },
-      { title: 'Activo', field: 'activo', type: 'boolean', dropdown: true },
-      //{ title: 'Comisión', field: 'comision', type: 'number' },
-      { title: 'Referencia', field: 'referencia', type: 'string' },
-      { title: 'Nombre TPV', field: 'nombre_tpv', type: 'string' }, //descboton en excel
-      { title: 'Tiene lote', field: 'tiene_lote', type: 'boolean', dropdown: true }, //chasis en excel
+      //{ title: 'Tipo', field: 'tipo', type: 'string', dropdown: true },
+      //{ title: 'Activo', field: 'activo', type: 'boolean', dropdown: true },
+      //{ title: 'Comisión', field: 'comision', type: 'number' }, - leer notas
+      //{ title: 'Referencia', field: 'referencia', type: 'string' },
+      //{ title: 'Nombre TPV', field: 'nombre_tpv', type: 'string' }, //descboton en excel
+      //{ title: 'Tiene lote', field: 'tiene_lote', type: 'boolean', dropdown: true }, //chasis en excel
+      //Marca - campo migue
+      //Grupo - leer notas
     ]
 
     return this.complementarColumnas(columnas);
@@ -92,7 +94,7 @@ export class TabulatorService {
       if (col.dropdown) {
         nuevaCol.headerFilter = 'list';
         nuevaCol.headerFilterFunc = 'in';
-        nuevaCol.headerFilterParams = { valuesLookup: true as any, sort: "asc", multiselect: true, placeholderLoading: 'Cargando resultados...', placeholderEmpty: 'Sin resultados' };
+        nuevaCol.headerFilterParams = { valuesLookup: 'active', sort: "asc", multiselect: true, placeholderLoading: 'Cargando resultados...', placeholderEmpty: 'Sin resultados' };
       }
 
       devol.push(nuevaCol)

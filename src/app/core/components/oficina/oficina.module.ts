@@ -10,6 +10,7 @@ import { SharedComponentsModule } from 'src/app/shared/components/shared-compone
 import { SharedModule } from 'src/app/shared/shared.module';
 import { RouterModule } from '@angular/router';
 import { ListaProveedoresComponent } from './lista-proveedores/lista-proveedores.component';
+import { ListaFamiliasSubfamiliasComponent } from './lista-familias-subfamilias/lista-familias-subfamilias.component';
 
 
 
@@ -18,7 +19,8 @@ import { ListaProveedoresComponent } from './lista-proveedores/lista-proveedores
     ListaArticulosComponent,
     ListaLogsComponent,
     MainComponent,
-    ListaProveedoresComponent
+    ListaProveedoresComponent,
+    ListaFamiliasSubfamiliasComponent
   ],
   imports: [
     CommonModule,

@@ -49,13 +49,15 @@ export class SupabaseService {
       'descripcion': 'nombre',
       'costo': 'precio_coste',
       'venta': 'precio_venta',
-      'ean13': 'ean13_1', //TODO: encontrar los otros ean13 (5) en el excel a importar
+      'ean13': 'ean13_1',
       'existencia': 'stock',
-      'proveedor': 'proveedor', //TODO: importar proveedores (pedir excel) y relacionarlo con la tabla de supabase
+      'proveedor': 'proveedor',
+      'tipo': 'tipo',
+      'familia': 'familia',
+      'iva': 'iva'
       //  'alta': 'fecha_alta',
-      // 'familia': 'familia',
     };
-    const numericFields = ['precio_coste', 'ean13', 'stock'];
+    const numericFields = ['codigo', 'precio_coste', 'precio_venta', 'ean13', 'stock', 'ean13_1', 'proveedor', 'familia'];
     const dateFields = ['fecha_alta'];
 
     try {
@@ -73,10 +75,7 @@ export class SupabaseService {
         reader.readAsBinaryString(archivo);
       });
 
-      const wb: XLSX.WorkBook = XLSX.read(bstr, {
-        type: 'binary',
-        cellDates: true
-      });
+      const wb: XLSX.WorkBook = XLSX.read(bstr, { type: 'binary', cellDates: true });
 
       const wsname = wb.SheetNames[0];
       const ws = wb.Sheets[wsname];
@@ -145,15 +144,26 @@ export class SupabaseService {
         return { success: false, error: 'duplicated', data: productosDuplicados, showError: `El excel contiene datos duplicados (columna Código)`, errorField: 'codigo' };
       }
 
+      const resIVA = await this.supabase.from('ivas').select('*').order('codigo');
 
       mappedData.forEach(articulo => {
 
         //Campo stock
         articulo.stock = Math.trunc(articulo.stock);
+
+        //Campo EAN13
         articulo.ean13_1 = Number(articulo.ean13_1);
         if (articulo.ean13_1 === 0) articulo.ean13_1 = null;
-      })
 
+        //Campo Tipo
+        articulo.tipo = articulo.tipo === 1 ? 'Material' : 'Servicio';
+        if (articulo.tipo === 'Servicio') articulo.stock = null;
+
+        //Campo IVA
+        if (articulo.iva === 'N') articulo.iva = resIVA.data?.find(iva => iva.valor_iva === 21).codigo;
+        if (articulo.iva === 'R') articulo.iva = resIVA.data?.find(iva => iva.valor_iva === 10).codigo;
+        if (articulo.iva === 'S') articulo.iva = resIVA.data?.find(iva => iva.valor_iva === 4).codigo;
+      })
 
       console.log(mappedData);
 

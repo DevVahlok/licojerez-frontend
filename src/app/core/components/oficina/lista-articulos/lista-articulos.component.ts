@@ -34,13 +34,14 @@ export class ListaArticulosComponent {
     this.cargaTablaArticulos = 0;
 
     const listaLlamadas: Array<Observable<any>> = [
-      from(this._supabase.supabase.from('articulos').select('*').order('codigo'))
+      from(this._supabase.supabase.from('articulos').select('*, proveedores(nombre), familias(nombre), subfamilias(nombre), ivas(valor_iva)').order('codigo'))
     ]
 
     forkJoin(listaLlamadas.map((obs$) => obs$.pipe(tap(() => { if (this.cargaTablaArticulos !== -1) this.cargaTablaArticulos += 100 / listaLlamadas.length })))).subscribe({
       next: ([{ data }]) => {
 
         data = this.tratamientoFilas(data);
+        console.log(data);
 
         if (this.componenteTabla?.tabla) {
           this.componenteTabla.sustituirDatos(this._utils.convertirEnFormatoTabla(data))
@@ -111,14 +112,30 @@ export class ListaArticulosComponent {
 
     filas.forEach((fila: any) => {
 
+      //Códigos de barras
       let listaEans = [];
       if (fila.ean13_1) listaEans.push(fila.ean13_1);
       if (fila.ean13_2) listaEans.push(fila.ean13_2);
       if (fila.ean13_3) listaEans.push(fila.ean13_3);
       if (fila.ean13_4) listaEans.push(fila.ean13_4);
       if (fila.ean13_5) listaEans.push(fila.ean13_5);
-
       fila.ean13 = listaEans.join(', ');
+
+      //Proveedor
+      if (fila.proveedor !== null) fila.proveedor = fila.proveedores.nombre;
+      delete fila.proveedores;
+
+      //Familia
+      if (fila.familia !== null) fila.familia = fila.familias.nombre;
+      delete fila.familias;
+
+      //Subfamilia
+      if (fila.subfamilia !== null) fila.subfamilia = fila.subfamilias.nombre;
+      delete fila.subfamilias;
+
+      //IVA
+      if (fila.iva !== null) fila.iva = fila.ivas.valor_iva;
+      delete fila.ivas;
     });
 
     return filas;
