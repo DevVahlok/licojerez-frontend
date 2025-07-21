@@ -34,7 +34,7 @@ export class ListaArticulosComponent {
     this.cargaTablaArticulos = 0;
 
     const listaLlamadas: Array<Observable<any>> = [
-      from(this._supabase.supabase.from('articulos').select('*, proveedores(nombre), familias(nombre), subfamilias(nombre), ivas(valor_iva)').order('codigo'))
+      from(this._supabase.supabase.from('articulos').select('*, proveedores(nombre), familias(nombre), subfamilias(nombre), ivas(valor_iva), marcas(nombre), articulos_grupos(grupo_codigo,  grupos_articulos(nombre))').order('codigo'))
     ]
 
     forkJoin(listaLlamadas.map((obs$) => obs$.pipe(tap(() => { if (this.cargaTablaArticulos !== -1) this.cargaTablaArticulos += 100 / listaLlamadas.length })))).subscribe({
@@ -101,6 +101,14 @@ export class ListaArticulosComponent {
       case 'cellContext':
         // this.clickDerechoCelda(evento)
         break;
+
+      case 'tableBuilt':
+        this.componenteTabla.tabla.setHeaderFilterValue('activo', true as any);
+        break;
+
+      case 'filtersCleared':
+        this.componenteTabla.tabla.setHeaderFilterValue('activo', true as any);
+        break;
     }
   }
 
@@ -136,6 +144,14 @@ export class ListaArticulosComponent {
       //IVA
       if (fila.iva !== null) fila.iva = fila.ivas.valor_iva;
       delete fila.ivas;
+
+      //Marca
+      if (fila.marca !== null) fila.marca = fila.marcas.nombre;
+      delete fila.marcas;
+
+      //Grupos
+      fila.grupos = fila.articulos_grupos.map((grupo: any) => grupo.grupos_articulos.nombre).join(', ');
+      delete fila.articulos_grupos;
     });
 
     return filas;

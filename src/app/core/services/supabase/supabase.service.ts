@@ -54,10 +54,15 @@ export class SupabaseService {
       'proveedor': 'proveedor',
       'tipo': 'tipo',
       'familia': 'familia',
-      'iva': 'iva'
-      //  'alta': 'fecha_alta',
+      'iva': 'iva',
+      'margen': 'margen',
+      'activo': 'activo',
+      'comision': 'comision_default',
+      'alta': 'fecha_alta',
+      'chasis': 'tiene_lote',
+      'descuento': 'descuento_default'
     };
-    const numericFields = ['codigo', 'precio_coste', 'precio_venta', 'ean13', 'stock', 'ean13_1', 'proveedor', 'familia'];
+    const numericFields = ['codigo', 'precio_coste', 'precio_venta', 'ean13', 'stock', 'ean13_1', 'proveedor', 'familia', 'margen', 'comision_default', 'descuento_default'];
     const dateFields = ['fecha_alta'];
 
     try {
@@ -148,7 +153,7 @@ export class SupabaseService {
 
       mappedData.forEach(articulo => {
 
-        //Campo stock
+        //Campo Stock
         articulo.stock = Math.trunc(articulo.stock);
 
         //Campo EAN13

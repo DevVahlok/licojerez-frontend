@@ -19,7 +19,7 @@ export class TabulatorService {
 
   getHeaderTablaArticulos(): ColumnDefinition[] {
 
-    let columnas: Columna[] = [
+    const columnas: Columna[] = [
       { title: 'Código', field: 'codigo', type: 'string' },
       { title: 'Nombre', field: 'nombre', type: 'string' },
       { title: 'Precio coste', field: 'precio_coste', type: 'number', formatter: 'money' },
@@ -31,14 +31,15 @@ export class TabulatorService {
       { title: 'Familia', field: 'familia', type: 'string', dropdown: true },
       { title: 'Subfamilia', field: 'subfamilia', type: 'string', dropdown: true },
       { title: 'IVA', field: 'iva', type: 'string', dropdown: true, formatter: '%' },
-      //{ title: 'Tipo', field: 'tipo', type: 'string', dropdown: true },
-      //{ title: 'Activo', field: 'activo', type: 'boolean', dropdown: true },
-      //{ title: 'Comisión', field: 'comision', type: 'number' }, - leer notas
-      //{ title: 'Referencia', field: 'referencia', type: 'string' },
-      //{ title: 'Nombre TPV', field: 'nombre_tpv', type: 'string' }, //descboton en excel
-      //{ title: 'Tiene lote', field: 'tiene_lote', type: 'boolean', dropdown: true }, //chasis en excel
-      //Marca - campo migue
-      //Grupo - leer notas
+      { title: 'Margen', field: 'margen', type: 'number', formatter: '%' },
+      { title: 'Tipo', field: 'tipo', type: 'string', dropdown: true },
+      { title: 'Activo', field: 'activo', type: 'boolean', dropdown: true },
+      { title: 'Comisión por defecto', field: 'comision_default', type: 'number', formatter: '%' },
+      { title: 'Tiene lote', field: 'tiene_lote', type: 'boolean', dropdown: true },
+      { title: 'Marca', field: 'marca', type: 'string', dropdown: true },
+      { title: 'Descuento por defecto', field: 'descuento_default', type: 'number', formatter: '%' },
+      { title: 'Grupos', field: 'grupos', type: 'string', dropdown: true },
+      //Grupo - leer notas, puede pertenecer a más de 1 grupo - stringificar como en los ean13 pero en el desplegable del filtro hacer llamada api para conseguir los Grupos y hacer un 'like'
     ]
 
     return this.complementarColumnas(columnas);
@@ -55,23 +56,27 @@ export class TabulatorService {
         field: col.field,
         headerFilter: true,
         headerFilterPlaceholder: `Filtrar por ${col.title}...`,
-        minWidth: 150
+        minWidth: 150,
+        hozAlign: 'left'
       }
 
       if (col.type === 'number') {
         nuevaCol.headerFilter = this.minMaxFilterEditor;
         nuevaCol.headerFilterFunc = this.minMaxFilterFunction;
         nuevaCol.headerFilterLiveFilter = false;
+        nuevaCol.hozAlign = 'right';
       }
 
       if (col.type === 'date') {
         nuevaCol.sorter = 'datetime';
         nuevaCol.sorterParams = { format: "dd/MM/yyyy" };
         nuevaCol.formatter = (cell) => moment(cell.getValue()).format('DD-MM-YYYY HH:mm:ss');
+        nuevaCol.hozAlign = 'center';
       }
 
       if (col.type === 'boolean') {
         nuevaCol.formatter = (cell) => cell.getValue() ? 'Sí' : 'No';
+        nuevaCol.hozAlign = 'center';
       }
 
       if (col.formatter) {
@@ -87,14 +92,20 @@ export class TabulatorService {
           }
           nuevaCol.hozAlign = 'right';
         } else {
-          nuevaCol.formatter = (cell) => cell.getValue() ? `${cell.getValue()}${col.formatter}` : '';
+          nuevaCol.formatter = (cell) => cell.getValue() !== null ? `${cell.getValue()}${col.formatter}` : '';
         }
       }
 
       if (col.dropdown) {
-        nuevaCol.headerFilter = 'list';
-        nuevaCol.headerFilterFunc = 'in';
-        nuevaCol.headerFilterParams = { valuesLookup: 'active', sort: "asc", multiselect: true, placeholderLoading: 'Cargando resultados...', placeholderEmpty: 'Sin resultados' };
+
+        if (col.type === 'boolean') {
+          nuevaCol.headerFilter = 'tickCross';
+          nuevaCol.headerFilterParams = { tristate: true };
+        } else {
+          nuevaCol.headerFilter = 'list';
+          nuevaCol.headerFilterFunc = 'in';
+          nuevaCol.headerFilterParams = { valuesLookup: 'active', sort: "asc", multiselect: true, placeholderLoading: 'Cargando resultados...', placeholderEmpty: 'Sin resultados' };
+        }
       }
 
       devol.push(nuevaCol)
