@@ -38,8 +38,7 @@ export class TabulatorService {
       { title: 'Tiene lote', field: 'tiene_lote', type: 'boolean', dropdown: true },
       { title: 'Marca', field: 'marca', type: 'string', dropdown: true },
       { title: 'Descuento por defecto', field: 'descuento_default', type: 'number', formatter: '%' },
-      { title: 'Grupos', field: 'grupos', type: 'string', dropdown: true },
-      //Grupo - leer notas, puede pertenecer a más de 1 grupo - stringificar como en los ean13 pero en el desplegable del filtro hacer llamada api para conseguir los Grupos y hacer un 'like'
+      { title: 'Grupos', field: 'grupos', type: 'string', dropdown: true }
     ]
 
     return this.complementarColumnas(columnas);

@@ -34,21 +34,29 @@ export class ListaArticulosComponent {
     this.cargaTablaArticulos = 0;
 
     const listaLlamadas: Array<Observable<any>> = [
-      from(this._supabase.supabase.from('articulos').select('*, proveedores(nombre), familias(nombre), subfamilias(nombre), ivas(valor_iva), marcas(nombre), articulos_grupos(grupo_codigo,  grupos_articulos(nombre))').order('codigo'))
+      from(this._supabase.supabase.from('articulos').select('*, proveedores(nombre), familias(nombre), subfamilias(nombre), ivas(valor_iva), marcas(nombre), articulos_grupos(grupo_codigo,  grupos_articulos(nombre))').order('codigo')),
+      from(this._supabase.supabase.from('grupos_articulos').select('nombre').order('codigo'))
     ]
 
     forkJoin(listaLlamadas.map((obs$) => obs$.pipe(tap(() => { if (this.cargaTablaArticulos !== -1) this.cargaTablaArticulos += 100 / listaLlamadas.length })))).subscribe({
-      next: ([{ data }]) => {
+      next: ([{ data: filas }, { data: listaGrupos }]) => {
 
-        data = this.tratamientoFilas(data);
-        console.log(data);
+        filas = this.tratamientoFilas(filas);
+
+        let cabecera = this._tabulator.getHeaderTablaArticulos();
+
+        let columnaGrupos = cabecera.find(col => col.field === 'grupos');
+        (columnaGrupos!.headerFilterParams as any).values = listaGrupos.map((grupo: { nombre: string }) => grupo.nombre);
+        (columnaGrupos!.headerFilterFunc as any) = (headerValue: any, rowValue: any, rowData: any, filterParams: any) => { return headerValue.some((valor: string) => rowValue.includes(valor)) };
+        delete (columnaGrupos!.headerFilterParams! as any).valuesLookup;
+
 
         if (this.componenteTabla?.tabla) {
-          this.componenteTabla.sustituirDatos(this._utils.convertirEnFormatoTabla(data))
+          this.componenteTabla.sustituirDatos(this._utils.convertirEnFormatoTabla(filas))
         } else {
           this.datosTabla = {
-            cabecera: this._tabulator.getHeaderTablaArticulos(),
-            tableData: this._utils.convertirEnFormatoTabla(data),
+            cabecera,
+            tableData: this._utils.convertirEnFormatoTabla(filas),
             options: {
               title: 'Lista de Artículos',
               height: '500px',
