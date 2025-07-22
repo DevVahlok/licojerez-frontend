@@ -26,3 +26,37 @@
     </div>
 
 </mat-menu>
+
+<ng-template #dialogErrorExcel>
+
+    <div class="container-general__dialog-error-excel">
+
+        <h1>Error en la importación</h1>
+
+        <div class="detalles-errores">
+            <span class="texto">{{errorExcel.message}}</span>
+
+            <span class="texto">Encontrado en:</span>
+
+            <cdk-virtual-scroll-viewport appendOnly itemSize="10" class="container-lista-registro">
+
+                <ng-container *cdkVirtualFor="let registro of errorExcel.data">
+
+                    <span class="texto">
+                        <span><strong>Nombre: </strong> {{registro.nombre}}</span>
+                        <span><strong>{{errorExcel.field}}: </strong> {{registro[errorExcel.field]}}</span>
+                    </span>
+
+                </ng-container>
+
+            </cdk-virtual-scroll-viewport>
+
+        </div>
+
+        <div class="container-botones-accion">
+            <button mat-button (click)="_dialog.closeAll()">Salir</button>
+        </div>
+
+    </div>
+
+</ng-template>

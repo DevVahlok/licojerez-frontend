@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core'
 import { createClient, SupabaseClient, User } from '@supabase/supabase-js'
 import { environment } from 'src/environments/environment'
 import * as XLSX from 'xlsx';
+import { UtilsService } from '../utils-v2/utils.service';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +11,7 @@ export class SupabaseService {
   public supabase: SupabaseClient;
   private user: any;
 
-  constructor() {
+  constructor(private _utils: UtilsService) {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey)
   }
 
@@ -42,19 +43,26 @@ export class SupabaseService {
     return this.supabase.auth.getSession();
   }
 
-  async subirExcelTablaArticulos(archivo: File): Promise<{ success: boolean; inserted?: number; error?: string; }> {
+  async subirExcelTablaArticulos(archivo: File): Promise<{ success: boolean; data?: any[]; error?: 'supabase' | 'duplicated', showError?: string, errorField?: string }> {
     const columnMap: { [key: string]: string } = {
       'codigo': 'codigo',
       'descripcion': 'nombre',
-      'ean13': 'ean13',
-      'alta': 'fecha_alta',
-      'existencia': 'stock',
       'costo': 'precio_coste',
-      // 'venta': 'precio_venta',
-      // 'proveedor': 'proveedor',
-      // 'familia': 'familia',
+      'venta': 'precio_venta',
+      'ean13': 'ean13_1',
+      'existencia': 'stock',
+      'proveedor': 'proveedor',
+      'tipo': 'tipo',
+      'familia': 'familia',
+      'iva': 'iva',
+      'margen': 'margen',
+      'activo': 'activo',
+      'comision': 'comision_default',
+      'alta': 'fecha_alta',
+      'chasis': 'tiene_lote',
+      'descuento': 'descuento_default'
     };
-    const numericFields = ['precio_coste', 'ean13', 'stock'];
+    const numericFields = ['codigo', 'precio_coste', 'precio_venta', 'ean13', 'stock', 'ean13_1', 'proveedor', 'familia', 'margen', 'comision_default', 'descuento_default'];
     const dateFields = ['fecha_alta'];
 
     try {
@@ -72,10 +80,7 @@ export class SupabaseService {
         reader.readAsBinaryString(archivo);
       });
 
-      const wb: XLSX.WorkBook = XLSX.read(bstr, {
-        type: 'binary',
-        cellDates: true
-      });
+      const wb: XLSX.WorkBook = XLSX.read(bstr, { type: 'binary', cellDates: true });
 
       const wsname = wb.SheetNames[0];
       const ws = wb.Sheets[wsname];
@@ -90,7 +95,7 @@ export class SupabaseService {
           let value = row[key];
 
           if (numericFields.includes(dbField)) {
-            const numberValue = Number(value);
+            const numberValue = parseFloat(Number(value).toFixed(2));
             newRow[dbField] = isNaN(numberValue) ? null : numberValue;
 
           } else if (dateFields.includes(dbField)) {
@@ -116,20 +121,69 @@ export class SupabaseService {
         return newRow;
       });
 
+      //Tratamiento datos
+
+      ///////////Campo código
+
+      //Convertir todos los códigos a número 
+      const productosConCodigoNumerico = mappedData.map(p => ({ ...p, codigo: Number(p.codigo) }));
+
+      // Paso 2: Contar ocurrencias de cada código
+      const contador = new Map<number, number>();
+
+      for (const producto of productosConCodigoNumerico) {
+        const codigo = producto.codigo;
+        contador.set(codigo, (contador.get(codigo) || 0) + 1);
+      }
+
+      // Paso 3: Filtrar los códigos que aparecen más de una vez
+      const codigosDuplicados = Array.from(contador.entries()).filter(([_, count]) => count > 1).map(([codigo]) => codigo);
+
+      // Opcional: mostrar productos con código duplicado
+      const productosDuplicados = productosConCodigoNumerico.filter(p =>
+        codigosDuplicados.includes(p.codigo as number)
+      );
+
+      if (productosDuplicados.length > 0) {
+        this.anadirLog(`ha tenido un error al intentar añadir ${mappedData.length} artículos a través de un excel`, 'El excel contiene datos duplicados (columna "codigo")');
+        return { success: false, error: 'duplicated', data: productosDuplicados, showError: `El excel contiene datos duplicados (columna Código)`, errorField: 'codigo' };
+      }
+
+      const resIVA = await this.supabase.from('ivas').select('*').order('codigo');
+
+      mappedData.forEach(articulo => {
+
+        //Campo Stock
+        articulo.stock = Math.trunc(articulo.stock);
+
+        //Campo EAN13
+        articulo.ean13_1 = Number(articulo.ean13_1);
+        if (articulo.ean13_1 === 0) articulo.ean13_1 = null;
+
+        //Campo Tipo
+        articulo.tipo = articulo.tipo === 1 ? 'Material' : 'Servicio';
+        if (articulo.tipo === 'Servicio') articulo.stock = null;
+
+        //Campo IVA
+        if (articulo.iva === 'N') articulo.iva = resIVA.data?.find(iva => iva.valor_iva === 21).codigo;
+        if (articulo.iva === 'R') articulo.iva = resIVA.data?.find(iva => iva.valor_iva === 10).codigo;
+        if (articulo.iva === 'S') articulo.iva = resIVA.data?.find(iva => iva.valor_iva === 4).codigo;
+      })
+
       console.log(mappedData);
 
       const { error } = await this.supabase.from('articulos').insert(mappedData);
 
       if (error) {
         this.anadirLog(`ha tenido un error al intentar añadir ${mappedData.length} artículos a través de un excel`, error.message);
-        return { success: false, error: error.message };
+        return { success: false, error: 'supabase' };
       } else {
         this.anadirLog(`ha añadido ${mappedData.length} artículos a través de un excel`);
-        return { success: true, inserted: mappedData.length };
+        return { success: true, data: mappedData };
       }
     } catch (err: any) {
       this.anadirLog(`ha tenido un error al procesar un excel para añadir artículos`, err.message || err);
-      return { success: false, error: err.message || 'Error desconocido' };
+      return { success: false, error: 'supabase' };
     }
   }
 

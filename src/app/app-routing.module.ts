@@ -6,6 +6,7 @@ import { PrincipalComponent } from './core/components/principal/principal.compon
 import { ListaArticulosComponent } from './core/components/oficina/lista-articulos/lista-articulos.component';
 import { AuthGuard } from './core/services/guard/auth.guard';
 import { ListaLogsComponent } from './core/components/oficina/lista-logs/lista-logs.component';
+import { ListaProveedoresComponent } from './core/components/oficina/lista-proveedores/lista-proveedores.component';
 
 const routes: Routes = [
   {
@@ -15,6 +16,11 @@ const routes: Routes = [
         path: 'articulos',
         canActivate: [AuthGuard],
         component: ListaArticulosComponent
+      },
+      {
+        path: 'proveedores',
+        canActivate: [AuthGuard],
+        component: ListaProveedoresComponent
       },
       {
         path: 'logs',
