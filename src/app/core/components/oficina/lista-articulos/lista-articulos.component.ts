@@ -8,6 +8,7 @@ import { forkJoin, from, Observable, tap } from 'rxjs';
 import { TabulatorService } from 'src/app/core/services/tabulator/tabulator.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
+import { ColumnDefinition } from 'tabulator-tables';
 
 @Component({
   selector: 'app-lista-articulos',
@@ -38,24 +39,18 @@ export class ListaArticulosComponent {
       from(this._supabase.supabase.from('grupos_articulos').select('nombre').order('codigo'))
     ]
 
+    //TODO: hacer config tabla y descargas excel, csv
+
     forkJoin(listaLlamadas.map((obs$) => obs$.pipe(tap(() => { if (this.cargaTablaArticulos !== -1) this.cargaTablaArticulos += 100 / listaLlamadas.length })))).subscribe({
       next: ([{ data: filas }, { data: listaGrupos }]) => {
 
         filas = this.tratamientoFilas(filas);
 
-        let cabecera = this._tabulator.getHeaderTablaArticulos();
-
-        let columnaGrupos = cabecera.find(col => col.field === 'grupos');
-        (columnaGrupos!.headerFilterParams as any).values = listaGrupos.map((grupo: { nombre: string }) => grupo.nombre);
-        (columnaGrupos!.headerFilterFunc as any) = (headerValue: any, rowValue: any, rowData: any, filterParams: any) => { return headerValue.some((valor: string) => rowValue.includes(valor)) };
-        delete (columnaGrupos!.headerFilterParams! as any).valuesLookup;
-
-
         if (this.componenteTabla?.tabla) {
           this.componenteTabla.sustituirDatos(this._utils.convertirEnFormatoTabla(filas))
         } else {
           this.datosTabla = {
-            cabecera,
+            cabecera: this.tratamientoColumnas(this._tabulator.getHeaderTablaArticulos(), listaGrupos),
             tableData: this._utils.convertirEnFormatoTabla(filas),
             options: {
               title: 'Lista de Artículos',
@@ -163,5 +158,14 @@ export class ListaArticulosComponent {
     });
 
     return filas;
+  }
+
+  tratamientoColumnas(cabecera: ColumnDefinition[], listaGrupos: { nombre: string }[]) {
+    let columnaGrupos = cabecera.find(col => col.field === 'grupos');
+    (columnaGrupos!.headerFilterParams as any).values = listaGrupos.map((grupo: { nombre: string }) => grupo.nombre);
+    (columnaGrupos!.headerFilterFunc as any) = (headerValue: any, rowValue: any, rowData: any, filterParams: any) => { return headerValue.some((valor: string) => rowValue.includes(valor)) };
+    delete (columnaGrupos!.headerFilterParams! as any).valuesLookup;
+
+    return cabecera;
   }
 }
