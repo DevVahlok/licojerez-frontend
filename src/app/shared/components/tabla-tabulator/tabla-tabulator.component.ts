@@ -33,7 +33,7 @@ export interface DataTablaTabulator {
 export interface TablaTabulatorEvent {
   type: 'tabla-tabulator',
   name: string,
-  action: 'columnMoved' | 'rowClick' | 'cellClick' | 'cellContext' | 'tableBuilt' | 'upload' | 'columnResized' | 'configChanged' | 'filtersCleared' | 'rowSelected' | 'rowDeselected' | 'rowSelectionChanged' | 'dataFiltered',
+  action: 'columnMoved' | 'rowClick' | 'cellClick' | 'cellContext' | 'tableBuilt' | 'upload' | 'columnResized' | 'configChanged' | 'filtersCleared' | 'rowSelected' | 'rowDeselected' | 'rowSelectionChanged' | 'dataFiltered' | 'cellDblClick',
   value: ConfigTablaTabulator | any
 }
 
@@ -309,6 +309,10 @@ export class TablaTabulatorComponent implements OnInit {
 
     this.tabla.on('cellClick', (evento, celda) => {
       this.emitter.emit({ type: 'tabla-tabulator', action: 'cellClick', name: this.name, value: celda })
+    })
+
+    this.tabla.on('cellDblClick', (evento, celda) => {
+      this.emitter.emit({ type: 'tabla-tabulator', action: 'cellDblClick', name: this.name, value: celda })
     })
 
     this.tabla.on('cellContext', (evento, celda) => {

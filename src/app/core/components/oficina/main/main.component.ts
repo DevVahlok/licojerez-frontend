@@ -1,12 +1,10 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { SupabaseService } from '../../../services/supabase/supabase.service';
-
-interface Usuario {
-  name: string,
-  user: string
-}
+import { UtilsService } from 'src/app/core/services/utils-v2/utils.service';
+import { MatMenuTrigger } from '@angular/material/menu';
+import { Subscription } from 'rxjs';
 
 interface OpcionMenuLateral {
   title: string,
@@ -14,6 +12,18 @@ interface OpcionMenuLateral {
   iconFont: string,
   icon: string,
 }
+
+export interface ElementoMenuContextual {
+  title: string,
+  field: string,
+  value?: any,
+  name?: string,
+  expandible?: boolean,
+  expandibleValues?: ElementoMenuContextual[],
+  class?: string,
+  badge?: string
+}
+
 
 @Component({
   selector: 'app-main',
@@ -28,20 +38,40 @@ export class MainComponent {
     { title: 'Artículos', icon: 'liquor', iconFont: 'material-symbols-outlined', url: '/oficina/articulos' },
     { title: 'Proveedores', icon: 'local_shipping', iconFont: 'material-symbols-outlined', url: '/oficina/proveedores' },
     { title: 'Logs', icon: 'checkbook', iconFont: 'material-symbols-outlined', url: '/oficina/logs' },
-  ]
+  ];
+  public contextMenuPosition = { x: '0px', y: '0px' };
+  public listaElementosContextual: ElementoMenuContextual[] = [];
+  public subContextual: Subscription;
+  @ViewChild('trigger') contextMenu: MatMenuTrigger;
 
-  constructor(private _router: Router, public _dialog: MatDialog, private _supabase: SupabaseService) { }
+  constructor(public _router: Router, public _dialog: MatDialog, private _supabase: SupabaseService, private _utils: UtilsService) { }
 
   async ngOnInit() {
     this.user = await this._supabase.getUser();
-  }
 
-  abrirDialogMenuLateral() {
-
+    this.subContextual = this._utils.eventoMenuContextual.subscribe(res => {
+      if (res.type === 'open') {
+        this.abrirMenuContextual(res.options, res.position, res.copyElement, res.name);
+      }
+    })
   }
 
   cerrarSesion() {
     this._supabase.signOut();
     this._router.navigate(['/login']);
+  }
+
+  enviarEventoMenuContextual(opcion: any, opcionPadre?: any, name?: string) {
+    this._utils.clickOpcionMenuContextual(opcion, opcionPadre, name)
+  }
+
+  abrirMenuContextual(opciones: ElementoMenuContextual[], posicion: { x: number, y: number }, copiar?: any, name?: string) {
+    if (opciones && opciones.length > 0) {
+      this.listaElementosContextual = opciones;
+      this.contextMenuPosition.x = `${posicion.x}px`;
+      this.contextMenuPosition.y = `${posicion.y}px`;
+      this.contextMenu.menuData = { 'item': copiar ? copiar : null, 'name': name }
+      this.contextMenu.openMenu();
+    }
   }
 }

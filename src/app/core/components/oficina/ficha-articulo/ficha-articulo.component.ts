@@ -7,4 +7,10 @@ import { Component } from '@angular/core';
 })
 export class FichaArticuloComponent {
 
+  constructor() { }
+
+  ngOnInit() {
+
+  }
+
 }

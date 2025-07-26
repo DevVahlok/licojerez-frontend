@@ -2,6 +2,7 @@ import { EventEmitter, Injectable } from '@angular/core';
 import html2canvas from 'html2canvas';
 import { saveAs } from 'file-saver';
 import { DataUnitTablaTabulator } from 'src/app/shared/components/tabla-tabulator/tabla-tabulator.component';
+import { ElementoMenuContextual } from '../../components/oficina/main/main.component';
 
 @Injectable({
   providedIn: 'root'
@@ -49,5 +50,14 @@ export class UtilsService {
     });
 
     return filas;
+  }
+
+  clickOpcionMenuContextual(opcion: any, opcionPadre?: any, name?: string) {
+    this.eventoMenuContextual.emit({ type: 'click', opcion, opcionPadre, name })
+  }
+
+  abrirMenuContextual(evento: any, opciones: ElementoMenuContextual[], posicion: { x: number, y: number }, copiar?: any, name?: string) {
+    evento.preventDefault();
+    this.eventoMenuContextual.emit({ type: 'open', options: opciones, position: posicion, copyElement: copiar, name })
   }
 }

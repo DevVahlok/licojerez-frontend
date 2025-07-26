@@ -7,6 +7,7 @@ import { ListaArticulosComponent } from './core/components/oficina/lista-articul
 import { AuthGuard } from './core/services/guard/auth.guard';
 import { ListaLogsComponent } from './core/components/oficina/lista-logs/lista-logs.component';
 import { ListaProveedoresComponent } from './core/components/oficina/lista-proveedores/lista-proveedores.component';
+import { FichaArticuloComponent } from './core/components/oficina/ficha-articulo/ficha-articulo.component';
 
 const routes: Routes = [
   {
@@ -21,6 +22,16 @@ const routes: Routes = [
         path: 'proveedores',
         canActivate: [AuthGuard],
         component: ListaProveedoresComponent
+      },
+      {
+        path: 'articulo',
+        canActivate: [AuthGuard],
+        component: FichaArticuloComponent
+      },
+      {
+        path: 'articulo/:id',
+        canActivate: [AuthGuard],
+        component: FichaArticuloComponent
       },
       {
         path: 'logs',

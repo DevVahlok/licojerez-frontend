@@ -1,8 +1,15 @@
 <div class="container-general__lista-articulos">
 
     <div class="toolbar">
-        <button mat-button [matTooltip]="'Opciones'"
-            [matMenuTriggerFor]="menuOpciones"><mat-icon>settings</mat-icon></button>
+        <div class="seccion">
+            <button mat-button class="boton-crear-articulo" (click)="redirigirCrearArticulo()"><mat-icon>add</mat-icon>
+                Crear artículo</button>
+        </div>
+
+        <div class="seccion">
+            <button mat-button [matTooltip]="'Opciones'"
+                [matMenuTriggerFor]="menuOpciones"><mat-icon>settings</mat-icon></button>
+        </div>
     </div>
 
     <app-component-loading-manager [progress]="cargaTablaArticulos" [name]="'tablaArticulos'"
