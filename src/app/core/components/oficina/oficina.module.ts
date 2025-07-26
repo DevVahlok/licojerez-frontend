@@ -12,6 +12,8 @@ import { RouterModule } from '@angular/router';
 import { ListaProveedoresComponent } from './lista-proveedores/lista-proveedores.component';
 import { ConfiguracionArticulosComponent } from './configuracion-articulos/configuracion-articulos.component';
 import { FichaArticuloComponent } from './ficha-articulo/ficha-articulo.component';
+import { CrearArticuloComponent } from './ficha-articulo/crear-articulo/crear-articulo.component';
+import { EditarArticuloComponent } from './ficha-articulo/editar-articulo/editar-articulo.component';
 
 
 
@@ -22,7 +24,9 @@ import { FichaArticuloComponent } from './ficha-articulo/ficha-articulo.componen
     MainComponent,
     ListaProveedoresComponent,
     ConfiguracionArticulosComponent,
-    FichaArticuloComponent
+    FichaArticuloComponent,
+    CrearArticuloComponent,
+    EditarArticuloComponent
   ],
   imports: [
     CommonModule,

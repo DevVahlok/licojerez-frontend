@@ -1,0 +1,35 @@
+<div class="container-general__editar-articulo">
+
+    <div *ngIf="spinner" class="container-spinner">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <div *ngIf="!spinner">
+        <h1>{{articulo?.nombre}}</h1>
+
+        <div class="toolbar">
+            <button mat-button>Dar de baja</button>
+        </div>
+
+        <mat-tab-group animationDuration="0ms">
+
+            <mat-tab label="Ficha">
+
+                <form [formGroup]="formArticulo">
+
+                    <mat-form-field class="campo-codigo">
+                        <mat-label>Código</mat-label>
+                        <input matInput formControlName="codigo">
+                    </mat-form-field>
+
+                </form>
+
+            </mat-tab>
+
+            <mat-tab label="Historial">
+
+            </mat-tab>
+
+        </mat-tab-group>
+    </div>
+</div>

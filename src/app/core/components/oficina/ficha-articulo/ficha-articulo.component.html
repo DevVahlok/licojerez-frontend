@@ -1,1 +1,11 @@
-<p>ficha-articulo works!</p>
+<div class="container-general__ficha-articulo">
+
+    <ng-container *ngIf="modo === 'creacion'">
+        <app-crear-articulo></app-crear-articulo>
+    </ng-container>
+
+    <ng-container *ngIf="modo === 'edicion'">
+        <app-editar-articulo [id]="_id"></app-editar-articulo>
+    </ng-container>
+
+</div>

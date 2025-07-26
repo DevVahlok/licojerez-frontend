@@ -1,0 +1,29 @@
+@import './../../../../../../styles/variables';
+
+.container-general__editar-articulo {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+
+    .container-spinner {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+        margin-top: 50px;
+    }
+
+    h1 {
+        width: 100%;
+        text-align: center;
+    }
+
+    .toolbar {
+        margin-bottom: 50px;
+    }
+
+    form {
+        .campo-codigo {
+            width: 80px;
+        }
+    }
+}
