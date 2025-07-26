@@ -196,26 +196,24 @@ export class TabulatorService {
       config = cabecera.map((col, i) => { return { field: col.field, visible: true, order: i + 1, width: 150 } as ConfigTablaTabulator });
       await this._supabase.supabase.from('config_componentes').insert({ viewname, user: this.user.username, config });
     } else {
-      //console.log(config);
+      let configModificada = false;
 
-      /*       let configModificada = false;
-      
-            cabecera.forEach(col => {
-              if (!config.find(e => col.field === e.field)) {
-                config.push({ field: col.field!, order: config.length, visible: true, width: 150 });
-                configModificada = true;
-              }
-            });
-      
-            for (let i = config.length - 1; i >= 0; i--) {
-              if (!cabecera.find(col => col.field === config[i].field)) {
-                config.splice(i, 1);
-              }
-            }
-      
-            if (configModificada) {
-              await this._supabase.supabase.from('config_componentes').update({ config }).eq('viewname', viewname).eq('user', this.user.username);
-            } */
+      cabecera.forEach(col => {
+        if (!config.find(e => col.field === e.field)) {
+          config.push({ field: col.field!, order: config.length, visible: true, width: 150 });
+          configModificada = true;
+        }
+      });
+
+      for (let i = config.length - 1; i >= 0; i--) {
+        if (!cabecera.find(col => col.field === config[i].field)) {
+          config.splice(i, 1);
+        }
+      }
+
+      if (configModificada) {
+        await this._supabase.supabase.from('config_componentes').update({ config }).eq('viewname', viewname).eq('user', this.user.username);
+      }
     }
 
     return config;
