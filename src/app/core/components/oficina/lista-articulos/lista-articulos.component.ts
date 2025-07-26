@@ -112,7 +112,7 @@ export class ListaArticulosComponent {
         break;
 
       case 'cellContext':
-        this._utils.abrirMenuContextual(evento.value.event, [{ title: 'Abrir ficha del artículo', field: 'abrir-ficha', value: (evento.value.celda as CellComponent).getRow().getData()['codigo'] }], { x: evento.value.event.clientX, y: evento.value.event.clientY }, true)
+        this._utils.abrirMenuContextual(evento.value.event, [{ title: 'Abrir ficha del artículo', field: 'abrir-ficha', value: (evento.value.celda as CellComponent).getRow().getData()['codigo'] }], { x: evento.value.event.clientX, y: evento.value.event.clientY }, (evento.value.celda as CellComponent).getValue())
         break;
 
       case 'cellDblClick':
