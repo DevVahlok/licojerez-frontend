@@ -1,0 +1,27 @@
+<div class="container-general__dialog-config-tabla">
+
+    <h1>Configuración de columnas</h1>
+
+    <span class="container-marcar-todo__dialog-config-tabla"><mat-checkbox (change)="toggleMarcarTodo($event.checked)"
+            [checked]="marcarTodo">Marcar todo</mat-checkbox></span>
+
+    <div cdkDropList class="container-lista__dialog-config-tabla" (cdkDropListDropped)="drop($event)">
+
+        <ng-container *ngFor="let col of listaColumnas;let index = index;">
+
+            <div cdkDrag class="elemento-lista__dialog-config-tabla">
+                <mat-checkbox (change)="cambioCheckbox($event,index)" [checked]="col.visible">{{col.title}}
+                </mat-checkbox>
+                <mat-icon>drag_handle</mat-icon>
+            </div>
+
+        </ng-container>
+
+    </div>
+
+    <div class="container-acciones__dialog-config-tabla">
+        <button mat-button (click)="close(false)">Cerrar</button>
+        <button mat-button (click)="close(true)">Guardar</button>
+    </div>
+
+</div>

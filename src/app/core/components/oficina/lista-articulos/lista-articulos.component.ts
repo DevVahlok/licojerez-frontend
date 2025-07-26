@@ -23,11 +23,13 @@ export class ListaArticulosComponent {
   @ViewChild('componenteTabla') componenteTabla: TablaTabulatorComponent;
   @ViewChild('dialogErrorExcel') dialogErrorExcel: TemplateRef<any>;
   public errorExcel: { message: string, field: string, data: { nombre: string }[] };
+  public user: any;
 
   constructor(private _title: Title, private _supabase: SupabaseService, private _utils: UtilsService, private _tabulator: TabulatorService, private _snackbar: MatSnackBar, public _dialog: MatDialog) { }
 
-  ngOnInit() {
+  async ngOnInit() {
     this._title.setTitle('Artículos');
+    this.user = await this._supabase.getUser();
     this.cargarTablaArticulos();
   }
 
@@ -35,14 +37,13 @@ export class ListaArticulosComponent {
     this.cargaTablaArticulos = 0;
 
     const listaLlamadas: Array<Observable<any>> = [
-      from(this._supabase.supabase.from('articulos').select('*, proveedores(nombre), familias(nombre), subfamilias(nombre), ivas(valor_iva), marcas(nombre), articulos_grupos(grupo_codigo,  grupos_articulos(nombre))').order('codigo')),
-      from(this._supabase.supabase.from('grupos_articulos').select('nombre').order('codigo'))
+      from(this._supabase.supabase.from('articulos').select('*, proveedores(nombre), familias(nombre), subfamilias(nombre), ivas(valor_iva), marcas(nombre), articulos_grupos(grupo_codigo,  grupos_articulos(nombre))').order('nombre')),
+      from(this._supabase.supabase.from('grupos_articulos').select('nombre').order('nombre')),
+      from(this._supabase.supabase.from('config_componentes').select('*').eq('viewname', 'tabla-lista-articulos').eq('user', this.user.username).single())
     ]
 
-    //TODO: hacer config tabla y descargas excel, csv
-
     forkJoin(listaLlamadas.map((obs$) => obs$.pipe(tap(() => { if (this.cargaTablaArticulos !== -1) this.cargaTablaArticulos += 100 / listaLlamadas.length })))).subscribe({
-      next: ([{ data: filas }, { data: listaGrupos }]) => {
+      next: async ([{ data: filas }, { data: listaGrupos }, { data: configUsuario }]) => {
 
         filas = this.tratamientoFilas(filas);
 
@@ -52,19 +53,19 @@ export class ListaArticulosComponent {
           this.datosTabla = {
             cabecera: this.tratamientoColumnas(this._tabulator.getHeaderTablaArticulos(), listaGrupos),
             tableData: this._utils.convertirEnFormatoTabla(filas),
+            config: await this._tabulator.tratamientoConfigTabla(this._tabulator.getHeaderTablaArticulos(), 'tabla-lista-articulos', configUsuario.config),
             options: {
               title: 'Lista de Artículos',
               height: '500px',
+              movableColumns: true,
               layout: 'fitDataStretch',
-              actionBar: { config: true, download: true, upload: false }
+              actionBar: { config: true, download: true }
             },
             styles: { theme: 'dark' }
           }
         }
       },
-      error: (err) => {
-        this.cargaTablaArticulos = -1;
-      }
+      error: (err) => { this.cargaTablaArticulos = -1; }
     });
   }
 
@@ -92,25 +93,24 @@ export class ListaArticulosComponent {
     this.inputArchivo.nativeElement.click();
   }
 
-  recibirEventosTabulator(evento: TablaTabulatorEvent) {
+  async recibirEventosTabulator(evento: TablaTabulatorEvent) {
 
     switch (evento.action) {
       case 'columnMoved':
       case 'columnResized':
       case 'configChanged':
-        // this.guardarConfigTabla(evento)
+        await this._supabase.supabase.from('config_componentes').update({ config: evento.value }).eq('viewname', 'tabla-lista-articulos').eq('user', this.user.username);
         break;
 
       case 'cellContext':
         // this.clickDerechoCelda(evento)
         break;
 
-      case 'tableBuilt':
-        this.componenteTabla.tabla.setHeaderFilterValue('activo', true as any);
-        break;
-
-      case 'filtersCleared':
-        this.componenteTabla.tabla.setHeaderFilterValue('activo', true as any);
+      case 'dataFiltered':
+        if (this.componenteTabla.tabla.getFilters(true).find(col => col.field === 'grupos')?.value.length === 0) {
+          await this._utils.delay(5);
+          this.componenteTabla.tabla.getColumn('grupos').setHeaderFilterValue('')
+        }
         break;
     }
   }
@@ -155,6 +155,12 @@ export class ListaArticulosComponent {
       //Grupos
       fila.grupos = fila.articulos_grupos.map((grupo: any) => grupo.grupos_articulos.nombre).join(', ');
       delete fila.articulos_grupos;
+
+      //Activo
+      fila.activo = fila.activo ? 'Sí' : 'No';
+
+      //Tiene Lote
+      fila.tiene_lote = fila.tiene_lote ? 'Sí' : 'No';
     });
 
     return filas;

@@ -9,7 +9,7 @@
         [template]="containerTablaArticulos" (emitter)="eventosLoadingManager($event)"
         [size]="{height: '600px',width:'100%'}">
         <ng-template #containerTablaArticulos>
-            <app-tabla-tabulator [data]="datosTabla" (emitter)="recibirEventosTabulator($event)"
+            <app-tabla-tabulator [data]="datosTabla" (emitter)="recibirEventosTabulator($event)" *ngIf="datosTabla"
                 #componenteTabla></app-tabla-tabulator>
         </ng-template>
     </app-component-loading-manager>

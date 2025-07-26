@@ -59,10 +59,10 @@ export class SupabaseService {
       'activo': 'activo',
       'comision': 'comision_default',
       'alta': 'fecha_alta',
-      'chasis': 'tiene_lote',
-      'descuento': 'descuento_default'
+      'chasis': 'tiene_lote'
     };
-    const numericFields = ['codigo', 'precio_coste', 'precio_venta', 'ean13', 'stock', 'ean13_1', 'proveedor', 'familia', 'margen', 'comision_default', 'descuento_default'];
+    const numericFields = ['codigo', 'precio_coste', 'precio_venta', 'ean13', 'stock', 'ean13_1', 'proveedor', 'familia', 'margen', 'comision_default'];
+    const numericFields4Decimals = ['precio_coste', 'precio_venta'];
     const dateFields = ['fecha_alta'];
 
     try {
@@ -95,7 +95,7 @@ export class SupabaseService {
           let value = row[key];
 
           if (numericFields.includes(dbField)) {
-            const numberValue = parseFloat(Number(value).toFixed(2));
+            const numberValue = parseFloat(Number(value).toFixed(numericFields4Decimals.includes(columnMap[key]) ? 4 : 2));
             newRow[dbField] = isNaN(numberValue) ? null : numberValue;
 
           } else if (dateFields.includes(dbField)) {
@@ -168,6 +168,9 @@ export class SupabaseService {
         if (articulo.iva === 'N') articulo.iva = resIVA.data?.find(iva => iva.valor_iva === 21).codigo;
         if (articulo.iva === 'R') articulo.iva = resIVA.data?.find(iva => iva.valor_iva === 10).codigo;
         if (articulo.iva === 'S') articulo.iva = resIVA.data?.find(iva => iva.valor_iva === 4).codigo;
+
+        //Nombre
+        articulo.nombre = articulo.nombre.trim();
       })
 
       console.log(mappedData);
