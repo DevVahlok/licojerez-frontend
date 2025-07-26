@@ -12,7 +12,7 @@
         color: $acento;
     }
 
-    .container-marcar-todo__dialog-config-tabla {
+    .container-marcar-todo {
         margin-bottom: 10px;
 
         .mat-checkbox-frame {
@@ -20,7 +20,7 @@
         }
     }
 
-    .container-lista__dialog-config-tabla {
+    .container-lista {
         width: 100%;
         border: 1px solid $acento;
         border-radius: 5px;
@@ -30,14 +30,14 @@
         background: $texto;
     }
 
-    .container-acciones__dialog-config-tabla {
+    .container-acciones {
         display: flex;
         flex-flow: row nowrap;
         justify-content: center;
         margin: 15px 0;
 
         button:last-child {
-            background-color: $texto;
+            background-color: $acento;
             margin-left: 15px;
         }
     }
@@ -53,14 +53,14 @@
     flex-flow: row nowrap;
     justify-content: space-between;
     padding: 20px 10px;
-    background: $texto;
+    background: $tabulator_fila_impar;
     box-sizing: border-box;
     cursor: move;
-    color: $texto;
-    border-bottom: 1px solid $texto;
+    color: $texto_alt;
+    border-bottom: 1px solid $texto_alt;
 
     .mat-checkbox-frame {
-        border-color: $texto;
+        border-color: $texto_alt;
     }
 
     &:last-child {

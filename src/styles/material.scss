@@ -488,6 +488,7 @@
     }
 
     .mdc-checkbox__background {
+        background-color: transparent !important;
         border-color: $texto_alt !important;
     }
 }
@@ -527,6 +528,7 @@
 
     .mdc-checkbox__background {
         border-color: $acento !important;
+        background: $acento !important;
     }
 }
 
