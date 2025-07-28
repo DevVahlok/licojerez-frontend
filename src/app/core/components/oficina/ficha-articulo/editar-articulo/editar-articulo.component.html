@@ -22,6 +22,98 @@
                         <input matInput formControlName="codigo">
                     </mat-form-field>
 
+                    <mat-form-field>
+                        <mat-label>Fecha alta</mat-label>
+                        <input matInput formControlName="fecha_alta">
+                    </mat-form-field>
+
+                    <mat-form-field>
+                        <mat-label>Nombre</mat-label>
+                        <input matInput formControlName="nombre">
+                    </mat-form-field>
+
+                    <fieldset>
+                        <legend>Códigos de barras</legend>
+
+                        <mat-form-field>
+                            <mat-label>1 - EAN 13</mat-label>
+                            <input matInput formControlName="ean13_1">
+                        </mat-form-field>
+
+                        <ng-container *ngIf="formArticulo.get('ean13_1')!.value">
+                            <mat-form-field>
+                                <mat-label>2 - EAN 13</mat-label>
+                                <input matInput formControlName="ean13_2">
+                            </mat-form-field>
+                        </ng-container>
+
+                        <ng-container *ngIf="formArticulo.get('ean13_2')!.value">
+                            <mat-form-field>
+                                <mat-label>3 - EAN 13</mat-label>
+                                <input matInput formControlName="ean13_3">
+                            </mat-form-field>
+                        </ng-container>
+
+                        <ng-container *ngIf="formArticulo.get('ean13_3')!.value">
+                            <mat-form-field>
+                                <mat-label>4 - EAN 13</mat-label>
+                                <input matInput formControlName="ean13_4">
+                            </mat-form-field>
+                        </ng-container>
+
+                        <ng-container *ngIf="formArticulo.get('ean13_4')!.value">
+                            <mat-form-field>
+                                <mat-label>5 - EAN 13</mat-label>
+                                <input matInput formControlName="ean13_5">
+                            </mat-form-field>
+                        </ng-container>
+
+                    </fieldset>
+
+                    <mat-form-field>
+                        <mat-label>Stock</mat-label>
+                        <input matInput formControlName="stock">
+                    </mat-form-field>
+
+                    <mat-form-field>
+                        <mat-label>Precio coste</mat-label>
+                        <input matInput formControlName="precio_coste">
+                    </mat-form-field>
+
+                    <mat-form-field>
+                        <mat-label>Precio venta</mat-label>
+                        <input matInput formControlName="precio_venta">
+                    </mat-form-field>
+
+                    <mat-form-field>
+                        <mat-label>Tipo</mat-label>
+                        <input matInput formControlName="tipo">
+                        <mat-select formControlName="tipo">
+                            <mat-option [value]="'Material'">Material</mat-option>
+                            <mat-option [value]="'Servicio'">Servicio</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <!-- 
+
+//TODO:
+
+//estos desplegables pedir en query desde componente padre
+
+proveedor - desplegable
+familia - desplegable
+subfamilia - desplegable
+iva - desplegable
+marca - desplegable
+
+margen
+activo - switch
+comision_default
+tiene_lote - switch
+
+
+-->
+
                 </form>
 
             </mat-tab>

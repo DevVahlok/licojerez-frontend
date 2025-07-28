@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { FormGroup, FormControl } from '@angular/forms';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { SupabaseService } from 'src/app/core/services/supabase/supabase.service';
@@ -16,7 +16,27 @@ export class FichaArticuloComponent {
   public _id: number;
   public articulo: Articulo;
   public formArticulo = new FormGroup({
-    codigo: new FormControl(0),
+    codigo: new FormControl(0, Validators.required),
+    fecha_alta: new FormControl(null, Validators.required),
+    nombre: new FormControl(null, Validators.required),
+    ean13_1: new FormControl(null),
+    ean13_2: new FormControl(null),
+    ean13_3: new FormControl(null),
+    ean13_4: new FormControl(null),
+    ean13_5: new FormControl(null),
+    stock: new FormControl(null, Validators.required),
+    precio_coste: new FormControl(null, Validators.required),
+    tipo: new FormControl(null, Validators.required),
+    precio_venta: new FormControl(null, Validators.required),
+    idProveedor: new FormControl(null),
+    idFamilia: new FormControl(null),
+    idSubfamilia: new FormControl(null),
+    idIva: new FormControl(null, Validators.required),
+    margen: new FormControl(null, Validators.required),
+    activo: new FormControl(null, Validators.required),
+    comision_default: new FormControl(null),
+    tiene_lote: new FormControl(null, Validators.required),
+    idMarca: new FormControl(null)
   })
 
   constructor(private _title: Title, private _router: Router, public _supabase: SupabaseService) { }
