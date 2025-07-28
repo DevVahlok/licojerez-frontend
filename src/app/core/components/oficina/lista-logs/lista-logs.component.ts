@@ -24,7 +24,7 @@ export class ListaLogsComponent {
 
   public listaLogs: LogInterno[];
   public moment = moment;
-  @ViewChild('dialogDetalleLog') dialogDetalleLog: TemplateRef<any>;
+  @ViewChild('dialogDetalleLog') dialogDetalleLog: TemplateRef<null>;
   @ViewChild(CdkVirtualScrollViewport) viewport!: CdkVirtualScrollViewport;
   public detalleLog: string = '';
   public spinner: 1 | 0 | -1 = 0;

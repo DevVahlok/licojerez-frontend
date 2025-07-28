@@ -5,6 +5,7 @@ import { SupabaseService } from '../../../services/supabase/supabase.service';
 import { UtilsService } from 'src/app/core/services/utils-v2/utils.service';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { Subscription } from 'rxjs';
+import { UserLicojerez } from 'src/app/models/general';
 
 interface OpcionMenuLateral {
   title: string,
@@ -33,7 +34,7 @@ export interface ElementoMenuContextual {
 })
 export class MainComponent {
 
-  public user: any;
+  public user: UserLicojerez;
   public opcionesMenuLateral: OpcionMenuLateral[] = [
     { title: 'Artículos', icon: 'liquor', iconFont: 'material-symbols-outlined', url: '/oficina/articulos' },
     { title: 'Proveedores', icon: 'local_shipping', iconFont: 'material-symbols-outlined', url: '/oficina/proveedores' },
@@ -61,7 +62,7 @@ export class MainComponent {
     this._router.navigate(['/login']);
   }
 
-  enviarEventoMenuContextual(opcion: any, opcionPadre?: any, name?: string) {
+  enviarEventoMenuContextual(opcion: ElementoMenuContextual, opcionPadre?: any, name?: string) {
     this._utils.clickOpcionMenuContextual(opcion, opcionPadre, name)
   }
 

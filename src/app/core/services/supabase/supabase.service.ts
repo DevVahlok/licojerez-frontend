@@ -2,16 +2,16 @@ import { Injectable } from '@angular/core'
 import { createClient, SupabaseClient, User } from '@supabase/supabase-js'
 import { environment } from 'src/environments/environment'
 import * as XLSX from 'xlsx';
-import { UtilsService } from '../utils-v2/utils.service';
+import { UserLicojerez } from 'src/app/models/general';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SupabaseService {
   public supabase: SupabaseClient;
-  private user: any;
+  private user: UserLicojerez;
 
-  constructor(private _utils: UtilsService) {
+  constructor() {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey)
   }
 
@@ -28,6 +28,7 @@ export class SupabaseService {
       const { data } = await this.supabase.auth.getUser();
       if (data) await this.setUser(data.user!)
     }
+
     return this.user;
   }
 
@@ -172,8 +173,6 @@ export class SupabaseService {
         //Nombre
         articulo.nombre = articulo.nombre.trim();
       })
-
-      console.log(mappedData);
 
       const { error } = await this.supabase.from('articulos').insert(mappedData);
 

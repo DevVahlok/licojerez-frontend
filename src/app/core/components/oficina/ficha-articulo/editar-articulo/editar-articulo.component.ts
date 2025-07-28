@@ -30,8 +30,15 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
     this.articulo = data;
     this.spinner = false;
 
-    this.formArticulo.get('codigo')?.setValue(this.id)
-    console.log(data);
+
+
+
+    this.formArticulo.get('codigo')?.setValue(this.id);
+
+
+
+
+    this.formArticulo.get('codigo')?.disable();
   }
 
 }

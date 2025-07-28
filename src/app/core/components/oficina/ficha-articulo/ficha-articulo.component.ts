@@ -1,8 +1,9 @@
 import { Component, Input } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { FormGroup, FormControl } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { SupabaseService } from 'src/app/core/services/supabase/supabase.service';
+import { Articulo } from 'src/app/models/oficina';
 
 @Component({
   selector: 'app-ficha-articulo',
@@ -13,7 +14,7 @@ export class FichaArticuloComponent {
 
   public modo: 'creacion' | 'edicion';
   public _id: number;
-  public articulo: any;
+  public articulo: Articulo;
   public formArticulo = new FormGroup({
     codigo: new FormControl(0),
   })
@@ -22,7 +23,6 @@ export class FichaArticuloComponent {
 
   ngOnInit() {
     this.detectarModoEdicion();
-    this.establecerFormulario();
   }
 
   async detectarModoEdicion() {
@@ -48,8 +48,4 @@ export class FichaArticuloComponent {
   }
 
   protected onIdCambiada(valor: number): void { }
-
-  establecerFormulario() {
-    this.formArticulo.get('codigo')?.disable();
-  }
 }
