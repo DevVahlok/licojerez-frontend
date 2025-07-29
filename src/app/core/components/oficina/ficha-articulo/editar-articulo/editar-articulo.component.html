@@ -87,30 +87,50 @@
 
                     <mat-form-field>
                         <mat-label>Tipo</mat-label>
-                        <input matInput formControlName="tipo">
                         <mat-select formControlName="tipo">
                             <mat-option [value]="'Material'">Material</mat-option>
                             <mat-option [value]="'Servicio'">Servicio</mat-option>
                         </mat-select>
                     </mat-form-field>
 
+                    <mat-form-field>
+                        <mat-label>Comisión por defecto</mat-label>
+                        <input matInput formControlName="comision_default">
+                    </mat-form-field>
+
+                    <mat-form-field>
+                        <mat-label>Margen</mat-label>
+                        <input matInput formControlName="margen">
+                    </mat-form-field>
+
+                    <mat-form-field>
+                        <mat-label>Proveedor</mat-label>
+                        <mat-select formControlName="idProveedor">
+
+                            <ng-container *ngFor="let proveedor of listasDesplegables.proveedor">
+                                <mat-option [value]="proveedor.codigo">{{proveedor.nombre}}</mat-option>
+                            </ng-container>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-slide-toggle formControlName="activo">Activo</mat-slide-toggle>
+                    <mat-slide-toggle formControlName="tiene_lote">Tiene lotes</mat-slide-toggle>
+
+
+
+
                     <!-- 
 
 //TODO:
 
 //estos desplegables pedir en query desde componente padre
+//enseñar spinners en carga desplegables
 
 proveedor - desplegable
 familia - desplegable
 subfamilia - desplegable
 iva - desplegable
 marca - desplegable
-
-margen
-activo - switch
-comision_default
-tiene_lote - switch
-
 
 -->
 

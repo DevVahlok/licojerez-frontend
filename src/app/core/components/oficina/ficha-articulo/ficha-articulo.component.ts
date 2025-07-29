@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import { from } from 'rxjs';
 import { SupabaseService } from 'src/app/core/services/supabase/supabase.service';
 import { Articulo } from 'src/app/models/oficina';
 
@@ -37,12 +38,20 @@ export class FichaArticuloComponent {
     comision_default: new FormControl(null),
     tiene_lote: new FormControl(null, Validators.required),
     idMarca: new FormControl(null)
-  })
+  });
+  public listasDesplegables: { proveedor: { codigo: string, nombre: string }[] | null, familia: { codigo: string, nombre: string }[] | null, subfamilia: { codigo: string, nombre: string }[] | null, iva: { codigo: string, nombre: string }[] | null, marca: { codigo: string, nombre: string }[] | null, } = {
+    proveedor: null,
+    familia: null,
+    subfamilia: null,
+    iva: null,
+    marca: null,
+  }
 
   constructor(private _title: Title, private _router: Router, public _supabase: SupabaseService) { }
 
   ngOnInit() {
     this.detectarModoEdicion();
+    this.getListasDesplegables();
   }
 
   async detectarModoEdicion() {
@@ -56,6 +65,18 @@ export class FichaArticuloComponent {
       this.modo = 'edicion';
       this._title.setTitle('Edición de Artículo');
     }
+  }
+
+  getListasDesplegables() {
+
+    //TODO: por qué esta deprecated?
+    from(this._supabase.supabase.from('proveedores').select('*')).subscribe(res => {  //TODO: tipar res
+      //TODO: no aparece en el componente hijo, tal vez que hay que hacer un set/get?
+      this.listasDesplegables.proveedor = res.data?.map(prov => { return { codigo: prov.codigo as string, nombre: prov.nombre as string } })!; //TODO: prov es any
+    }, (err) => {
+
+    })
+
   }
 
   @Input() set id(value: number) {
