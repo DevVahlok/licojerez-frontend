@@ -1,10 +1,20 @@
 import { Component, Input } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { from } from 'rxjs';
 import { SupabaseService } from 'src/app/core/services/supabase/supabase.service';
-import { Articulo } from 'src/app/models/oficina';
+import { UtilsService } from 'src/app/core/services/utils-v2/utils.service';
+import { Articulo, Familia, Marca, Proveedor, Subfamilia } from 'src/app/models/oficina';
+
+interface ListaDesplegablesFichaArticulo {
+  proveedor: { codigo: string, nombre: string }[] | null,
+  familia: { codigo: string, nombre: string }[] | null,
+  subfamilia: { codigo: string, nombre: string }[] | null,
+  iva: { codigo: string, nombre: string }[] | null,
+  marca: { codigo: string, nombre: string }[] | null,
+}
 
 @Component({
   selector: 'app-ficha-articulo',
@@ -17,29 +27,29 @@ export class FichaArticuloComponent {
   public _id: number;
   public articulo: Articulo;
   public formArticulo = new FormGroup({
-    codigo: new FormControl(0, Validators.required),
-    fecha_alta: new FormControl(null, Validators.required),
-    nombre: new FormControl(null, Validators.required),
-    ean13_1: new FormControl(null),
-    ean13_2: new FormControl(null),
-    ean13_3: new FormControl(null),
-    ean13_4: new FormControl(null),
-    ean13_5: new FormControl(null),
-    stock: new FormControl(null, Validators.required),
-    precio_coste: new FormControl(null, Validators.required),
-    tipo: new FormControl(null, Validators.required),
-    precio_venta: new FormControl(null, Validators.required),
-    idProveedor: new FormControl(null),
-    idFamilia: new FormControl(null),
-    idSubfamilia: new FormControl(null),
-    idIva: new FormControl(null, Validators.required),
-    margen: new FormControl(null, Validators.required),
-    activo: new FormControl(null, Validators.required),
-    comision_default: new FormControl(null),
-    tiene_lote: new FormControl(null, Validators.required),
-    idMarca: new FormControl(null)
+    codigo: new FormControl(-1, Validators.required),
+    fecha_alta: new FormControl('', Validators.required),
+    nombre: new FormControl('', Validators.required),
+    ean13_1: new FormControl(0, Validators.pattern(/^-?\d+(\.\d+)?$/)),
+    ean13_2: new FormControl(0, Validators.pattern(/^-?\d+(\.\d+)?$/)),
+    ean13_3: new FormControl(0, Validators.pattern(/^-?\d+(\.\d+)?$/)),
+    ean13_4: new FormControl(0, Validators.pattern(/^-?\d+(\.\d+)?$/)),
+    ean13_5: new FormControl(0, Validators.pattern(/^-?\d+(\.\d+)?$/)),
+    stock: new FormControl(0, Validators.required),
+    precio_coste: new FormControl(0, Validators.required),
+    tipo: new FormControl('Material', Validators.required),
+    precio_venta: new FormControl(0, Validators.required),
+    idProveedor: new FormControl(-1),
+    idFamilia: new FormControl(-1),
+    idSubfamilia: new FormControl(-1),
+    idIva: new FormControl(-1, Validators.required),
+    margen: new FormControl(0, Validators.required),
+    activo: new FormControl(false, Validators.required),
+    comision_default: new FormControl(0),
+    tiene_lote: new FormControl(false, Validators.required),
+    idMarca: new FormControl(-1)
   });
-  public listasDesplegables: { proveedor: { codigo: string, nombre: string }[] | null, familia: { codigo: string, nombre: string }[] | null, subfamilia: { codigo: string, nombre: string }[] | null, iva: { codigo: string, nombre: string }[] | null, marca: { codigo: string, nombre: string }[] | null, } = {
+  public _listasDesplegables: ListaDesplegablesFichaArticulo = {
     proveedor: null,
     familia: null,
     subfamilia: null,
@@ -47,7 +57,7 @@ export class FichaArticuloComponent {
     marca: null,
   }
 
-  constructor(private _title: Title, private _router: Router, public _supabase: SupabaseService) { }
+  constructor(private _title: Title, private _router: Router, public _supabase: SupabaseService, protected _snackbar: MatSnackBar) { }
 
   ngOnInit() {
     this.detectarModoEdicion();
@@ -67,16 +77,31 @@ export class FichaArticuloComponent {
     }
   }
 
-  getListasDesplegables() {
+  async getListasDesplegables() {
 
-    //TODO: por qué esta deprecated?
-    from(this._supabase.supabase.from('proveedores').select('*')).subscribe(res => {  //TODO: tipar res
-      //TODO: no aparece en el componente hijo, tal vez que hay que hacer un set/get?
-      this.listasDesplegables.proveedor = res.data?.map(prov => { return { codigo: prov.codigo as string, nombre: prov.nombre as string } })!; //TODO: prov es any
-    }, (err) => {
+    from(this._supabase.supabase.from<any, Proveedor[]>('proveedores').select('*')).subscribe(async ({ data, error }) => {
+      if (!error) {
+        this.listasDesplegables.proveedor = data?.map(prov => { return { codigo: prov.codigo, nombre: prov.nombre } })!;
+      }
+    });
 
-    })
+    from(this._supabase.supabase.from<any, Familia[]>('familias').select('*')).subscribe(({ data, error }) => {
+      if (!error) {
+        this.listasDesplegables.familia = data?.map(fam => { return { codigo: fam.codigo, nombre: fam.nombre } })!;
+      }
+    });
 
+    from(this._supabase.supabase.from<any, Subfamilia[]>('subfamilias').select('*')).subscribe(({ data, error }) => {
+      if (!error) {
+        this.listasDesplegables.subfamilia = data?.map(subfam => { return { codigo: subfam.codigo, nombre: subfam.nombre } })!;
+      }
+    });
+
+    from(this._supabase.supabase.from<any, Marca[]>('marcas').select('*')).subscribe(({ data, error }) => {
+      if (!error) {
+        this.listasDesplegables.marca = data?.map(marca => { return { codigo: marca.codigo, nombre: marca.nombre } })!;
+      }
+    });
   }
 
   @Input() set id(value: number) {
@@ -84,9 +109,16 @@ export class FichaArticuloComponent {
     this.onIdCambiada(value);
   }
 
-  get id(): number {
-    return this._id;
-  }
+  get id(): number { return this._id; }
 
   protected onIdCambiada(valor: number): void { }
+
+  @Input() set listasDesplegables(value: ListaDesplegablesFichaArticulo) {
+    this._listasDesplegables = value;
+    this.onListasDesplegablesCambiada(value);
+  }
+
+  get listasDesplegables(): ListaDesplegablesFichaArticulo { return this._listasDesplegables; }
+
+  protected onListasDesplegablesCambiada(valor: ListaDesplegablesFichaArticulo): void { }
 }

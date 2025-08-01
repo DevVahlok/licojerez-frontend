@@ -1,6 +1,8 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { FichaArticuloComponent } from '../ficha-articulo.component';
 import moment from 'moment';
+import { Articulo } from 'src/app/models/oficina';
+import { RealtimeChannel } from '@supabase/supabase-js';
 
 @Component({
   selector: 'app-editar-articulo',
@@ -11,6 +13,8 @@ import moment from 'moment';
 export class EditarArticuloComponent extends FichaArticuloComponent {
 
   public spinner: boolean = false;
+  private timer: NodeJS.Timeout;
+  private suscripcionArticulo: RealtimeChannel;
 
   override ngOnInit(): void {
     this.spinner = true;
@@ -21,6 +25,22 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
   }
 
   async conseguirArticulo() {
+
+    //TODO: aplicar sockets a cada desplegable (cada vez que se crea una subfamilia, por ejemplo)
+
+    //TODO: añadir buscadores a los desplegables
+
+    //TODO: remaquetar apartado tarifas
+
+    //TODO: añadir formatter € en los campos
+
+    this.suscripcionArticulo = this._supabase.supabase.channel(`articulo-${this.id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'articulos', filter: `codigo=eq.${this.id}` }, payload => {
+        console.log(payload);
+        this.articulo = payload.new as Articulo;
+        this.formArticulo.setValue(this.tratamientoPreFormulario())
+      }).subscribe();
+
     const { data, error } = await this._supabase.supabase.from('articulos').select('*').eq('codigo', this.id).single();
 
     if (error) {
@@ -29,7 +49,6 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
     }
 
     console.log(data);
-
 
     this.articulo = data;
     this.spinner = false;
@@ -64,6 +83,33 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
       comision_default: this.articulo.comision_default,
       tiene_lote: this.articulo.tiene_lote,
       idMarca: this.articulo.idMarca
-    } as any
+    }
+  }
+
+  editarCampo<K extends keyof Articulo>(campo: K) {
+
+    const camposSinDelay = ['activo', 'tiene_lote', 'tipo']
+
+    clearTimeout(this.timer);
+
+    if (this.formArticulo.get(campo)?.valid) {
+      this.timer = setTimeout(async () => {
+
+        if (this.formArticulo.get(campo)!.value === '') this.formArticulo.get(campo)!.setValue(null as any);
+
+        const { error } = await this._supabase.supabase.from('articulos').update({ [campo]: this.formArticulo.get(campo)!.value }).eq('codigo', this.id)
+        //TODO: logs
+        if (error) {
+          this._snackbar.open(`Ha habido un error al modificar el campo: ${campo}`, undefined, { duration: 7000 });
+        } else {
+          this.articulo[campo] = this.formArticulo.get(campo)!.value as Articulo[K];
+        }
+
+      }, (camposSinDelay.includes(campo) ? 0 : 500));
+    }
+  }
+
+  ngOnDestroy() {
+    this._supabase.supabase.removeChannel(this.suscripcionArticulo);
   }
 }

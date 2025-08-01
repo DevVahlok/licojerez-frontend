@@ -9,136 +9,238 @@
 
         <div class="toolbar">
             <button mat-button>Dar de baja</button>
+            <button mat-button>Clonar artículo</button>
+            <button mat-button>Crear nuevo artículo</button>
+            <button mat-button>Añadir etiqueta</button>
         </div>
 
-        <mat-tab-group animationDuration="0ms">
+        <mat-tab-group>
 
             <mat-tab label="Ficha">
 
-                <form [formGroup]="formArticulo">
+                <form [formGroup]="formArticulo" *ngIf="formArticulo">
 
-                    <mat-form-field class="campo-codigo">
-                        <mat-label>Código</mat-label>
-                        <input matInput formControlName="codigo">
-                    </mat-form-field>
+                    <div class="container-izq">
 
-                    <mat-form-field>
-                        <mat-label>Fecha alta</mat-label>
-                        <input matInput formControlName="fecha_alta">
-                    </mat-form-field>
-
-                    <mat-form-field>
-                        <mat-label>Nombre</mat-label>
-                        <input matInput formControlName="nombre">
-                    </mat-form-field>
-
-                    <fieldset>
-                        <legend>Códigos de barras</legend>
-
-                        <mat-form-field>
-                            <mat-label>1 - EAN 13</mat-label>
-                            <input matInput formControlName="ean13_1">
-                        </mat-form-field>
-
-                        <ng-container *ngIf="formArticulo.get('ean13_1')!.value">
-                            <mat-form-field>
-                                <mat-label>2 - EAN 13</mat-label>
-                                <input matInput formControlName="ean13_2">
+                        <div class="fila">
+                            <mat-form-field class="campo-codigo">
+                                <mat-label>Código</mat-label>
+                                <input matInput formControlName="codigo">
                             </mat-form-field>
-                        </ng-container>
 
-                        <ng-container *ngIf="formArticulo.get('ean13_2')!.value">
-                            <mat-form-field>
-                                <mat-label>3 - EAN 13</mat-label>
-                                <input matInput formControlName="ean13_3">
+                            <mat-form-field class="campo-nombre">
+                                <mat-label>Nombre</mat-label>
+                                <input matInput formControlName="nombre" (input)="editarCampo('nombre')">
+                                <mat-error *ngIf="formArticulo?.get('nombre')?.errors?.['required']">El nombre es
+                                    obligatorio</mat-error>
                             </mat-form-field>
-                        </ng-container>
 
-                        <ng-container *ngIf="formArticulo.get('ean13_3')!.value">
                             <mat-form-field>
-                                <mat-label>4 - EAN 13</mat-label>
-                                <input matInput formControlName="ean13_4">
+                                <mat-label>Fecha alta</mat-label>
+                                <input matInput formControlName="fecha_alta">
                             </mat-form-field>
-                        </ng-container>
 
-                        <ng-container *ngIf="formArticulo.get('ean13_4')!.value">
+                            <div class="container-switch">
+                                <mat-slide-toggle formControlName="activo"
+                                    (change)="editarCampo('activo')">Activo</mat-slide-toggle>
+                                <mat-slide-toggle formControlName="tiene_lote"
+                                    (change)="editarCampo('tiene_lote')">Tiene
+                                    lotes</mat-slide-toggle>
+                            </div>
+
                             <mat-form-field>
-                                <mat-label>5 - EAN 13</mat-label>
-                                <input matInput formControlName="ean13_5">
+                                <mat-label>Tipo</mat-label>
+                                <mat-select formControlName="tipo" (selectionChange)="editarCampo('tipo')">
+                                    <mat-option [value]="'Material'">Material</mat-option>
+                                    <mat-option [value]="'Servicio'">Servicio</mat-option>
+                                </mat-select>
                             </mat-form-field>
-                        </ng-container>
+                        </div>
 
-                    </fieldset>
+                        <div class="fila">
 
-                    <mat-form-field>
-                        <mat-label>Stock</mat-label>
-                        <input matInput formControlName="stock">
-                    </mat-form-field>
+                            <fieldset class="container-agrupaciones">
+                                <legend>Agrupaciones</legend>
 
-                    <mat-form-field>
-                        <mat-label>Precio coste</mat-label>
-                        <input matInput formControlName="precio_coste">
-                    </mat-form-field>
+                                <div class="container-selector">
+                                    <mat-form-field class="campo-proveedor">
+                                        <mat-label>Proveedor</mat-label>
+                                        <mat-select formControlName="idProveedor"
+                                            (selectionChange)="editarCampo('idProveedor')">
+                                            <ng-container *ngFor="let proveedor of listasDesplegables.proveedor">
+                                                <mat-option [value]="proveedor.codigo">{{proveedor.nombre}}</mat-option>
+                                            </ng-container>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-spinner [diameter]="35" *ngIf="!listasDesplegables.proveedor"></mat-spinner>
+                                </div>
 
-                    <mat-form-field>
-                        <mat-label>Precio venta</mat-label>
-                        <input matInput formControlName="precio_venta">
-                    </mat-form-field>
+                                <div class="container-selector">
+                                    <mat-form-field class="campo-familia">
+                                        <mat-label>Familia</mat-label>
+                                        <mat-select formControlName="idFamilia"
+                                            (selectionChange)="editarCampo('idFamilia')">
+                                            <ng-container *ngFor="let familia of listasDesplegables.familia">
+                                                <mat-option [value]="familia.codigo">{{familia.nombre}}</mat-option>
+                                            </ng-container>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-spinner [diameter]="35" *ngIf="!listasDesplegables.familia"></mat-spinner>
+                                </div>
 
-                    <mat-form-field>
-                        <mat-label>Tipo</mat-label>
-                        <mat-select formControlName="tipo">
-                            <mat-option [value]="'Material'">Material</mat-option>
-                            <mat-option [value]="'Servicio'">Servicio</mat-option>
-                        </mat-select>
-                    </mat-form-field>
+                                <div class="container-selector">
+                                    <mat-form-field class="campo-subfamilia">
+                                        <mat-label>Subfamilia</mat-label>
+                                        <mat-select formControlName="idSubfamilia"
+                                            (selectionChange)="editarCampo('idSubfamilia')">
+                                            <ng-container *ngFor="let subfamilia of listasDesplegables.subfamilia">
+                                                <mat-option
+                                                    [value]="subfamilia.codigo">{{subfamilia.nombre}}</mat-option>
+                                            </ng-container>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-spinner [diameter]="35" *ngIf="!listasDesplegables.subfamilia"></mat-spinner>
+                                </div>
 
-                    <mat-form-field>
-                        <mat-label>Comisión por defecto</mat-label>
-                        <input matInput formControlName="comision_default">
-                    </mat-form-field>
+                                <div class="container-selector">
+                                    <mat-form-field class="campo-marca">
+                                        <mat-label>Marca</mat-label>
+                                        <mat-select formControlName="idMarca"
+                                            (selectionChange)="editarCampo('idMarca')">
+                                            <ng-container *ngFor="let marca of listasDesplegables.marca">
+                                                <mat-option [value]="marca.codigo">{{marca.nombre}}</mat-option>
+                                            </ng-container>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-spinner [diameter]="35" *ngIf="!listasDesplegables.marca"></mat-spinner>
+                                </div>
 
-                    <mat-form-field>
-                        <mat-label>Margen</mat-label>
-                        <input matInput formControlName="margen">
-                    </mat-form-field>
+                            </fieldset>
 
-                    <mat-form-field>
-                        <mat-label>Proveedor</mat-label>
-                        <mat-select formControlName="idProveedor">
+                        </div>
 
-                            <ng-container *ngFor="let proveedor of listasDesplegables.proveedor">
-                                <mat-option [value]="proveedor.codigo">{{proveedor.nombre}}</mat-option>
+                        <div class="fila">
+
+                            <fieldset>
+                                <legend>Tarifas</legend>
+
+                                <mat-form-field>
+                                    <mat-label>Stock</mat-label>
+                                    <input matInput formControlName="stock">
+                                </mat-form-field>
+
+                                <mat-form-field>
+                                    <mat-label>Precio coste</mat-label>
+                                    <input matInput formControlName="precio_coste">
+                                </mat-form-field>
+
+                                <mat-form-field>
+                                    <mat-label>Precio venta</mat-label>
+                                    <input matInput formControlName="precio_venta">
+                                </mat-form-field>
+
+                                <mat-form-field>
+                                    <mat-label>Comisión por defecto</mat-label>
+                                    <input matInput formControlName="comision_default">
+                                </mat-form-field>
+
+                                <mat-form-field>
+                                    <mat-label>Margen</mat-label>
+                                    <input matInput formControlName="margen">
+                                </mat-form-field>
+
+                            </fieldset>
+
+                        </div>
+
+                        <div class="fila">
+
+
+
+                        </div>
+
+
+                    </div>
+
+                    <div class="container-der">
+                        <fieldset class="container-ean">
+                            <legend>Códigos de barras</legend>
+
+                            <mat-form-field>
+                                <mat-label>1 - EAN 13</mat-label>
+                                <input matInput formControlName="ean13_1" (input)="editarCampo('ean13_1')">
+                                <mat-error *ngIf="formArticulo?.get('ean13_1')?.errors?.['pattern']">El campo debe ser
+                                    numérico.</mat-error>
+                            </mat-form-field>
+
+                            <ng-container>
+                                <mat-form-field>
+                                    <mat-label>2 - EAN 13</mat-label>
+                                    <input matInput formControlName="ean13_2" (input)="editarCampo('ean13_2')">
+                                    <mat-error *ngIf="formArticulo?.get('ean13_2')?.errors?.['pattern']">El campo debe
+                                        ser numérico.</mat-error>
+                                </mat-form-field>
                             </ng-container>
-                        </mat-select>
-                    </mat-form-field>
 
-                    <mat-slide-toggle formControlName="activo">Activo</mat-slide-toggle>
-                    <mat-slide-toggle formControlName="tiene_lote">Tiene lotes</mat-slide-toggle>
+                            <ng-container>
+                                <mat-form-field>
+                                    <mat-label>3 - EAN 13</mat-label>
+                                    <input matInput formControlName="ean13_3" (input)="editarCampo('ean13_3')">
+                                    <mat-error *ngIf="formArticulo?.get('ean13_3')?.errors?.['pattern']">El campo debe
+                                        ser numérico.</mat-error>
+                                </mat-form-field>
+                            </ng-container>
 
+                            <ng-container>
+                                <mat-form-field>
+                                    <mat-label>4 - EAN 13</mat-label>
+                                    <input matInput formControlName="ean13_4" (input)="editarCampo('ean13_4')">
+                                    <mat-error *ngIf="formArticulo?.get('ean13_4')?.errors?.['pattern']">El campo debe
+                                        ser numérico.</mat-error>
+                                </mat-form-field>
+                            </ng-container>
 
+                            <ng-container>
+                                <mat-form-field>
+                                    <mat-label>5 - EAN 13</mat-label>
+                                    <input matInput formControlName="ean13_5" (input)="editarCampo('ean13_5')">
+                                    <mat-error *ngIf="formArticulo?.get('ean13_5')?.errors?.['pattern']">El campo debe
+                                        ser numérico.</mat-error>
+                                </mat-form-field>
+                            </ng-container>
 
-
-                    <!-- 
-
-//TODO:
-
-//estos desplegables pedir en query desde componente padre
-//enseñar spinners en carga desplegables
-
-proveedor - desplegable
-familia - desplegable
-subfamilia - desplegable
-iva - desplegable
-marca - desplegable
-
--->
+                        </fieldset>
+                    </div>
 
                 </form>
 
             </mat-tab>
 
+            <mat-tab label="Tabla">
+
+            </mat-tab>
+
             <mat-tab label="Historial">
+
+            </mat-tab>
+
+            <mat-tab label="Situación">
+
+            </mat-tab>
+
+            <mat-tab label="Proveedores">
+
+            </mat-tab>
+
+            <mat-tab label="Otros datos">
+
+            </mat-tab>
+
+            <mat-tab label="Equivalencias">
+
+            </mat-tab>
+
+            <mat-tab label="Documentos">
 
             </mat-tab>
 

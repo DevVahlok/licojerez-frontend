@@ -14,7 +14,9 @@ import { ElementoMenuContextual } from '../main/main.component';
 import { UserLicojerez } from 'src/app/models/general';
 import { Articulo, ConfigTabla } from 'src/app/models/oficina';
 
-interface ArticuloSupabase extends Articulo {
+type Override<T, R> = Omit<T, keyof R> & R;
+
+interface ArticuloSupabase extends Override<Articulo, { activo: string, tiene_lote: string }> {
   proveedores: { nombre: string },
   familias: { nombre: string },
   subfamilias: { nombre: string },
@@ -28,6 +30,8 @@ interface ArticuloSupabase extends Articulo {
   iva?: number,
   marca?: string,
   grupos?: string,
+  activo: string,
+  tiene_lote: string,
 }
 
 @Component({

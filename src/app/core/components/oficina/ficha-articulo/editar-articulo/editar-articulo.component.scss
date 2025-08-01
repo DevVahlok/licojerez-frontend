@@ -19,11 +19,104 @@
 
     .toolbar {
         margin-bottom: 50px;
+
+        button {
+            margin-right: 15px;
+        }
     }
 
     form {
-        .campo-codigo {
-            width: 80px;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-around;
+
+        .mat-mdc-form-field {
+            margin-right: 25px;
+            height: fit-content;
+        }
+
+        .container-selector {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: flex-start;
+
+            .mat-mdc-progress-spinner {
+                margin: auto 0 auto 10px;
+            }
+        }
+
+        fieldset {
+            border-color: $acento;
+            border-radius: 5px;
+        }
+
+        legend {
+            color: $texto;
+            padding: 0 15px;
+        }
+
+        .container-izq {
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: flex-start;
+
+            .fila {
+                display: flex;
+                flex-flow: row nowrap;
+                justify-content: flex-start;
+
+                .campo-codigo {
+                    width: 80px;
+                }
+
+                .campo-nombre {
+                    width: 450px;
+                }
+
+                .container-switch {
+                    display: flex;
+                    flex-flow: column nowrap;
+                    justify-content: center;
+                    height: fit-content;
+                    width: fit-content;
+                    margin-right: 100px;
+
+                    .mdc-switch:first-child {
+                        margin: 10px 0;
+                    }
+                }
+
+                .container-agrupaciones {
+                    display: flex;
+                    flex-flow: row nowrap;
+                    justify-content: flex-start;
+                    margin-top: 25px;
+
+                    .campo-proveedor {
+                        width: 260px;
+                    }
+
+                    .campo-familia {
+                        width: 260px;
+                    }
+
+                    .campo-subfamilia {
+                        width: 200px;
+                    }
+                }
+            }
+        }
+
+        .container-der {
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: flex-start;
+
+            .container-ean {
+                display: flex;
+                flex-flow: column nowrap;
+                justify-content: flex-start;
+            }
         }
     }
 }
