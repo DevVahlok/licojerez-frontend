@@ -2,12 +2,12 @@
 
 .container-general__editar-articulo {
     display: flex;
-    flex-flow: column nowrap;
+    flex-flow: column wrap;
     justify-content: flex-start;
 
     .container-spinner {
         display: flex;
-        flex-flow: row nowrap;
+        flex-flow: row wrap;
         justify-content: center;
         margin-top: 50px;
     }
@@ -27,7 +27,7 @@
 
     form {
         display: flex;
-        flex-flow: row nowrap;
+        flex-flow: row wrap;
         justify-content: space-around;
 
         .mat-mdc-form-field {
@@ -37,7 +37,7 @@
 
         .container-selector {
             display: flex;
-            flex-flow: row nowrap;
+            flex-flow: row wrap;
             justify-content: flex-start;
 
             .mat-mdc-progress-spinner {
@@ -57,13 +57,25 @@
 
         .container-izq {
             display: flex;
-            flex-flow: column nowrap;
+            flex-flow: column wrap;
             justify-content: flex-start;
 
             .fila {
                 display: flex;
-                flex-flow: row nowrap;
+                flex-flow: row wrap;
                 justify-content: flex-start;
+
+                &:nth-child(1) {
+                    height: 80px;
+                }
+
+                &:nth-child(2) {
+                    margin-bottom: 25px;
+                }
+
+                &:nth-child(3) {
+                    margin-bottom: 25px;
+                }
 
                 .campo-codigo {
                     width: 80px;
@@ -75,7 +87,7 @@
 
                 .container-switch {
                     display: flex;
-                    flex-flow: column nowrap;
+                    flex-flow: column wrap;
                     justify-content: center;
                     height: fit-content;
                     width: fit-content;
@@ -88,7 +100,7 @@
 
                 .container-agrupaciones {
                     display: flex;
-                    flex-flow: row nowrap;
+                    flex-flow: row wrap;
                     justify-content: flex-start;
                     margin-top: 25px;
 
@@ -109,12 +121,12 @@
 
         .container-der {
             display: flex;
-            flex-flow: column nowrap;
+            flex-flow: column wrap;
             justify-content: flex-start;
 
             .container-ean {
                 display: flex;
-                flex-flow: column nowrap;
+                flex-flow: column wrap;
                 justify-content: flex-start;
             }
         }

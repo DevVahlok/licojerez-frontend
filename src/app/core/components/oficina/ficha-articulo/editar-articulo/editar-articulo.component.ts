@@ -15,6 +15,7 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
   public spinner: boolean = false;
   private timer: NodeJS.Timeout;
   private suscripcionArticulo: RealtimeChannel;
+  private valoresAnteriores: Articulo;
 
   override ngOnInit(): void {
     this.spinner = true;
@@ -30,13 +31,10 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
 
     //TODO: añadir buscadores a los desplegables
 
-    //TODO: remaquetar apartado tarifas
-
-    //TODO: añadir formatter € en los campos
+    //TODO: añadir formatter € y % en los campos
 
     this.suscripcionArticulo = this._supabase.supabase.channel(`articulo-${this.id}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'articulos', filter: `codigo=eq.${this.id}` }, payload => {
-        console.log(payload);
         this.articulo = payload.new as Articulo;
         this.formArticulo.setValue(this.tratamientoPreFormulario())
       }).subscribe();
@@ -48,18 +46,23 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
       return;
     }
 
-    console.log(data);
-
     this.articulo = data;
     this.spinner = false;
 
     this.formArticulo.setValue(this.tratamientoPreFormulario())
+    this.valoresAnteriores = this.tratamientoPreFormulario();
   }
 
   tratamientoPreFormulario() {
 
     this.formArticulo.get('codigo')?.disable();
     this.formArticulo.get('fecha_alta')?.disable();
+
+    if (Number(this.formArticulo.get('stock')!.value) === 0) {
+      this.formArticulo.get('tiene_lote')!.enable();
+    } else {
+      this.formArticulo.get('tiene_lote')!.disable();
+    }
 
     return {
       codigo: this.articulo.codigo,
@@ -98,11 +101,22 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
         if (this.formArticulo.get(campo)!.value === '') this.formArticulo.get(campo)!.setValue(null as any);
 
         const { error } = await this._supabase.supabase.from('articulos').update({ [campo]: this.formArticulo.get(campo)!.value }).eq('codigo', this.id)
-        //TODO: logs
+
         if (error) {
           this._snackbar.open(`Ha habido un error al modificar el campo: ${campo}`, undefined, { duration: 7000 });
+          this._supabase.anadirLog(`ha tenido un error al modificar el campo "${campo}" del artículo con código ${this.id}`, error.message);
         } else {
           this.articulo[campo] = this.formArticulo.get(campo)!.value as Articulo[K];
+          this._supabase.anadirLog(`ha modificado el campo "${campo}": ${this.valoresAnteriores[campo]} \u2192 ${this.formArticulo.get(campo)!.value} del artículo con código ${this.id}`);
+          this.valoresAnteriores[campo] = this.formArticulo.get(campo)!.value;
+
+          if (campo === 'stock') {
+            if (Number(this.formArticulo.get(campo)!.value) === 0) {
+              this.formArticulo.get('tiene_lote')!.enable();
+            } else {
+              this.formArticulo.get('tiene_lote')!.disable();
+            }
+          }
         }
 
       }, (camposSinDelay.includes(campo) ? 0 : 500));

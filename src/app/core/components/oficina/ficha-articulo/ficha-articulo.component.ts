@@ -35,7 +35,7 @@ export class FichaArticuloComponent {
     ean13_3: new FormControl(0, Validators.pattern(/^-?\d+(\.\d+)?$/)),
     ean13_4: new FormControl(0, Validators.pattern(/^-?\d+(\.\d+)?$/)),
     ean13_5: new FormControl(0, Validators.pattern(/^-?\d+(\.\d+)?$/)),
-    stock: new FormControl(0, Validators.required),
+    stock: new FormControl(0, [Validators.required, Validators.pattern(/^-?\d+(\.\d+)?$/)]),
     precio_coste: new FormControl(0, Validators.required),
     tipo: new FormControl('Material', Validators.required),
     precio_venta: new FormControl(0, Validators.required),

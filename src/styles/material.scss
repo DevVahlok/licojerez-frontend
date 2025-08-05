@@ -187,7 +187,7 @@
 }
 
 .mat-mdc-select-panel {
-    background-color: grey !important;
+    background-color: $texto_alt;
     width: 100%;
     overflow-x: hidden !important;
 
@@ -195,7 +195,7 @@
         width: 100%;
 
         .mdc-list-item__primary-text {
-            color: $texto_alt !important;
+            color: $texto !important;
         }
     }
 
@@ -553,12 +553,10 @@
 
 .mat-mdc-slide-toggle.mat-mdc-slide-toggle-checked:not(.mat-disabled) .mdc-switch__shadow {
     background-color: $acento;
-    /*replace with your color*/
 }
 
 .mat-mdc-slide-toggle.mat-mdc-slide-toggle-checked:not(.mat-disabled) .mdc-switch__track::after {
     background-color: $acento !important;
-    /*replace with your color*/
 }
 
 .mat-mdc-tab-body-content {
@@ -691,4 +689,8 @@
     h1 {
         color: $acento;
     }
+}
+
+.mat-mdc-option-pseudo-checkbox {
+    margin-right: -3px;
 }
