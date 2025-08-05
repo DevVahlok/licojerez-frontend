@@ -680,7 +680,7 @@
 
 .contains-mat-select-search {
     z-index: 99999999;
-    background-color: grey;
+    background-color: transparent;
 }
 
 .mat-mdc-dialog-container {
@@ -693,4 +693,9 @@
 
 .mat-mdc-option-pseudo-checkbox {
     margin-right: -3px;
+}
+
+.mat-select-search-inner {
+    width: max-content !important;
+    min-width: 290px !important;
 }

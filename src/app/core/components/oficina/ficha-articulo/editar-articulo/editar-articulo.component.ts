@@ -1,8 +1,9 @@
 import { Component, ViewEncapsulation } from '@angular/core';
-import { FichaArticuloComponent } from '../ficha-articulo.component';
-import moment from 'moment';
+import { FichaArticuloComponent, ListaDesplegablesFichaArticulo } from '../ficha-articulo.component';
 import { Articulo } from 'src/app/models/oficina';
 import { RealtimeChannel } from '@supabase/supabase-js';
+import { FormControl, FormGroup } from '@angular/forms';
+import moment from 'moment';
 
 @Component({
   selector: 'app-editar-articulo',
@@ -16,6 +17,21 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
   private timer: NodeJS.Timeout;
   private suscripcionArticulo: RealtimeChannel;
   private valoresAnteriores: Articulo;
+  public formFiltrosDesplegables = new FormGroup({
+    proveedor: new FormControl(null),
+    familia: new FormControl(null),
+    subfamilia: new FormControl(null),
+    marca: new FormControl(null),
+    formato: new FormControl(null),
+  });
+
+  public listasFiltradasDesplegables: ListaDesplegablesFichaArticulo = {
+    proveedor: [],
+    familia: [],
+    subfamilia: [],
+    iva: [],
+    marca: [],
+  }
 
   override ngOnInit(): void {
     this.spinner = true;
@@ -25,19 +41,40 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
     await this.conseguirArticulo();
   }
 
+  override onListasDesplegablesCambiada(valor: ListaDesplegablesFichaArticulo) {
+    if (valor.proveedor) this.filtrarDesplegableSearch('proveedor');
+    if (valor.familia) this.filtrarDesplegableSearch('familia');
+    if (valor.subfamilia) this.filtrarDesplegableSearch('subfamilia');
+    if (valor.marca) this.filtrarDesplegableSearch('marca');
+  }
+
+  filtrarDesplegableSearch(campo: 'proveedor' | 'familia' | 'subfamilia' | 'marca') {
+    this.listasFiltradasDesplegables[campo] = this.listasDesplegables[campo];
+    this.formFiltrosDesplegables.get(campo)!.valueChanges.pipe().subscribe(() => {
+      if (!this.formFiltrosDesplegables.get(campo)!.value || this.formFiltrosDesplegables.get(campo)!.value === '') {
+        this.listasFiltradasDesplegables[campo] = this.listasDesplegables[campo];
+      } else {
+        this.listasFiltradasDesplegables[campo] = this.listasDesplegables[campo]!?.filter(prov => prov.nombre.toLowerCase().includes((this.formFiltrosDesplegables.get(campo)!.value! as string).toLowerCase()));
+      }
+    });
+  }
+
   async conseguirArticulo() {
 
     //TODO: aplicar sockets a cada desplegable (cada vez que se crea una subfamilia, por ejemplo)
 
-    //TODO: añadir buscadores a los desplegables
+    //TODO: añadir campo Formato
 
-    //TODO: añadir formatter € y % en los campos
+    //TODO: relacionar jerarquicamente familias con subfamilias, bloquear subfamilia si no tiene familia seleccionada
 
-    this.suscripcionArticulo = this._supabase.supabase.channel(`articulo-${this.id}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'articulos', filter: `codigo=eq.${this.id}` }, payload => {
-        this.articulo = payload.new as Articulo;
-        this.formArticulo.setValue(this.tratamientoPreFormulario())
-      }).subscribe();
+    //TODO: calcular margen si se edita el precio venta, calcular precio venta si se edita el margen
+
+    //TODO: estilizar con placeholders la lisa de comisiones con sus vendedores
+
+    this.suscripcionArticulo = this._supabase.supabase.channel(`articulo-${this.id}`).on('postgres_changes', { event: '*', schema: 'public', table: 'articulos', filter: `codigo=eq.${this.id}` }, payload => {
+      this.articulo = payload.new as Articulo;
+      this.formArticulo.setValue(this.tratamientoPreFormulario())
+    }).subscribe();
 
     const { data, error } = await this._supabase.supabase.from('articulos').select('*').eq('codigo', this.id).single();
 
@@ -57,10 +94,16 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
 
     this.formArticulo.get('codigo')?.disable();
     this.formArticulo.get('fecha_alta')?.disable();
+    this.formArticulo.get('precio_coste')?.disable();
 
     if (Number(this.formArticulo.get('stock')!.value) === 0) {
       this.formArticulo.get('tiene_lote')!.enable();
     } else {
+      this.formArticulo.get('tiene_lote')!.disable();
+    }
+
+    if (this.formArticulo.get('tipo')!.value === 'Servicio') {
+      this.formArticulo.get('stock')!.disable();
       this.formArticulo.get('tiene_lote')!.disable();
     }
 
@@ -115,6 +158,18 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
               this.formArticulo.get('tiene_lote')!.enable();
             } else {
               this.formArticulo.get('tiene_lote')!.disable();
+            }
+          }
+
+          if (campo === 'tipo') {
+            if (this.formArticulo.get('tipo')!.value === 'Servicio') {
+              this.formArticulo.get('stock')!.setValue(0)
+              this.articulo.stock = 0;
+              this.formArticulo.get('stock')!.disable();
+              this.formArticulo.get('tiene_lote')!.disable();
+              const { error } = await this._supabase.supabase.from('articulos').update({ stock: 0 }).eq('codigo', this.id);
+            } else {
+              this.formArticulo.get('stock')!.enable();
             }
           }
         }

@@ -85,6 +85,21 @@
                     width: 450px;
                 }
 
+                .campo-precio-coste,
+                .campo-precio-venta {
+                    width: 100px;
+                }
+
+                .campo-margen {
+                    width: 80px;
+                }
+
+                .fieldset-tarifas {
+                    display: flex;
+                    flex-flow: row wrap;
+                    justify-content: flex-start;
+                }
+
                 .container-switch {
                     display: flex;
                     flex-flow: column wrap;

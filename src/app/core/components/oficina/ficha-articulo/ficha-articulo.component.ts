@@ -5,15 +5,19 @@ import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { from } from 'rxjs';
 import { SupabaseService } from 'src/app/core/services/supabase/supabase.service';
-import { UtilsService } from 'src/app/core/services/utils-v2/utils.service';
 import { Articulo, Familia, Marca, Proveedor, Subfamilia } from 'src/app/models/oficina';
 
-interface ListaDesplegablesFichaArticulo {
-  proveedor: { codigo: string, nombre: string }[] | null,
-  familia: { codigo: string, nombre: string }[] | null,
-  subfamilia: { codigo: string, nombre: string }[] | null,
-  iva: { codigo: string, nombre: string }[] | null,
-  marca: { codigo: string, nombre: string }[] | null,
+export interface ElementoDesplegable {
+  codigo: string,
+  nombre: string
+}
+
+export interface ListaDesplegablesFichaArticulo {
+  proveedor: ElementoDesplegable[] | null,
+  familia: ElementoDesplegable[] | null,
+  subfamilia: ElementoDesplegable[] | null,
+  iva: ElementoDesplegable[] | null,
+  marca: ElementoDesplegable[] | null,
 }
 
 @Component({
@@ -81,25 +85,25 @@ export class FichaArticuloComponent {
 
     from(this._supabase.supabase.from<any, Proveedor[]>('proveedores').select('*')).subscribe(async ({ data, error }) => {
       if (!error) {
-        this.listasDesplegables.proveedor = data?.map(prov => { return { codigo: prov.codigo, nombre: prov.nombre } })!;
+        this.listasDesplegables = { ...this.listasDesplegables, proveedor: data?.map(prov => { return { codigo: prov.codigo, nombre: prov.nombre }; })! } as ListaDesplegablesFichaArticulo;
       }
     });
 
     from(this._supabase.supabase.from<any, Familia[]>('familias').select('*')).subscribe(({ data, error }) => {
       if (!error) {
-        this.listasDesplegables.familia = data?.map(fam => { return { codigo: fam.codigo, nombre: fam.nombre } })!;
+        this.listasDesplegables = { ...this.listasDesplegables, familia: data?.map(fam => { return { codigo: fam.codigo, nombre: fam.nombre }; })! } as ListaDesplegablesFichaArticulo;
       }
     });
 
     from(this._supabase.supabase.from<any, Subfamilia[]>('subfamilias').select('*')).subscribe(({ data, error }) => {
       if (!error) {
-        this.listasDesplegables.subfamilia = data?.map(subfam => { return { codigo: subfam.codigo, nombre: subfam.nombre } })!;
+        this.listasDesplegables = { ...this.listasDesplegables, subfamilia: data?.map(subfam => { return { codigo: subfam.codigo, nombre: subfam.nombre }; })! } as ListaDesplegablesFichaArticulo;
       }
     });
 
     from(this._supabase.supabase.from<any, Marca[]>('marcas').select('*')).subscribe(({ data, error }) => {
       if (!error) {
-        this.listasDesplegables.marca = data?.map(marca => { return { codigo: marca.codigo, nombre: marca.nombre } })!;
+        this.listasDesplegables = { ...this.listasDesplegables, marca: data?.map(marca => { return { codigo: marca.codigo, nombre: marca.nombre }; })! } as ListaDesplegablesFichaArticulo;
       }
     });
   }

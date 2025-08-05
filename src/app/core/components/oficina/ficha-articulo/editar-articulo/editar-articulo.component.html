@@ -35,7 +35,6 @@
                                     obligatorio</mat-error>
                             </mat-form-field>
 
-
                             <mat-form-field>
                                 <mat-label>Fecha alta</mat-label>
                                 <input matInput formControlName="fecha_alta">
@@ -45,7 +44,7 @@
                                 <mat-slide-toggle formControlName="activo"
                                     (change)="editarCampo('activo')">Activo</mat-slide-toggle>
                                 <div
-                                    [matTooltip]="this.formArticulo.get('tiene_lote')!.disabled ? 'El stock debe de ser 0 para poder modificar el valor' : ''">
+                                    [matTooltip]="this.formArticulo.get('tiene_lote')!.disabled ? (formArticulo.get('tipo')!.value === 'Servicio'  ? 'El artículo está marcado como tipo Servicio':'El stock debe de ser 0 para poder modificar el valor') : '' ">
                                     <mat-slide-toggle formControlName="tiene_lote"
                                         (change)="editarCampo('tiene_lote')">Tiene
                                         lotes</mat-slide-toggle>
@@ -60,14 +59,19 @@
                                 </mat-select>
                             </mat-form-field>
 
-                            <mat-form-field>
-                                <mat-label>Stock</mat-label>
-                                <input matInput formControlName="stock" (input)="editarCampo('stock')">
-                                <mat-error *ngIf="formArticulo?.get('stock')?.errors?.['required']">El stock es
-                                    obligatorio</mat-error>
-                                <mat-error *ngIf="formArticulo?.get('stock')?.errors?.['pattern']">El campo debe
-                                    ser numérico.</mat-error>
-                            </mat-form-field>
+                            <div
+                                [matTooltip]="this.formArticulo.get('stock')!.disabled ? 'Al ser de tipo Servicio, no se considera el stock' : ''">
+                                <mat-form-field>
+                                    <mat-label>Stock</mat-label>
+                                    <input matInput formControlName="stock" (input)="editarCampo('stock')">
+                                    <mat-error *ngIf="formArticulo?.get('stock')?.errors?.['required']">El stock es
+                                        obligatorio</mat-error>
+                                    <mat-error *ngIf="formArticulo?.get('stock')?.errors?.['pattern']">El campo debe
+                                        ser numérico.</mat-error>
+                                </mat-form-field>
+
+                            </div>
+
                         </div>
 
                         <div class="fila">
@@ -80,7 +84,12 @@
                                         <mat-label>Proveedor</mat-label>
                                         <mat-select formControlName="idProveedor"
                                             (selectionChange)="editarCampo('idProveedor')">
-                                            <ng-container *ngFor="let proveedor of listasDesplegables.proveedor">
+                                            <mat-option>
+                                                <ngx-mat-select-search
+                                                    [formControl]="formFiltrosDesplegables.get('proveedor')! | formControl"></ngx-mat-select-search>
+                                            </mat-option>
+                                            <ng-container
+                                                *ngFor="let proveedor of listasFiltradasDesplegables.proveedor">
                                                 <mat-option [value]="proveedor.codigo">{{proveedor.nombre}}</mat-option>
                                             </ng-container>
                                         </mat-select>
@@ -93,7 +102,11 @@
                                         <mat-label>Familia</mat-label>
                                         <mat-select formControlName="idFamilia"
                                             (selectionChange)="editarCampo('idFamilia')">
-                                            <ng-container *ngFor="let familia of listasDesplegables.familia">
+                                            <mat-option>
+                                                <ngx-mat-select-search
+                                                    [formControl]="formFiltrosDesplegables.get('familia')! | formControl"></ngx-mat-select-search>
+                                            </mat-option>
+                                            <ng-container *ngFor="let familia of listasFiltradasDesplegables.familia">
                                                 <mat-option [value]="familia.codigo">{{familia.nombre}}</mat-option>
                                             </ng-container>
                                         </mat-select>
@@ -106,7 +119,12 @@
                                         <mat-label>Subfamilia</mat-label>
                                         <mat-select formControlName="idSubfamilia"
                                             (selectionChange)="editarCampo('idSubfamilia')">
-                                            <ng-container *ngFor="let subfamilia of listasDesplegables.subfamilia">
+                                            <mat-option>
+                                                <ngx-mat-select-search
+                                                    [formControl]="formFiltrosDesplegables.get('subfamilia')! | formControl"></ngx-mat-select-search>
+                                            </mat-option>
+                                            <ng-container
+                                                *ngFor="let subfamilia of listasFiltradasDesplegables.subfamilia">
                                                 <mat-option
                                                     [value]="subfamilia.codigo">{{subfamilia.nombre}}</mat-option>
                                             </ng-container>
@@ -120,7 +138,11 @@
                                         <mat-label>Marca</mat-label>
                                         <mat-select formControlName="idMarca"
                                             (selectionChange)="editarCampo('idMarca')">
-                                            <ng-container *ngFor="let marca of listasDesplegables.marca">
+                                            <mat-option>
+                                                <ngx-mat-select-search
+                                                    [formControl]="formFiltrosDesplegables.get('marca')! | formControl"></ngx-mat-select-search>
+                                            </mat-option>
+                                            <ng-container *ngFor="let marca of listasFiltradasDesplegables.marca">
                                                 <mat-option [value]="marca.codigo">{{marca.nombre}}</mat-option>
                                             </ng-container>
                                         </mat-select>
@@ -134,22 +156,28 @@
 
                         <div class="fila">
 
-                            <fieldset>
+                            <fieldset class="fieldset-tarifas">
                                 <legend>Tarifas</legend>
 
-                                <mat-form-field>
-                                    <mat-label>Precio coste</mat-label>
-                                    <input matInput formControlName="precio_coste">
-                                </mat-form-field>
+                                <div
+                                    [matTooltip]="'El precio coste se calcula automáticamente a partir de las entradas registradas'">
+                                    <mat-form-field class="campo-precio-coste">
+                                        <mat-label>Precio coste</mat-label>
+                                        <input matInput formControlName="precio_coste">
+                                        <span matSuffix>€</span>
+                                    </mat-form-field>
+                                </div>
 
-                                <mat-form-field>
+                                <mat-form-field class="campo-precio-venta">
                                     <mat-label>Precio venta</mat-label>
                                     <input matInput formControlName="precio_venta">
+                                    <span matSuffix>€</span>
                                 </mat-form-field>
 
-                                <mat-form-field>
+                                <mat-form-field class="campo-margen">
                                     <mat-label>Margen</mat-label>
                                     <input matInput formControlName="margen">
+                                    <span matSuffix>%</span>
                                 </mat-form-field>
 
                             </fieldset>
@@ -164,6 +192,7 @@
                                 <mat-form-field>
                                     <mat-label>Comisión por defecto</mat-label>
                                     <input matInput formControlName="comision_default">
+                                    <span matSuffix>%</span>
                                 </mat-form-field>
 
                             </fieldset>
