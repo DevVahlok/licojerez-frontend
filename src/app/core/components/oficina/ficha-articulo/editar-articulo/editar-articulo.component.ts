@@ -5,6 +5,12 @@ import { RealtimeChannel } from '@supabase/supabase-js';
 import { FormControl, FormGroup } from '@angular/forms';
 import moment from 'moment';
 
+interface opcionBuscadorArticulo {
+  codigo: number,
+  nombre: string,
+  ean13: string[]
+}
+
 @Component({
   selector: 'app-editar-articulo',
   templateUrl: './editar-articulo.component.html',
@@ -24,7 +30,6 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
     marca: new FormControl(null),
     formato: new FormControl(null),
   });
-
   public listasFiltradasDesplegables: ListaDesplegablesFichaArticulo = {
     proveedor: [],
     familia: [],
@@ -32,9 +37,75 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
     iva: [],
     marca: [],
   }
+  public buscadorArticulo = new FormControl('');
+  public opcionesBuscadorArticulos: opcionBuscadorArticulo[] = [];
+  public opcionesBuscadorArticulosFiltrado: opcionBuscadorArticulo[] = [];
+  public listaVendedores: any = [];
+  public listaVendedoresFiltrada: any = [];
+  public inputVendedor = new FormControl('');
 
-  override ngOnInit(): void {
+  override async ngOnInit(): Promise<void> {
     this.spinner = true;
+    this.conseguirVendedores();
+
+    this.buscadorArticulo.valueChanges.subscribe(async value => {
+      clearTimeout(this.timer);
+
+      if (!value) value = '';
+      value = value.replace(/,/g, ' ');
+
+      this.timer = setTimeout(async () => {
+
+        if (value === '') {
+          this.opcionesBuscadorArticulosFiltrado = [];
+        } else {
+          const { data } = await this._supabase.supabase.from('articulos_busqueda').select('*').or(`nombre.ilike.%${value}%,` + `codigo.ilike.%${value}%,` + `ean13_1.ilike.%${value}%,` + `ean13_2.ilike.%${value}%,` + `ean13_3.ilike.%${value}%,` + `ean13_4.ilike.%${value}%,` + `ean13_5.ilike.%${value}%`);
+
+          let resultado = data!?.map(articulo => { return { codigo: articulo.codigo, nombre: articulo.nombre, ean13: [articulo.ean13_1, articulo.ean13_2, articulo.ean13_3, articulo.ean13_4, articulo.ean13_5] } });
+
+          const indexCodigoIdentico = resultado.findIndex(articulo => articulo.codigo === value);
+
+          if (indexCodigoIdentico <= 0 || indexCodigoIdentico >= resultado.length) {
+
+          } else {
+            const elemento = resultado.splice(indexCodigoIdentico, 1)[0];
+            resultado.unshift(elemento);
+          }
+
+          this.opcionesBuscadorArticulosFiltrado = resultado;
+        }
+
+      }, 200);
+
+    });
+  }
+
+  seleccionarPrimero() {
+    const opciones = this.opcionesBuscadorArticulosFiltrado;
+    if (opciones.length > 0) this.redigirOtroArticulo(opciones[0].codigo)
+  }
+
+  redigirOtroArticulo(codigo: number) {
+    this._router.navigateByUrl('/principal', { skipLocationChange: true }).then(() => {
+      this._router.navigate([`/oficina/articulo/${codigo}`]);
+    });
+  }
+
+  conseguirVendedores() {
+    this.listaVendedores = [
+      { codigo: 1, nombre: 'Carlos Medrano', comision: 5 },
+      { codigo: 2, nombre: 'David Valderrama', comision: 7 },
+      { codigo: 3, nombre: 'David Sainz', comision: 3 },
+      { codigo: 4, nombre: 'Tomás Moreno', comision: 2 },
+    ]
+
+    this.listaVendedoresFiltrada = JSON.parse(JSON.stringify(this.listaVendedores))
+  }
+
+  filtrarVendedores() {
+    //TODO: refactorizar vendedores hardcoded
+    this.listaVendedoresFiltrada = this.listaVendedores.filter((vendedor: any) => vendedor.nombre.toLowerCase().includes(this.inputVendedor.value!.toLowerCase()))
+
   }
 
   override async onIdCambiada(valor: number): Promise<void> {
@@ -61,13 +132,13 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
 
   async conseguirArticulo() {
 
-    //TODO: aplicar sockets a cada desplegable (cada vez que se crea una subfamilia, por ejemplo)
+    //TODO: aplicar sockets a cada desplegable (cada vez que se crea una subfamilia, por ejemplo), también en lista vendedores
+
+    //TODO: poder ordenar lista vendedores por % comisión
 
     //TODO: añadir campo Formato
 
     //TODO: relacionar jerarquicamente familias con subfamilias, bloquear subfamilia si no tiene familia seleccionada
-
-    //TODO: calcular margen si se edita el precio venta, calcular precio venta si se edita el margen
 
     //TODO: estilizar con placeholders la lisa de comisiones con sus vendedores
 
@@ -107,6 +178,8 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
       this.formArticulo.get('tiene_lote')!.disable();
     }
 
+    this.formArticulo.get('formato')!.disable();
+
     return {
       codigo: this.articulo.codigo,
       fecha_alta: moment(this.articulo.fecha_alta).format('DD/MM/yyyy'),
@@ -128,7 +201,8 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
       activo: this.articulo.activo,
       comision_default: this.articulo.comision_default,
       tiene_lote: this.articulo.tiene_lote,
-      idMarca: this.articulo.idMarca
+      idMarca: this.articulo.idMarca,
+      formato: null
     }
   }
 
@@ -161,16 +235,64 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
             }
           }
 
-          if (campo === 'tipo') {
-            if (this.formArticulo.get('tipo')!.value === 'Servicio') {
-              this.formArticulo.get('stock')!.setValue(0)
-              this.articulo.stock = 0;
-              this.formArticulo.get('stock')!.disable();
-              this.formArticulo.get('tiene_lote')!.disable();
-              const { error } = await this._supabase.supabase.from('articulos').update({ stock: 0 }).eq('codigo', this.id);
-            } else {
-              this.formArticulo.get('stock')!.enable();
-            }
+          const precio_venta = Number(this.formArticulo.get('precio_venta')!.value);
+          const precio_coste = Number(this.formArticulo.get('precio_coste')!.value);
+          const margen = Number(this.formArticulo.get('margen')!.value);
+
+          switch (campo) {
+
+            case 'tipo':
+
+              if (this.formArticulo.get('tipo')!.value === 'Servicio') {
+                this.formArticulo.get('stock')!.setValue(0)
+                this.articulo.stock = 0;
+                this.formArticulo.get('stock')!.disable();
+                this.formArticulo.get('tiene_lote')!.disable();
+                const { error } = await this._supabase.supabase.from('articulos').update({ stock: 0 }).eq('codigo', this.id);
+                if (error) {
+                  this._supabase.anadirLog(`ha tenido un error al modificar el campo "stock" del artículo con código ${this.id}`, error.message);
+                } else {
+                  this._supabase.anadirLog(`ha modificado el campo "stock": ${this.valoresAnteriores['stock']} \u2192 ${this.formArticulo.get('stock')!.value} del artículo con código ${this.id}`);
+                }
+              } else {
+                this.formArticulo.get('stock')!.enable();
+              }
+
+              break;
+
+            case 'precio_venta':
+
+              const nuevoMargen = Math.round((((precio_venta - precio_coste) / precio_venta) * 100) * 100) / 100;
+
+              this.formArticulo.get('margen')!.setValue(nuevoMargen);
+              this.articulo.margen = nuevoMargen;
+
+              //TODO: hay flickering
+
+              const { error: error2 } = await this._supabase.supabase.from('articulos').update({ margen: nuevoMargen }).eq('codigo', this.id);
+              if (error2) {
+                this._supabase.anadirLog(`ha tenido un error al modificar el campo "margen" del artículo con código ${this.id}`, error2.message);
+              } else {
+                this._supabase.anadirLog(`ha modificado el campo "margen": ${this.valoresAnteriores['margen']} \u2192 ${this.formArticulo.get('margen')!.value} del artículo con código ${this.id}`);
+              }
+
+              break;
+
+            case 'margen':
+
+              const nuevoPrecioVenta = Math.round((precio_coste / (1 - margen / 100)) * 10000) / 10000;
+
+              this.formArticulo.get('precio_venta')!.setValue(nuevoPrecioVenta);
+              this.articulo.precio_venta = nuevoPrecioVenta;
+
+              const { error: error3 } = await this._supabase.supabase.from('articulos').update({ precio_venta: nuevoPrecioVenta }).eq('codigo', this.id);
+              if (error3) {
+                this._supabase.anadirLog(`ha tenido un error al modificar el campo "precio_venta" del artículo con código ${this.id}`, error3.message);
+              } else {
+                this._supabase.anadirLog(`ha modificado el campo "precio_venta": ${this.valoresAnteriores['precio_venta']} \u2192 ${this.formArticulo.get('precio_venta')!.value} del artículo con código ${this.id}`);
+              }
+
+              break;
           }
         }
 

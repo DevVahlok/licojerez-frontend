@@ -12,6 +12,21 @@
             <button mat-button>Clonar artículo</button>
             <button mat-button>Crear nuevo artículo</button>
             <button mat-button>Añadir etiqueta</button>
+
+            <div>
+                <mat-form-field>
+                    <mat-label>Buscar otro artículo</mat-label>
+                    <input type="text" matInput [formControl]="buscadorArticulo" [matAutocomplete]="auto"
+                        (keydown.enter)="seleccionarPrimero()">
+                    <mat-autocomplete #auto="matAutocomplete"
+                        (optionSelected)="redigirOtroArticulo($event.option.value)">
+                        <ng-container *ngFor="let articulo of opcionesBuscadorArticulosFiltrado">
+                            <mat-option [value]="articulo.codigo"> {{articulo.nombre}} </mat-option>
+                        </ng-container>
+                    </mat-autocomplete>
+                </mat-form-field>
+            </div>
+
         </div>
 
         <mat-tab-group>
@@ -150,6 +165,15 @@
                                     <mat-spinner [diameter]="35" *ngIf="!listasDesplegables.marca"></mat-spinner>
                                 </div>
 
+                                <div class="container-selector">
+                                    <mat-form-field class="campo-formato">
+                                        <mat-label>Formato</mat-label>
+                                        <mat-select formControlName="formato">
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-spinner [diameter]="35" *ngIf="!listasDesplegables.marca"></mat-spinner>
+                                </div>
+
                             </fieldset>
 
                         </div>
@@ -170,21 +194,18 @@
 
                                 <mat-form-field class="campo-precio-venta">
                                     <mat-label>Precio venta</mat-label>
-                                    <input matInput formControlName="precio_venta">
+                                    <input matInput formControlName="precio_venta"
+                                        (input)="editarCampo('precio_venta')">
                                     <span matSuffix>€</span>
                                 </mat-form-field>
 
                                 <mat-form-field class="campo-margen">
                                     <mat-label>Margen</mat-label>
-                                    <input matInput formControlName="margen">
+                                    <input matInput formControlName="margen" (input)="editarCampo('margen')">
                                     <span matSuffix>%</span>
                                 </mat-form-field>
 
                             </fieldset>
-
-                        </div>
-
-                        <div class="fila">
 
                             <fieldset>
                                 <legend>Comisiones</legend>
@@ -194,6 +215,27 @@
                                     <input matInput formControlName="comision_default">
                                     <span matSuffix>%</span>
                                 </mat-form-field>
+
+                                <div class="container-comision">
+                                    <h3>Comisión por vendedor <mat-icon
+                                            [matTooltip]="'Editar comisiones'">edit</mat-icon></h3>
+
+                                    <mat-form-field>
+                                        <mat-label>Buscar vendedor...</mat-label>
+                                        <input matInput [formControl]="inputVendedor" (input)="filtrarVendedores()">
+                                    </mat-form-field>
+                                    <div class="lista-comisiones">
+
+                                        <ng-container *ngFor="let vendedor of listaVendedoresFiltrada">
+
+                                            <div>
+                                                <span>{{vendedor.nombre}} - {{vendedor.comision}}%</span>
+                                            </div>
+
+                                        </ng-container>
+
+                                    </div>
+                                </div>
 
                             </fieldset>
 
@@ -205,48 +247,50 @@
                         <fieldset class="container-ean">
                             <legend>Códigos de barras</legend>
 
-                            <mat-form-field>
-                                <mat-label>1 - EAN 13</mat-label>
-                                <input matInput formControlName="ean13_1" (input)="editarCampo('ean13_1')">
-                                <mat-error *ngIf="formArticulo?.get('ean13_1')?.errors?.['pattern']">El campo debe ser
-                                    numérico.</mat-error>
-                            </mat-form-field>
+                            <div class="encapsulador-ean13">
+                                <mat-form-field>
+                                    <mat-label>1 - EAN 13</mat-label>
+                                    <input matInput formControlName="ean13_1" (input)="editarCampo('ean13_1')">
+                                    <mat-error *ngIf="formArticulo?.get('ean13_1')?.errors?.['pattern']">El campo debe
+                                        ser
+                                        numérico.</mat-error>
+                                </mat-form-field>
+                            </div>
 
-                            <ng-container>
+                            <div class="encapsulador-ean13">
                                 <mat-form-field>
                                     <mat-label>2 - EAN 13</mat-label>
                                     <input matInput formControlName="ean13_2" (input)="editarCampo('ean13_2')">
                                     <mat-error *ngIf="formArticulo?.get('ean13_2')?.errors?.['pattern']">El campo debe
                                         ser numérico.</mat-error>
                                 </mat-form-field>
-                            </ng-container>
+                            </div>
 
-                            <ng-container>
+                            <div class="encapsulador-ean13">
                                 <mat-form-field>
                                     <mat-label>3 - EAN 13</mat-label>
                                     <input matInput formControlName="ean13_3" (input)="editarCampo('ean13_3')">
                                     <mat-error *ngIf="formArticulo?.get('ean13_3')?.errors?.['pattern']">El campo debe
                                         ser numérico.</mat-error>
                                 </mat-form-field>
-                            </ng-container>
-
-                            <ng-container>
+                            </div>
+                            <div class="encapsulador-ean13">
                                 <mat-form-field>
                                     <mat-label>4 - EAN 13</mat-label>
                                     <input matInput formControlName="ean13_4" (input)="editarCampo('ean13_4')">
                                     <mat-error *ngIf="formArticulo?.get('ean13_4')?.errors?.['pattern']">El campo debe
                                         ser numérico.</mat-error>
                                 </mat-form-field>
-                            </ng-container>
+                            </div>
 
-                            <ng-container>
+                            <div class="encapsulador-ean13">
                                 <mat-form-field>
                                     <mat-label>5 - EAN 13</mat-label>
                                     <input matInput formControlName="ean13_5" (input)="editarCampo('ean13_5')">
                                     <mat-error *ngIf="formArticulo?.get('ean13_5')?.errors?.['pattern']">El campo debe
                                         ser numérico.</mat-error>
                                 </mat-form-field>
-                            </ng-container>
+                            </div>
 
                         </fieldset>
                     </div>

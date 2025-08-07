@@ -51,7 +51,8 @@ export class FichaArticuloComponent {
     activo: new FormControl(false, Validators.required),
     comision_default: new FormControl(0),
     tiene_lote: new FormControl(false, Validators.required),
-    idMarca: new FormControl(-1)
+    idMarca: new FormControl(-1),
+    formato: new FormControl(null)
   });
   public _listasDesplegables: ListaDesplegablesFichaArticulo = {
     proveedor: null,
@@ -61,7 +62,7 @@ export class FichaArticuloComponent {
     marca: null,
   }
 
-  constructor(private _title: Title, private _router: Router, public _supabase: SupabaseService, protected _snackbar: MatSnackBar) { }
+  constructor(private _title: Title, public _router: Router, public _supabase: SupabaseService, protected _snackbar: MatSnackBar) { }
 
   ngOnInit() {
     this.detectarModoEdicion();
