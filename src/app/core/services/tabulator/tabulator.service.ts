@@ -188,9 +188,6 @@ export class TabulatorService {
 
   async tratamientoConfigTabla(cabecera: ColumnDefinition[], viewname: string, config: ConfigTablaTabulator[]): Promise<ConfigTablaTabulator[]> {
 
-    console.log(config);
-
-
     if (!this.user) {
       this.user = await this._supabase.getUser();
     }

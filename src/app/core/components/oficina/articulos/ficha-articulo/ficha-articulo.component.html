@@ -1,4 +1,4 @@
-<div class="container-general__editar-articulo">
+<div class="container-general__ficha-articulo">
 
     <div *ngIf="spinner" class="container-spinner">
         <mat-spinner></mat-spinner>
@@ -9,24 +9,8 @@
 
         <div class="toolbar">
             <button mat-button>Dar de baja</button>
-            <button mat-button>Clonar artículo</button>
             <button mat-button>Crear nuevo artículo</button>
             <button mat-button>Añadir etiqueta</button>
-
-            <div>
-                <mat-form-field>
-                    <mat-label>Buscar otro artículo</mat-label>
-                    <input type="text" matInput [formControl]="buscadorArticulo" [matAutocomplete]="auto"
-                        (keydown.enter)="seleccionarPrimero()">
-                    <mat-autocomplete #auto="matAutocomplete"
-                        (optionSelected)="redigirOtroArticulo($event.option.value)">
-                        <ng-container *ngFor="let articulo of opcionesBuscadorArticulosFiltrado">
-                            <mat-option [value]="articulo.codigo"> {{articulo.nombre}} </mat-option>
-                        </ng-container>
-                    </mat-autocomplete>
-                </mat-form-field>
-            </div>
-
         </div>
 
         <mat-tab-group>

@@ -1,7 +1,7 @@
-import { Component, ElementRef, TemplateRef, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Output, TemplateRef, ViewChild, ViewEncapsulation } from '@angular/core';
 import { DataTablaTabulator, TablaTabulatorComponent, TablaTabulatorEvent } from 'src/app/shared/components/tabla-tabulator/tabla-tabulator.component';
-import { SupabaseService } from '../../../services/supabase/supabase.service';
-import { UtilsService } from '../../../services/utils-v2/utils.service';
+import { SupabaseService } from '../../../../services/supabase/supabase.service';
+import { UtilsService } from '../../../../services/utils-v2/utils.service';
 import { Title } from '@angular/platform-browser';
 import { LoadingManagerEvent } from 'src/app/shared/layers/component-loading-manager/component-loading-manager.component';
 import { forkJoin, from, Observable, Subscription, tap } from 'rxjs';
@@ -10,7 +10,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { CellComponent, ColumnDefinition, EditorParams } from 'tabulator-tables';
 import { Router } from '@angular/router';
-import { ElementoMenuContextual } from '../main/main.component';
+import { ElementoMenuContextual } from '../../main/main.component';
 import { UserLicojerez } from 'src/app/models/general';
 import { Articulo, ConfigTabla } from 'src/app/models/oficina';
 
@@ -49,6 +49,7 @@ export class ListaArticulosComponent {
   public errorExcel: { message: string, field: string, data: { nombre: string }[] };
   public user: UserLicojerez;
   public subContextual: Subscription;
+  @Output() abrirFicha = new EventEmitter<number>();
 
   constructor(private _title: Title, private _supabase: SupabaseService, private _utils: UtilsService, private _tabulator: TabulatorService, private _snackbar: MatSnackBar, public _dialog: MatDialog, private _router: Router) { }
 
@@ -56,7 +57,6 @@ export class ListaArticulosComponent {
     this._title.setTitle('Artículos');
     this.user = await this._supabase.getUser();
     this.cargarTablaArticulos();
-
     this.subContextual = this._utils.eventoMenuContextual.subscribe(res => {
       if (res.type === 'click') {
         this.opcionesMenuContextual(res.opcion)
@@ -143,9 +143,7 @@ export class ListaArticulosComponent {
         break;
 
       case 'cellDblClick':
-        // window.open(this._router.serializeUrl(this._router.createUrlTree([`/oficina/articulo/${(evento.value as CellComponent).getRow().getData()['codigo']}`])), '_blank');
-        this._router.navigate([`/oficina/articulo/${(evento.value as CellComponent).getRow().getData()['codigo']}`]);
-
+        this.abrirFicha.emit((evento.value as CellComponent).getRow().getData()['codigo']);
         break;
 
       case 'dataFiltered':
@@ -160,8 +158,7 @@ export class ListaArticulosComponent {
   opcionesMenuContextual(opcion: ElementoMenuContextual) {
     switch (opcion.field) {
       case 'abrir-ficha':
-        //window.open(this._router.serializeUrl(this._router.createUrlTree([`/oficina/articulo/${opcion.value}`],)), '_blank');
-        this._router.navigate([`/oficina/articulo/${opcion.value}`]);
+        this.abrirFicha.emit(opcion.value);
         break;
     }
   }
@@ -218,10 +215,5 @@ export class ListaArticulosComponent {
     delete (columnaGrupos!.headerFilterParams! as EditorParams & { valuesLookup?: string }).valuesLookup;
 
     return cabecera;
-  }
-
-  redirigirCrearArticulo() {
-    //window.open(this._router.serializeUrl(this._router.createUrlTree([`/oficina/articulo`])), '_blank');
-    this._router.navigate([`/oficina/articulo`]);
   }
 }

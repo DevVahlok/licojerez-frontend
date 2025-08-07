@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EditarArticuloComponent } from './editar-articulo.component';
+import { FichaArticuloComponent } from './ficha-articulo.component';
 
 describe('EditarArticuloComponent', () => {
-  let component: EditarArticuloComponent;
-  let fixture: ComponentFixture<EditarArticuloComponent>;
+  let component: FichaArticuloComponent;
+  let fixture: ComponentFixture<FichaArticuloComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [EditarArticuloComponent]
+      declarations: [FichaArticuloComponent]
     });
-    fixture = TestBed.createComponent(EditarArticuloComponent);
+    fixture = TestBed.createComponent(FichaArticuloComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,23 +1,21 @@
-import { Component, ViewEncapsulation } from '@angular/core';
-import { FichaArticuloComponent, ListaDesplegablesFichaArticulo } from '../ficha-articulo.component';
-import { Articulo } from 'src/app/models/oficina';
+import { Component, Input, SimpleChange, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { ArticulosComponent, ListaDesplegablesFichaArticulo } from '../articulos.component';
+import { Articulo, Familia, Marca, Proveedor, Subfamilia } from 'src/app/models/oficina';
 import { RealtimeChannel } from '@supabase/supabase-js';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
-
-interface opcionBuscadorArticulo {
-  codigo: number,
-  nombre: string,
-  ean13: string[]
-}
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
+import { SupabaseService } from 'src/app/core/services/supabase/supabase.service';
+import { from } from 'rxjs';
 
 @Component({
-  selector: 'app-editar-articulo',
-  templateUrl: './editar-articulo.component.html',
-  styleUrls: ['./editar-articulo.component.scss'],
+  selector: 'app-ficha-articulo',
+  templateUrl: './ficha-articulo.component.html',
+  styleUrls: ['./ficha-articulo.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class EditarArticuloComponent extends FichaArticuloComponent {
+export class FichaArticuloComponent {
 
   public spinner: boolean = false;
   private timer: NodeJS.Timeout;
@@ -37,57 +35,89 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
     iva: [],
     marca: [],
   }
-  public buscadorArticulo = new FormControl('');
-  public opcionesBuscadorArticulos: opcionBuscadorArticulo[] = [];
-  public opcionesBuscadorArticulosFiltrado: opcionBuscadorArticulo[] = [];
+
   public listaVendedores: any = [];
   public listaVendedoresFiltrada: any = [];
   public inputVendedor = new FormControl('');
+  public listasDesplegables: ListaDesplegablesFichaArticulo = {
+    proveedor: null,
+    familia: null,
+    subfamilia: null,
+    iva: null,
+    marca: null,
+  }
+  @Input() id: number;
+  public articulo: Articulo;
+  public formArticulo = new FormGroup({
+    codigo: new FormControl(-1, Validators.required),
+    fecha_alta: new FormControl('', Validators.required),
+    nombre: new FormControl('', Validators.required),
+    ean13_1: new FormControl(0, Validators.pattern(/^-?\d+(\.\d+)?$/)),
+    ean13_2: new FormControl(0, Validators.pattern(/^-?\d+(\.\d+)?$/)),
+    ean13_3: new FormControl(0, Validators.pattern(/^-?\d+(\.\d+)?$/)),
+    ean13_4: new FormControl(0, Validators.pattern(/^-?\d+(\.\d+)?$/)),
+    ean13_5: new FormControl(0, Validators.pattern(/^-?\d+(\.\d+)?$/)),
+    stock: new FormControl(0, [Validators.required, Validators.pattern(/^-?\d+(\.\d+)?$/)]),
+    precio_coste: new FormControl(0, Validators.required),
+    tipo: new FormControl('Material', Validators.required),
+    precio_venta: new FormControl(0, Validators.required),
+    idProveedor: new FormControl(-1),
+    idFamilia: new FormControl(-1),
+    idSubfamilia: new FormControl(-1),
+    idIva: new FormControl(-1, Validators.required),
+    margen: new FormControl(0, Validators.required),
+    activo: new FormControl(false, Validators.required),
+    comision_default: new FormControl(0),
+    tiene_lote: new FormControl(false, Validators.required),
+    idMarca: new FormControl(-1),
+    formato: new FormControl(null)
+  });
 
-  override async ngOnInit(): Promise<void> {
+  constructor(public _router: Router, public _supabase: SupabaseService, protected _snackbar: MatSnackBar) { }
+
+  async ngOnInit(): Promise<void> {
     this.spinner = true;
+    this.getListasDesplegables();
     this.conseguirVendedores();
-    //prueba
-    this.buscadorArticulo.valueChanges.subscribe(async value => {
-      clearTimeout(this.timer);
+    this.conseguirPrimerArticulo();
+  }
 
-      if (!value) value = '';
-      value = value.replace(/,/g, ' ');
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['id']?.currentValue) {
+      this.conseguirArticulo();
+    }
+  }
 
-      this.timer = setTimeout(async () => {
+  async conseguirPrimerArticulo() {
+    const { data } = await this._supabase.supabase.from('articulos').select('*').order('codigo', { ascending: true }).limit(1).single();
+    this.id = data.codigo;
+    this.conseguirArticulo();
+  }
 
-        if (value === '') {
-          this.opcionesBuscadorArticulosFiltrado = [];
-        } else {
-          const { data } = await this._supabase.supabase.from('articulos_busqueda').select('*').or(`nombre.ilike.%${value}%,` + `codigo.ilike.%${value}%,` + `ean13_1.ilike.%${value}%,` + `ean13_2.ilike.%${value}%,` + `ean13_3.ilike.%${value}%,` + `ean13_4.ilike.%${value}%,` + `ean13_5.ilike.%${value}%`);
+  getListasDesplegables() {
 
-          let resultado = data!?.map(articulo => { return { codigo: articulo.codigo, nombre: articulo.nombre, ean13: [articulo.ean13_1, articulo.ean13_2, articulo.ean13_3, articulo.ean13_4, articulo.ean13_5] } });
-
-          const indexCodigoIdentico = resultado.findIndex(articulo => articulo.codigo === value);
-
-          if (indexCodigoIdentico <= 0 || indexCodigoIdentico >= resultado.length) {
-
-          } else {
-            const elemento = resultado.splice(indexCodigoIdentico, 1)[0];
-            resultado.unshift(elemento);
-          }
-
-          this.opcionesBuscadorArticulosFiltrado = resultado;
-        }
-
-      }, 200);
-
+    from(this._supabase.supabase.from<any, Proveedor[]>('proveedores').select('*')).subscribe(async ({ data, error }) => {
+      if (!error) {
+        this.listasDesplegables = { ...this.listasDesplegables, proveedor: data?.map(prov => { return { codigo: prov.codigo, nombre: prov.nombre }; })! } as ListaDesplegablesFichaArticulo;
+      }
     });
-  }
 
-  seleccionarPrimero() {
-    const opciones = this.opcionesBuscadorArticulosFiltrado;
-    if (opciones.length > 0) this.redigirOtroArticulo(opciones[0].codigo)
-  }
+    from(this._supabase.supabase.from<any, Familia[]>('familias').select('*')).subscribe(({ data, error }) => {
+      if (!error) {
+        this.listasDesplegables = { ...this.listasDesplegables, familia: data?.map(fam => { return { codigo: fam.codigo, nombre: fam.nombre }; })! } as ListaDesplegablesFichaArticulo;
+      }
+    });
 
-  redigirOtroArticulo(codigo: number) {
-    this._router.navigateByUrl('/principal', { skipLocationChange: true }).then(() => {
-      this._router.navigate([`/oficina/articulo/${codigo}`]);
+    from(this._supabase.supabase.from<any, Subfamilia[]>('subfamilias').select('*')).subscribe(({ data, error }) => {
+      if (!error) {
+        this.listasDesplegables = { ...this.listasDesplegables, subfamilia: data?.map(subfam => { return { codigo: subfam.codigo, nombre: subfam.nombre }; })! } as ListaDesplegablesFichaArticulo;
+      }
+    });
+
+    from(this._supabase.supabase.from<any, Marca[]>('marcas').select('*')).subscribe(({ data, error }) => {
+      if (!error) {
+        this.listasDesplegables = { ...this.listasDesplegables, marca: data?.map(marca => { return { codigo: marca.codigo, nombre: marca.nombre }; })! } as ListaDesplegablesFichaArticulo;
+      }
     });
   }
 
@@ -105,14 +135,9 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
   filtrarVendedores() {
     //TODO: refactorizar vendedores hardcoded
     this.listaVendedoresFiltrada = this.listaVendedores.filter((vendedor: any) => vendedor.nombre.toLowerCase().includes(this.inputVendedor.value!.toLowerCase()))
-
   }
 
-  override async onIdCambiada(valor: number): Promise<void> {
-    await this.conseguirArticulo();
-  }
-
-  override onListasDesplegablesCambiada(valor: ListaDesplegablesFichaArticulo) {
+  onListasDesplegablesCambiada(valor: ListaDesplegablesFichaArticulo) {
     if (valor.proveedor) this.filtrarDesplegableSearch('proveedor');
     if (valor.familia) this.filtrarDesplegableSearch('familia');
     if (valor.subfamilia) this.filtrarDesplegableSearch('subfamilia');
@@ -166,6 +191,7 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
     this.formArticulo.get('codigo')?.disable();
     this.formArticulo.get('fecha_alta')?.disable();
     this.formArticulo.get('precio_coste')?.disable();
+    this.formArticulo.get('stock')?.disable();
 
     if (Number(this.formArticulo.get('stock')!.value) === 0) {
       this.formArticulo.get('tiene_lote')!.enable();

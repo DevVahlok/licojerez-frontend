@@ -48,25 +48,6 @@
 
                 <mat-divider></mat-divider>
 
-                <a mat-list-item [matTooltip]="'Crear artículo'" matTooltipPosition="right"
-                    *ngIf="_router.url === '/oficina/articulo'" routerLinkActive="elemento-menu-lateral-actual"
-                    [routerLink]="'/oficina/articulo'" class="elemento-menu-lateral">
-                    <div class="encapsulador-icono-menu-lateral">
-                        <mat-icon>add</mat-icon>
-                        <span class="titulo-icono">Crear artículo</span>
-                    </div>
-                </a>
-
-                <a mat-list-item [matTooltip]="'Editar artículo'" matTooltipPosition="right"
-                    *ngIf="_router.url.startsWith('/oficina/articulo') && _router.url !== '/oficina/articulos' && _router.url !== '/oficina/articulo'"
-                    routerLinkActive="elemento-menu-lateral-actual" [routerLink]="_router.url"
-                    class="elemento-menu-lateral">
-                    <div class="encapsulador-icono-menu-lateral">
-                        <mat-icon>edit</mat-icon>
-                        <span class="titulo-icono">Editar artículo</span>
-                    </div>
-                </a>
-
                 <a mat-list-item (click)="cerrarSesion()" [matTooltip]="'Cerrar sesión'" matTooltipPosition="right"
                     class="elemento-menu-lateral">
                     <div class="encapsulador-icono-menu-lateral">
