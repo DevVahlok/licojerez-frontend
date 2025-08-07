@@ -143,7 +143,7 @@ export class ListaArticulosComponent {
         break;
 
       case 'cellDblClick':
-        window.open(this._router.serializeUrl(this._router.createUrlTree([`/oficina/articulo/${(evento.value as CellComponent).getRow().getData()['codigo']}`])), '_blank');
+        window.open(this._router.serializeUrl(this._router.createUrlTree([`/oficina/articulo/${(evento.value as CellComponent).getRow().getData()['codigo']}`])));
         break;
 
       case 'dataFiltered':
@@ -158,7 +158,7 @@ export class ListaArticulosComponent {
   opcionesMenuContextual(opcion: ElementoMenuContextual) {
     switch (opcion.field) {
       case 'abrir-ficha':
-        window.open(this._router.serializeUrl(this._router.createUrlTree([`/oficina/articulo/${opcion.value}`],)), '_blank');
+        window.open(this._router.serializeUrl(this._router.createUrlTree([`/oficina/articulo/${opcion.value}`],)));
         break;
     }
   }
@@ -218,6 +218,6 @@ export class ListaArticulosComponent {
   }
 
   redirigirCrearArticulo() {
-    window.open(this._router.serializeUrl(this._router.createUrlTree([`/oficina/articulo`])), '_blank');
+    window.open(this._router.serializeUrl(this._router.createUrlTree([`/oficina/articulo`])));
   }
 }
