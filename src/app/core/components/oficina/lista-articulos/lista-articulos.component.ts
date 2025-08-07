@@ -143,7 +143,9 @@ export class ListaArticulosComponent {
         break;
 
       case 'cellDblClick':
-        window.open(this._router.serializeUrl(this._router.createUrlTree([`/oficina/articulo/${(evento.value as CellComponent).getRow().getData()['codigo']}`])));
+        // window.open(this._router.serializeUrl(this._router.createUrlTree([`/oficina/articulo/${(evento.value as CellComponent).getRow().getData()['codigo']}`])), '_blank');
+        this._router.navigate([`/oficina/articulo/${(evento.value as CellComponent).getRow().getData()['codigo']}`]);
+
         break;
 
       case 'dataFiltered':
@@ -158,7 +160,8 @@ export class ListaArticulosComponent {
   opcionesMenuContextual(opcion: ElementoMenuContextual) {
     switch (opcion.field) {
       case 'abrir-ficha':
-        window.open(this._router.serializeUrl(this._router.createUrlTree([`/oficina/articulo/${opcion.value}`],)));
+        //window.open(this._router.serializeUrl(this._router.createUrlTree([`/oficina/articulo/${opcion.value}`],)), '_blank');
+        this._router.navigate([`/oficina/articulo/${opcion.value}`]);
         break;
     }
   }
@@ -218,6 +221,7 @@ export class ListaArticulosComponent {
   }
 
   redirigirCrearArticulo() {
-    window.open(this._router.serializeUrl(this._router.createUrlTree([`/oficina/articulo`])));
+    //window.open(this._router.serializeUrl(this._router.createUrlTree([`/oficina/articulo`])), '_blank');
+    this._router.navigate([`/oficina/articulo`]);
   }
 }
