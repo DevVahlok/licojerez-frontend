@@ -47,7 +47,7 @@ export class EditarArticuloComponent extends FichaArticuloComponent {
   override async ngOnInit(): Promise<void> {
     this.spinner = true;
     this.conseguirVendedores();
-
+    //prueba
     this.buscadorArticulo.valueChanges.subscribe(async value => {
       clearTimeout(this.timer);
 
