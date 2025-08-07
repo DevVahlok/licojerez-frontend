@@ -1,0 +1,69 @@
+@import '../../../../styles/variables';
+
+.container-general__dialog-config-tabla {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    color: $texto;
+
+    h1 {
+        width: 100%;
+        text-align: center;
+        color: $acento;
+    }
+
+    .container-marcar-todo {
+        margin-bottom: 10px;
+
+        .mat-checkbox-frame {
+            border-color: $texto;
+        }
+    }
+
+    .container-lista {
+        width: 100%;
+        border: 1px solid $acento;
+        border-radius: 5px;
+        height: 300px;
+        display: block;
+        overflow-x: hidden;
+        background: $texto;
+    }
+
+    .container-acciones {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+        margin: 15px 0;
+
+        button:last-child {
+            background-color: $acento;
+            margin-left: 15px;
+        }
+    }
+
+}
+
+.cdk-drag-placeholder {
+    opacity: 0;
+}
+
+.elemento-lista__dialog-config-tabla {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    padding: 20px 10px;
+    background: $tabulator_fila_impar;
+    box-sizing: border-box;
+    cursor: move;
+    color: $texto_alt;
+    border-bottom: 1px solid $texto_alt;
+
+    .mat-checkbox-frame {
+        border-color: $texto_alt;
+    }
+
+    &:last-child {
+        border: none;
+    }
+}

@@ -33,7 +33,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ClipboardModule } from '@angular/cdk/clipboard';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
+import { MAT_SELECTSEARCH_DEFAULT_OPTIONS, MatSelectSearchOptions, NgxMatSelectSearchModule } from 'ngx-mat-select-search';
 
 @NgModule({
   declarations: [],
@@ -110,6 +110,15 @@ import { NgxMatSelectSearchModule } from 'ngx-mat-select-search';
     MatSliderModule,
     MatAutocompleteModule,
     NgxMatSelectSearchModule
+  ],
+  providers: [
+    {
+      provide: MAT_SELECTSEARCH_DEFAULT_OPTIONS,
+      useValue: <MatSelectSearchOptions>{
+        noEntriesFoundLabel: 'No se han encontrado resultados',
+        placeholderLabel: 'Filtrar...'
+      }
+    }
   ]
 })
 export class MaterialModule { }

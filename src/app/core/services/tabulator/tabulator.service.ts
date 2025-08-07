@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import moment from 'moment';
+import { ConfigTablaTabulator } from 'src/app/shared/components/tabla-tabulator/tabla-tabulator.component';
 import { CellComponent, ColumnDefinition } from 'tabulator-tables';
+import { UtilsService } from '../utils-v2/utils.service';
+import { SupabaseService } from '../supabase/supabase.service';
 
 interface Columna {
   title: string,
@@ -15,7 +18,9 @@ interface Columna {
 })
 export class TabulatorService {
 
-  constructor() { }
+  public user: any;
+
+  constructor(private _utils: UtilsService, private _supabase: SupabaseService) { }
 
   getHeaderTablaArticulos(): ColumnDefinition[] {
 
@@ -37,7 +42,6 @@ export class TabulatorService {
       { title: 'Comisión por defecto', field: 'comision_default', type: 'number', formatter: '%' },
       { title: 'Tiene lote', field: 'tiene_lote', type: 'boolean', dropdown: true },
       { title: 'Marca', field: 'marca', type: 'string', dropdown: true },
-      { title: 'Descuento por defecto', field: 'descuento_default', type: 'number', formatter: '%' },
       { title: 'Grupos', field: 'grupos', type: 'string', dropdown: true }
     ]
 
@@ -74,7 +78,6 @@ export class TabulatorService {
       }
 
       if (col.type === 'boolean') {
-        nuevaCol.formatter = (cell) => cell.getValue() ? 'Sí' : 'No';
         nuevaCol.hozAlign = 'center';
       }
 
@@ -87,7 +90,7 @@ export class TabulatorService {
             symbol: "€",
             symbolAfter: true,
             negativeSign: true,
-            precision: 2,
+            precision: 4,
           }
           nuevaCol.hozAlign = 'right';
         } else {
@@ -96,14 +99,13 @@ export class TabulatorService {
       }
 
       if (col.dropdown) {
+        nuevaCol.headerFilter = 'list';
+        nuevaCol.headerFilterFunc = 'in';
+        nuevaCol.headerFilterParams = { valuesLookup: 'active', sort: "asc", multiselect: true, placeholderLoading: 'Cargando resultados...', placeholderEmpty: 'Sin resultados' };
 
         if (col.type === 'boolean') {
-          nuevaCol.headerFilter = 'tickCross';
-          nuevaCol.headerFilterParams = { tristate: true };
-        } else {
-          nuevaCol.headerFilter = 'list';
-          nuevaCol.headerFilterFunc = 'in';
-          nuevaCol.headerFilterParams = { valuesLookup: 'active', sort: "asc", multiselect: true, placeholderLoading: 'Cargando resultados...', placeholderEmpty: 'Sin resultados' };
+          nuevaCol.headerFilterParams.values = ['Sí', 'No'];
+          delete nuevaCol.headerFilterParams.valuesLookup;
         }
       }
 
@@ -182,5 +184,38 @@ export class TabulatorService {
       }
     }
     return true;
+  }
+
+  async tratamientoConfigTabla(cabecera: ColumnDefinition[], viewname: string, config: ConfigTablaTabulator[]): Promise<ConfigTablaTabulator[]> {
+
+    if (!this.user) {
+      this.user = await this._supabase.getUser();
+    }
+
+    if (!config || config.length === 0) {
+      config = cabecera.map((col, i) => { return { field: col.field, visible: true, order: i + 1, width: 150 } as ConfigTablaTabulator });
+      await this._supabase.supabase.from('config_componentes').insert({ viewname, user: this.user.username, config });
+    } else {
+      let configModificada = false;
+
+      cabecera.forEach(col => {
+        if (!config.find(e => col.field === e.field)) {
+          config.push({ field: col.field!, order: config.length, visible: true, width: 150 });
+          configModificada = true;
+        }
+      });
+
+      for (let i = config.length - 1; i >= 0; i--) {
+        if (!cabecera.find(col => col.field === config[i].field)) {
+          config.splice(i, 1);
+        }
+      }
+
+      if (configModificada) {
+        await this._supabase.supabase.from('config_componentes').update({ config }).eq('viewname', viewname).eq('user', this.user.username);
+      }
+    }
+
+    return config;
   }
 }

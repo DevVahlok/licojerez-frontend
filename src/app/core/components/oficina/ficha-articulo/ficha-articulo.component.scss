@@ -1,0 +1,7 @@
+@import './../../../../../styles/variables';
+
+.container-general__ficha-articulo {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+}

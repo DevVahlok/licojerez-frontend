@@ -14,7 +14,13 @@
     .toolbar {
         display: flex;
         flex-flow: row nowrap;
-        justify-content: flex-end;
+        justify-content: space-between;
+
+        .boton-crear-articulo {
+            mat-icon {
+                margin-right: 5px !important;
+            }
+        }
     }
 
     .container-input-excel {

@@ -4,7 +4,7 @@ import { UtilsService } from 'src/app/core/services/utils-v2/utils.service';
 import Tabulator, { ColumnDefinition, RowComponent } from 'tabulator-tables';
 import TabulatorTable from 'tabulator-tables';
 import { TabulatorFull } from 'tabulator-tables';
-//import { DialogConfigTablaV2 } from '../../dialogs/dialog-config-tabla/dialog-config-tabla';
+import { DialogConfigTabla } from '../../dialogs/dialog-config-tabla/dialog-config-tabla';
 
 export interface DataTablaTabulator {
   tableData: DataUnitTablaTabulator[][],
@@ -33,11 +33,12 @@ export interface DataTablaTabulator {
 export interface TablaTabulatorEvent {
   type: 'tabla-tabulator',
   name: string,
-  action: 'columnMoved' | 'rowClick' | 'cellClick' | 'cellContext' | 'tableBuilt' | 'upload' | 'columnResized' | 'configChanged' | 'filtersCleared' | 'rowSelected' | 'rowDeselected' | 'rowSelectionChanged' | 'dataFiltered',
+  action: 'columnMoved' | 'rowClick' | 'cellClick' | 'cellContext' | 'tableBuilt' | 'upload' | 'columnResized' | 'configChanged' | 'filtersCleared' | 'rowSelected' | 'rowDeselected' | 'rowSelectionChanged' | 'dataFiltered' | 'cellDblClick',
   value: ConfigTablaTabulator | any
 }
 
 export interface ConfigTablaTabulator {
+  title?: string,
   field: string,
   visible: boolean,
   order: number,
@@ -87,6 +88,21 @@ export class TablaTabulatorComponent implements OnInit {
   }
 
   private configurarTabla(): TabulatorTable.Options {
+
+    if (this.data.config) {
+
+      const map2 = new Map(this.data.config.map(obj => [obj.field, obj]));
+
+      const array1Modificado = this.data.cabecera.map(col => {
+        const config = map2.get(col.field!);
+        if (config) {
+          return { ...col, width: config.width, visible: config.visible, order: config.order };
+        }
+        return col;
+      });
+
+      this.data.cabecera = this._utils.ordenarObjectArrayPorPropiedad(array1Modificado, 'order') as ColumnDefinition[];
+    }
 
     let tableOptions: TabulatorTable.Options = {
       data: this.formatearDatosTabulator(this.data.tableData),
@@ -204,37 +220,37 @@ export class TablaTabulatorComponent implements OnInit {
 
   abrirDialogConfigs() {
 
-    /*     let columnas = JSON.parse(JSON.stringify(this.data.config));
-    
-        columnas.forEach(e => {
-          e.title = this.tabla.getColumns().find(e2 => e2.getField() === e.field)!.getDefinition().title
-        });
-    
-        this._dialog.open(DialogConfigTablaV2, { width: '500px', data: { listaColumnas: columnas } }).afterClosed().subscribe((res: any) => {
-    
-          if (res) {
-    
-            res.forEach(e => delete e.title);
-    
-            let columnas = this.tabla.getColumns()
-    
-            columnas.forEach((col, i) => {
-    
-              col.getDefinition().visible = res.find(e => e.field === col.getField()).visible;
-    
-              col['order'] = res.find(e => e.field === col.getField()).order;
-            })
-    
-            columnas = this._utils.ordenarObjectArrayPorPropiedad(columnas, 'order');
-    
-            columnas.forEach((e: any) => delete e.order);
-    
-            this.tabla.setColumns(columnas.map(col => col.getDefinition()))
-    
-            this.emitter.emit({ type: 'tabla-tabulator', action: 'configChanged', name: this.name, value: res })
-          }
-    
-        }) */
+    let columnas = JSON.parse(JSON.stringify(this.data.config));
+
+    columnas.forEach((e: any) => {
+      e.title = this.tabla.getColumns().find(e2 => e2.getField() === e.field)!.getDefinition().title
+    });
+
+    this._dialog.open(DialogConfigTabla, { width: '500px', data: { listaColumnas: columnas } }).afterClosed().subscribe((res: any) => {
+
+      if (res) {
+
+        res.forEach((e: any) => delete e.title);
+
+        let columnas = this.tabla.getColumns()
+
+        columnas.forEach((col, i) => {
+
+          col.getDefinition().visible = res.find((e: any) => e.field === col.getField()).visible;
+
+          (col as any)['order'] = res.find((e: any) => e.field === col.getField()).order;
+        })
+
+        columnas = this._utils.ordenarObjectArrayPorPropiedad(columnas, 'order')!;
+
+        columnas.forEach((e: any) => delete e.order);
+
+        this.tabla.setColumns(columnas.map(col => col.getDefinition()))
+
+        this.emitter.emit({ type: 'tabla-tabulator', action: 'configChanged', name: this.name, value: res })
+      }
+
+    })
   }
 
   administrarEventosTabulator() {
@@ -293,6 +309,10 @@ export class TablaTabulatorComponent implements OnInit {
 
     this.tabla.on('cellClick', (evento, celda) => {
       this.emitter.emit({ type: 'tabla-tabulator', action: 'cellClick', name: this.name, value: celda })
+    })
+
+    this.tabla.on('cellDblClick', (evento, celda) => {
+      this.emitter.emit({ type: 'tabla-tabulator', action: 'cellDblClick', name: this.name, value: celda })
     })
 
     this.tabla.on('cellContext', (evento, celda) => {

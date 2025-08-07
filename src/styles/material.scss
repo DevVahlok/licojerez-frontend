@@ -62,7 +62,7 @@
 
 .mat-mdc-form-field {
     background-color: transparent;
-    color: $texto_alt !important;
+    color: $texto !important;
 
     &.mat-form-field-disabled {
         mat-label {
@@ -92,7 +92,7 @@
         margin-bottom: 30px;
 
         .mdc-line-ripple::before {
-            border-bottom-color: red !important;
+            border-bottom-color: $error !important;
         }
     }
 
@@ -110,7 +110,7 @@
     }
 
     .mat-mdc-input-element {
-        color: $texto_alt;
+        color: $texto;
     }
 
     .mat-mdc-text-field-wrapper {
@@ -135,7 +135,7 @@
     .mdc-line-ripple {
 
         &::before {
-            border-bottom-color: $texto_alt !important;
+            border-bottom-color: $texto !important;
         }
 
         &::after {
@@ -144,8 +144,8 @@
     }
 
     .mdc-text-field__input {
-        caret-color: $texto_alt !important;
-        color: $texto_alt !important;
+        caret-color: $texto !important;
+        color: $texto !important;
     }
 
     .mat-mdc-form-field-focus-overlay {
@@ -173,7 +173,7 @@
     .mat-mdc-select {
 
         * {
-            color: $texto_alt
+            color: $texto
         }
 
         &:hover {
@@ -187,7 +187,7 @@
 }
 
 .mat-mdc-select-panel {
-    background-color: grey !important;
+    background-color: $texto_alt;
     width: 100%;
     overflow-x: hidden !important;
 
@@ -195,7 +195,7 @@
         width: 100%;
 
         .mdc-list-item__primary-text {
-            color: $texto_alt !important;
+            color: $texto !important;
         }
     }
 
@@ -449,7 +449,7 @@
         height: 40px !important;
 
         .mdc-tab__text-label {
-            color: $texto_alt;
+            color: $texto;
             padding: 0 24px;
 
             .mat-mdc-progress-spinner {
@@ -488,6 +488,7 @@
     }
 
     .mdc-checkbox__background {
+        background-color: transparent !important;
         border-color: $texto_alt !important;
     }
 }
@@ -527,6 +528,7 @@
 
     .mdc-checkbox__background {
         border-color: $acento !important;
+        background: $acento !important;
     }
 }
 
@@ -542,11 +544,19 @@
         width: 40px !important;
 
         label {
-            color: $texto_alt !important;
+            color: $texto !important;
             min-width: max-content;
             cursor: pointer;
         }
     }
+}
+
+.mat-mdc-slide-toggle.mat-mdc-slide-toggle-checked:not(.mat-disabled) .mdc-switch__shadow {
+    background-color: $acento;
+}
+
+.mat-mdc-slide-toggle.mat-mdc-slide-toggle-checked:not(.mat-disabled) .mdc-switch__track::after {
+    background-color: $acento !important;
 }
 
 .mat-mdc-tab-body-content {
@@ -670,7 +680,7 @@
 
 .contains-mat-select-search {
     z-index: 99999999;
-    background-color: grey;
+    background-color: transparent;
 }
 
 .mat-mdc-dialog-container {
@@ -679,4 +689,13 @@
     h1 {
         color: $acento;
     }
+}
+
+.mat-mdc-option-pseudo-checkbox {
+    margin-right: -3px;
+}
+
+.mat-select-search-inner {
+    width: max-content !important;
+    min-width: 290px !important;
 }

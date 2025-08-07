@@ -1,10 +1,9 @@
-import { Component, NgZone, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import packageJson from '../../../../../package.json';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
-import { createClient } from '@supabase/supabase-js';
 import { SupabaseService } from '../../services/supabase/supabase.service';
 
 @Component({
