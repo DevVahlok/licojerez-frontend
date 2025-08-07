@@ -88,7 +88,7 @@ export class ListaArticulosComponent {
           this.datosTabla = {
             cabecera: this.tratamientoColumnas(this._tabulator.getHeaderTablaArticulos(), listaGrupos),
             tableData: this._utils.convertirEnFormatoTabla(filas),
-            config: await this._tabulator.tratamientoConfigTabla(this._tabulator.getHeaderTablaArticulos(), 'tabla-lista-articulos', configUsuario.config),
+            config: await this._tabulator.tratamientoConfigTabla(this._tabulator.getHeaderTablaArticulos(), 'tabla-lista-articulos', configUsuario ? configUsuario.config : []),
             options: {
               title: 'Lista de Artículos',
               height: '500px',
