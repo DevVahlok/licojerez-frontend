@@ -8,6 +8,7 @@ import { AuthGuard } from './core/services/guard/auth.guard';
 import { ListaLogsComponent } from './core/components/oficina/lista-logs/lista-logs.component';
 import { ListaProveedoresComponent } from './core/components/oficina/lista-proveedores/lista-proveedores.component';
 import { FichaArticuloComponent } from './core/components/oficina/ficha-articulo/ficha-articulo.component';
+import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 
 const routes: Routes = [
   {
@@ -47,6 +48,7 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
+  providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }] //TODO: eliminar cuando se quite el host de github pages
 })
 export class AppRoutingModule { }
