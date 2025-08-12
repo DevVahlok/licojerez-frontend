@@ -220,7 +220,7 @@ export class TablaTabulatorComponent implements OnInit {
 
   abrirDialogConfigs() {
 
-    let columnas = JSON.parse(JSON.stringify(this.data.config));
+    let columnas = structuredClone(this.data.config)!;
 
     columnas.forEach((e: any) => {
       e.title = this.tabla.getColumns().find(e2 => e2.getField() === e.field)!.getDefinition().title
@@ -321,7 +321,7 @@ export class TablaTabulatorComponent implements OnInit {
 
     this.tabla.on('columnMoved', (column, columns) => {
 
-      let nuevaConfig = JSON.parse(JSON.stringify(this.data.config));
+      let nuevaConfig = structuredClone(this.data.config)!;
 
       let nuevaPosicion = columns.findIndex(e => e.getField() === column.getField());
 
@@ -334,9 +334,9 @@ export class TablaTabulatorComponent implements OnInit {
 
     this.tabla.on('columnResized', (column) => {
 
-      let nuevaConfig = JSON.parse(JSON.stringify(this.data.config));
+      let nuevaConfig = structuredClone(this.data.config)!;
 
-      nuevaConfig.find((e: any) => e.field === column.getField()).width = column.getWidth();
+      nuevaConfig.find((e: any) => e.field === column.getField())!.width = column.getWidth();
 
       this.emitter.emit({ type: 'tabla-tabulator', action: 'columnResized', name: this.name, value: nuevaConfig })
     })

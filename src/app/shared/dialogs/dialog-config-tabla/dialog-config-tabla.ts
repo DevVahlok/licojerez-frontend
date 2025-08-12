@@ -19,7 +19,7 @@ export class DialogConfigTabla {
     constructor(public dialogRef: MatDialogRef<DialogConfigTabla>, @Inject(MAT_DIALOG_DATA) public data: any) { }
 
     ngOnInit() {
-        this.listaColumnas = JSON.parse(JSON.stringify(this.data.listaColumnas));
+        this.listaColumnas = structuredClone(this.data.listaColumnas);
         this.marcarTodo = this.listaColumnas.every(e => e.visible);
     }
 

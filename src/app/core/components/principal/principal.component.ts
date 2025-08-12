@@ -25,10 +25,10 @@ export class PrincipalComponent {
   async ngOnInit() {
     this._title.setTitle('Menú principal');
     this.user = await this._supabase.getUser();
-    this.conseguirOpcionesMenu();
+    this.getOpcionesMenu();
   }
 
-  conseguirOpcionesMenu() {
+  getOpcionesMenu() {
     this.listaOpciones = [
       // { titulo: 'TPV', icono: 'shopping_cart', redirect: '' },
       { titulo: 'Oficina', icono: 'business_center', redirect: '/oficina/articulos' }

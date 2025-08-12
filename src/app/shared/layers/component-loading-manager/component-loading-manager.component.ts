@@ -35,7 +35,7 @@ export class ComponentLoadingManagerComponent implements OnInit {
     }
 
     if (changes['size']) {
-      this.originalSize = JSON.parse(JSON.stringify(this.size));
+      this.originalSize = structuredClone(this.size);
     }
   }
 
@@ -50,7 +50,7 @@ export class ComponentLoadingManagerComponent implements OnInit {
     if (this.minimized) {
       this.size.height = '25px';
     } else {
-      this.size.height = JSON.parse(JSON.stringify(this.originalSize.height));
+      this.size.height = structuredClone(this.originalSize.height);
     }
 
     const evento: LoadingManagerEvent = { type: 'component-loading-manager', name: this.name, value: null };

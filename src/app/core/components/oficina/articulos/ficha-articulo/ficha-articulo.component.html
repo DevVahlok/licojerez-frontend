@@ -167,6 +167,18 @@
                             <fieldset class="fieldset-tarifas">
                                 <legend>Tarifas</legend>
 
+                                <div class="container-selector">
+                                    <mat-form-field>
+                                        <mat-label>IVA</mat-label>
+                                        <mat-select formControlName="idIva" (selectionChange)="editarCampo('idIva')">
+                                            <ng-container *ngFor="let iva of listasDesplegables.iva">
+                                                <mat-option [value]="iva.codigo">{{iva.nombre}} %</mat-option>
+                                            </ng-container>
+                                        </mat-select>
+                                    </mat-form-field>
+                                    <mat-spinner [diameter]="35" *ngIf="!listasDesplegables.iva"></mat-spinner>
+                                </div>
+
                                 <div
                                     [matTooltip]="'El precio coste se calcula automáticamente a partir de las entradas registradas'">
                                     <mat-form-field class="campo-precio-coste">

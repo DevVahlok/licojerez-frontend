@@ -62,6 +62,10 @@ export interface Marca {
 
 }
 
+export interface IVA {
+
+}
+
 export interface ConfigTabla {
     id: number,
     viewname: string,

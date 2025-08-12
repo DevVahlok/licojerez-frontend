@@ -1,6 +1,6 @@
-import { Component, Input, SimpleChange, SimpleChanges, ViewEncapsulation } from '@angular/core';
-import { ArticulosComponent, ListaDesplegablesFichaArticulo } from '../articulos.component';
-import { Articulo, Familia, Marca, Proveedor, Subfamilia } from 'src/app/models/oficina';
+import { Component, Input, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { ListaDesplegablesFichaArticulo } from '../articulos.component';
+import { Articulo, Familia, IVA, Marca, Proveedor, Subfamilia } from 'src/app/models/oficina';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import moment from 'moment';
@@ -26,7 +26,7 @@ export class FichaArticuloComponent {
     familia: new FormControl(null),
     subfamilia: new FormControl(null),
     marca: new FormControl(null),
-    formato: new FormControl(null),
+    formato: new FormControl(null)
   });
   public listasFiltradasDesplegables: ListaDesplegablesFichaArticulo = {
     proveedor: [],
@@ -78,20 +78,21 @@ export class FichaArticuloComponent {
   async ngOnInit(): Promise<void> {
     this.spinner = true;
     this.getListasDesplegables();
-    this.conseguirVendedores();
-    this.conseguirPrimerArticulo();
+    this.getPrimerArticulo();
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['id']?.currentValue) {
-      this.conseguirArticulo();
+      this.getArticulo();
+      this.getVendedores();
     }
   }
 
-  async conseguirPrimerArticulo() {
+  async getPrimerArticulo() {
     const { data } = await this._supabase.supabase.from('articulos').select('*').order('codigo', { ascending: true }).limit(1).single();
     this.id = data.codigo;
-    this.conseguirArticulo();
+    this.getArticulo();
+    this.getVendedores();
   }
 
   getListasDesplegables() {
@@ -119,21 +120,27 @@ export class FichaArticuloComponent {
         this.listasDesplegables = { ...this.listasDesplegables, marca: data?.map(marca => { return { codigo: marca.codigo, nombre: marca.nombre }; })! } as ListaDesplegablesFichaArticulo;
       }
     });
+
+    from(this._supabase.supabase.from<any, IVA[]>('ivas').select('*')).subscribe(({ data, error }) => {
+      if (!error) {
+        this.listasDesplegables = { ...this.listasDesplegables, iva: data?.map(iva => { return { codigo: iva.codigo, nombre: iva.valor_iva }; })! } as ListaDesplegablesFichaArticulo;
+      }
+    });
   }
 
-  conseguirVendedores() {
-    this.listaVendedores = [
-      { codigo: 1, nombre: 'Carlos Medrano', comision: 5 },
-      { codigo: 2, nombre: 'David Valderrama', comision: 7 },
-      { codigo: 3, nombre: 'David Sainz', comision: 3 },
-      { codigo: 4, nombre: 'Tomás Moreno', comision: 2 },
-    ]
+  async getVendedores() {
+    const { data, error } = await this._supabase.supabase.from('comisiones_articulos').select(`id_comision, comision,   vendedores (     *   ) `).eq('id_comision', this.id);
 
-    this.listaVendedoresFiltrada = JSON.parse(JSON.stringify(this.listaVendedores))
+    if (error) {
+      //TODO: gestionar errores
+    } else {
+      this.listaVendedores = (data as unknown as { vendedores: { nombre: string, created_at: string, id_vendedor: number }, id_comision: number, comision: number }[]).map(vendedor => { return { codigo: vendedor.id_comision, nombre: vendedor.vendedores.nombre, comision: vendedor.comision } })
+    }
+
+    this.listaVendedoresFiltrada = structuredClone(this.listaVendedores)
   }
 
   filtrarVendedores() {
-    //TODO: refactorizar vendedores hardcoded
     this.listaVendedoresFiltrada = this.listaVendedores.filter((vendedor: any) => vendedor.nombre.toLowerCase().includes(this.inputVendedor.value!.toLowerCase()))
   }
 
@@ -144,7 +151,7 @@ export class FichaArticuloComponent {
     if (valor.marca) this.filtrarDesplegableSearch('marca');
   }
 
-  filtrarDesplegableSearch(campo: 'proveedor' | 'familia' | 'subfamilia' | 'marca') {
+  filtrarDesplegableSearch(campo: 'proveedor' | 'familia' | 'subfamilia' | 'marca' | 'iva') {
     this.listasFiltradasDesplegables[campo] = this.listasDesplegables[campo];
     this.formFiltrosDesplegables.get(campo)!.valueChanges.pipe().subscribe(() => {
       if (!this.formFiltrosDesplegables.get(campo)!.value || this.formFiltrosDesplegables.get(campo)!.value === '') {
@@ -155,17 +162,17 @@ export class FichaArticuloComponent {
     });
   }
 
-  async conseguirArticulo() {
+  async getArticulo() {
+
+    //TODO: interfaces en oficina.ts
 
     //TODO: aplicar sockets a cada desplegable (cada vez que se crea una subfamilia, por ejemplo), también en lista vendedores
 
     //TODO: poder ordenar lista vendedores por % comisión
 
-    //TODO: añadir campo Formato
-
     //TODO: relacionar jerarquicamente familias con subfamilias, bloquear subfamilia si no tiene familia seleccionada
 
-    //TODO: estilizar con placeholders la lisa de comisiones con sus vendedores
+    //TODO: poner RLS policies en All
 
     this.suscripcionArticulo = this._supabase.supabase.channel(`articulo-${this.id}`).on('postgres_changes', { event: '*', schema: 'public', table: 'articulos', filter: `codigo=eq.${this.id}` }, payload => {
       this.articulo = payload.new as Articulo;
