@@ -5,21 +5,21 @@ export interface Articulo {
     stock: number,
     precio_coste: number,
     tipo: 'Material' | 'Servicio',
-    codigo: number,
+    id_articulo: number,
     precio_venta: number,
     ean13_2: number,
     ean13_3: number,
     ean13_4: number,
     ean13_5: number,
-    idProveedor: number,
-    idFamilia: number,
-    idSubfamilia: number,
-    idIva: number,
+    id_proveedor: number,
+    id_familia: number,
+    id_subfamilia: number,
+    id_iva: number,
     margen: number,
     activo: boolean,
     comision_default: number,
     tiene_lote: boolean,
-    idMarca: number
+    id_marca: number
 }
 
 export interface Proveedor {
@@ -28,7 +28,7 @@ export interface Proveedor {
     banco_bic: string,
     cif: string,
     ciudad: string,
-    codigo: number,
+    id_proveedor: number,
     codigo_cuenta_cliente: string,
     codigo_postal: number,
     contacto: string,
@@ -51,23 +51,33 @@ export interface Proveedor {
 }
 
 export interface Familia {
-
+    id_familia: number,
+    fecha_alta: string,
+    nombre: string
 }
 
 export interface Subfamilia {
-
+    id_subfamilia: number,
+    fecha_alta: string,
+    nombre: string,
+    id_familia: number
 }
 
 export interface Marca {
-
+    id_marca: number,
+    fecha_alta: string,
+    nombre: string
 }
 
 export interface IVA {
-
+    id_iva: number,
+    fecha_alta: string,
+    valor_iva: number,
+    valor_recargo_equivalencia: number
 }
 
 export interface ConfigTabla {
-    id: number,
+    id_config: number,
     viewname: string,
     user: string,
     config: {

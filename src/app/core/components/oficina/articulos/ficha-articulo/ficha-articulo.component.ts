@@ -49,7 +49,7 @@ export class FichaArticuloComponent {
   @Input() id: number;
   public articulo: Articulo;
   public formArticulo = new FormGroup({
-    codigo: new FormControl(-1, Validators.required),
+    id_articulo: new FormControl(-1, Validators.required),
     fecha_alta: new FormControl('', Validators.required),
     nombre: new FormControl('', Validators.required),
     ean13_1: new FormControl(0, Validators.pattern(/^-?\d+(\.\d+)?$/)),
@@ -61,15 +61,15 @@ export class FichaArticuloComponent {
     precio_coste: new FormControl(0, Validators.required),
     tipo: new FormControl('Material', Validators.required),
     precio_venta: new FormControl(0, Validators.required),
-    idProveedor: new FormControl(-1),
-    idFamilia: new FormControl(-1),
-    idSubfamilia: new FormControl(-1),
-    idIva: new FormControl(-1, Validators.required),
+    id_proveedor: new FormControl(-1),
+    id_familia: new FormControl(-1),
+    id_subfamilia: new FormControl(-1),
+    id_iva: new FormControl(-1, Validators.required),
     margen: new FormControl(0, Validators.required),
     activo: new FormControl(false, Validators.required),
     comision_default: new FormControl(0),
     tiene_lote: new FormControl(false, Validators.required),
-    idMarca: new FormControl(-1),
+    id_marca: new FormControl(-1),
     formato: new FormControl(null)
   });
 
@@ -77,7 +77,6 @@ export class FichaArticuloComponent {
 
   async ngOnInit(): Promise<void> {
     this.spinner = true;
-    this.getListasDesplegables();
     this.getPrimerArticulo();
   }
 
@@ -89,8 +88,8 @@ export class FichaArticuloComponent {
   }
 
   async getPrimerArticulo() {
-    const { data } = await this._supabase.supabase.from('articulos').select('*').order('codigo', { ascending: true }).limit(1).single();
-    this.id = data.codigo;
+    const { data } = await this._supabase.supabase.from('articulos').select('*').order('id_articulo', { ascending: true }).limit(1).single();
+    this.id = data.id_articulo;
     this.getArticulo();
     this.getVendedores();
   }
@@ -99,37 +98,44 @@ export class FichaArticuloComponent {
 
     from(this._supabase.supabase.from<any, Proveedor[]>('proveedores').select('*')).subscribe(async ({ data, error }) => {
       if (!error) {
-        this.listasDesplegables = { ...this.listasDesplegables, proveedor: data?.map(prov => { return { codigo: prov.codigo, nombre: prov.nombre }; })! } as ListaDesplegablesFichaArticulo;
+        this.listasDesplegables = { ...this.listasDesplegables, proveedor: data?.map(prov => { return { codigo: prov.id_proveedor, nombre: prov.nombre }; })! } as ListaDesplegablesFichaArticulo;
+        this.filtrarDesplegableSearch('proveedor');
       }
     });
 
     from(this._supabase.supabase.from<any, Familia[]>('familias').select('*')).subscribe(({ data, error }) => {
       if (!error) {
-        this.listasDesplegables = { ...this.listasDesplegables, familia: data?.map(fam => { return { codigo: fam.codigo, nombre: fam.nombre }; })! } as ListaDesplegablesFichaArticulo;
+        this.listasDesplegables = { ...this.listasDesplegables, familia: data?.map(fam => { return { codigo: fam.id_familia, nombre: fam.nombre }; })! } as ListaDesplegablesFichaArticulo;
+        this.filtrarDesplegableSearch('familia');
       }
     });
 
-    from(this._supabase.supabase.from<any, Subfamilia[]>('subfamilias').select('*')).subscribe(({ data, error }) => {
-      if (!error) {
-        this.listasDesplegables = { ...this.listasDesplegables, subfamilia: data?.map(subfam => { return { codigo: subfam.codigo, nombre: subfam.nombre }; })! } as ListaDesplegablesFichaArticulo;
-      }
-    });
+    if (this.formArticulo.get('id_familia')!.value !== null && this.formArticulo.get('id_familia')!.value !== -1) {
+      from(this._supabase.supabase.from('subfamilias').select('*').eq('id_familia', this.formArticulo.get('id_familia')!.value)).subscribe(({ data, error }) => {
+        if (!error) {
+          const subfamilias = (data ?? []) as Subfamilia[];
+          this.listasDesplegables = { ...this.listasDesplegables, subfamilia: subfamilias.map(subfamilia => ({ codigo: subfamilia.id_subfamilia, nombre: subfamilia.nombre })) } as unknown as ListaDesplegablesFichaArticulo;
+          this.filtrarDesplegableSearch('subfamilia');
+        }
+      });
+    }
 
     from(this._supabase.supabase.from<any, Marca[]>('marcas').select('*')).subscribe(({ data, error }) => {
       if (!error) {
-        this.listasDesplegables = { ...this.listasDesplegables, marca: data?.map(marca => { return { codigo: marca.codigo, nombre: marca.nombre }; })! } as ListaDesplegablesFichaArticulo;
+        this.listasDesplegables = { ...this.listasDesplegables, marca: data?.map(marca => { return { codigo: marca.id_marca, nombre: marca.nombre }; })! } as ListaDesplegablesFichaArticulo;
+        this.filtrarDesplegableSearch('marca');
       }
     });
 
     from(this._supabase.supabase.from<any, IVA[]>('ivas').select('*')).subscribe(({ data, error }) => {
       if (!error) {
-        this.listasDesplegables = { ...this.listasDesplegables, iva: data?.map(iva => { return { codigo: iva.codigo, nombre: iva.valor_iva }; })! } as ListaDesplegablesFichaArticulo;
+        this.listasDesplegables = { ...this.listasDesplegables, iva: data?.map(iva => { return { codigo: iva.id_iva, nombre: iva.valor_iva }; })! } as ListaDesplegablesFichaArticulo;
       }
     });
   }
 
   async getVendedores() {
-    const { data, error } = await this._supabase.supabase.from('comisiones_articulos').select(`id_comision, comision,   vendedores (     *   ) `).eq('id_comision', this.id);
+    const { data, error } = await this._supabase.supabase.from('comisiones_articulos').select(`id_comision, comision,   vendedores (     *   ) `).eq('id_articulo', this.id);
 
     if (error) {
       //TODO: gestionar errores
@@ -144,14 +150,7 @@ export class FichaArticuloComponent {
     this.listaVendedoresFiltrada = this.listaVendedores.filter((vendedor: any) => vendedor.nombre.toLowerCase().includes(this.inputVendedor.value!.toLowerCase()))
   }
 
-  onListasDesplegablesCambiada(valor: ListaDesplegablesFichaArticulo) {
-    if (valor.proveedor) this.filtrarDesplegableSearch('proveedor');
-    if (valor.familia) this.filtrarDesplegableSearch('familia');
-    if (valor.subfamilia) this.filtrarDesplegableSearch('subfamilia');
-    if (valor.marca) this.filtrarDesplegableSearch('marca');
-  }
-
-  filtrarDesplegableSearch(campo: 'proveedor' | 'familia' | 'subfamilia' | 'marca' | 'iva') {
+  filtrarDesplegableSearch(campo: 'proveedor' | 'familia' | 'subfamilia' | 'marca') {
     this.listasFiltradasDesplegables[campo] = this.listasDesplegables[campo];
     this.formFiltrosDesplegables.get(campo)!.valueChanges.pipe().subscribe(() => {
       if (!this.formFiltrosDesplegables.get(campo)!.value || this.formFiltrosDesplegables.get(campo)!.value === '') {
@@ -179,7 +178,7 @@ export class FichaArticuloComponent {
       this.formArticulo.setValue(this.tratamientoPreFormulario())
     }).subscribe();
 
-    const { data, error } = await this._supabase.supabase.from('articulos').select('*').eq('codigo', this.id).single();
+    const { data, error } = await this._supabase.supabase.from('articulos').select('*').eq('id_articulo', this.id).single();
 
     if (error) {
       //TODO: mostrar error
@@ -191,11 +190,12 @@ export class FichaArticuloComponent {
 
     this.formArticulo.setValue(this.tratamientoPreFormulario())
     this.valoresAnteriores = this.tratamientoPreFormulario();
+    this.getListasDesplegables();
   }
 
   tratamientoPreFormulario() {
 
-    this.formArticulo.get('codigo')?.disable();
+    this.formArticulo.get('id_articulo')?.disable();
     this.formArticulo.get('fecha_alta')?.disable();
     this.formArticulo.get('precio_coste')?.disable();
     this.formArticulo.get('stock')?.disable();
@@ -214,7 +214,7 @@ export class FichaArticuloComponent {
     this.formArticulo.get('formato')!.disable();
 
     return {
-      codigo: this.articulo.codigo,
+      id_articulo: this.articulo.id_articulo,
       fecha_alta: moment(this.articulo.fecha_alta).format('DD/MM/yyyy'),
       nombre: this.articulo.nombre,
       ean13_1: this.articulo.ean13_1,
@@ -226,15 +226,15 @@ export class FichaArticuloComponent {
       precio_coste: this.articulo.precio_coste,
       tipo: this.articulo.tipo,
       precio_venta: this.articulo.precio_venta,
-      idProveedor: this.articulo.idProveedor,
-      idFamilia: this.articulo.idFamilia,
-      idSubfamilia: this.articulo.idSubfamilia,
-      idIva: this.articulo.idIva,
+      id_proveedor: this.articulo.id_proveedor,
+      id_familia: this.articulo.id_familia,
+      id_subfamilia: this.articulo.id_subfamilia,
+      id_iva: this.articulo.id_iva,
       margen: this.articulo.margen,
       activo: this.articulo.activo,
       comision_default: this.articulo.comision_default,
       tiene_lote: this.articulo.tiene_lote,
-      idMarca: this.articulo.idMarca,
+      id_marca: this.articulo.id_marca,
       formato: null
     }
   }
@@ -250,7 +250,7 @@ export class FichaArticuloComponent {
 
         if (this.formArticulo.get(campo)!.value === '') this.formArticulo.get(campo)!.setValue(null as any);
 
-        const { error } = await this._supabase.supabase.from('articulos').update({ [campo]: this.formArticulo.get(campo)!.value }).eq('codigo', this.id)
+        const { error } = await this._supabase.supabase.from('articulos').update({ [campo]: this.formArticulo.get(campo)!.value }).eq('id_articulo', this.id)
 
         if (error) {
           this._snackbar.open(`Ha habido un error al modificar el campo: ${campo}`, undefined, { duration: 7000 });
@@ -281,7 +281,7 @@ export class FichaArticuloComponent {
                 this.articulo.stock = 0;
                 this.formArticulo.get('stock')!.disable();
                 this.formArticulo.get('tiene_lote')!.disable();
-                const { error } = await this._supabase.supabase.from('articulos').update({ stock: 0 }).eq('codigo', this.id);
+                const { error } = await this._supabase.supabase.from('articulos').update({ stock: 0 }).eq('id_articulo', this.id);
                 if (error) {
                   this._supabase.anadirLog(`ha tenido un error al modificar el campo "stock" del artículo con código ${this.id}`, error.message);
                 } else {
@@ -302,7 +302,7 @@ export class FichaArticuloComponent {
 
               //TODO: hay flickering
 
-              const { error: error2 } = await this._supabase.supabase.from('articulos').update({ margen: nuevoMargen }).eq('codigo', this.id);
+              const { error: error2 } = await this._supabase.supabase.from('articulos').update({ margen: nuevoMargen }).eq('id_articulo', this.id);
               if (error2) {
                 this._supabase.anadirLog(`ha tenido un error al modificar el campo "margen" del artículo con código ${this.id}`, error2.message);
               } else {
@@ -318,12 +318,25 @@ export class FichaArticuloComponent {
               this.formArticulo.get('precio_venta')!.setValue(nuevoPrecioVenta);
               this.articulo.precio_venta = nuevoPrecioVenta;
 
-              const { error: error3 } = await this._supabase.supabase.from('articulos').update({ precio_venta: nuevoPrecioVenta }).eq('codigo', this.id);
+              const { error: error3 } = await this._supabase.supabase.from('articulos').update({ precio_venta: nuevoPrecioVenta }).eq('id_articulo', this.id);
               if (error3) {
                 this._supabase.anadirLog(`ha tenido un error al modificar el campo "precio_venta" del artículo con código ${this.id}`, error3.message);
               } else {
                 this._supabase.anadirLog(`ha modificado el campo "precio_venta": ${this.valoresAnteriores['precio_venta']} \u2192 ${this.formArticulo.get('precio_venta')!.value} del artículo con código ${this.id}`);
               }
+
+              break;
+
+            case 'id_familia':
+
+              this.listasDesplegables.subfamilia = null;
+
+              from(this._supabase.supabase.from('subfamilias').select('*').eq('id_familia', this.formArticulo.get('id_familia')!.value)).subscribe(({ data, error }) => {
+                if (!error) {
+                  const subfamilias = (data ?? []) as Subfamilia[];
+                  this.listasDesplegables = { ...this.listasDesplegables, subfamilia: subfamilias.map(subfamilia => ({ codigo: subfamilia.id_subfamilia, nombre: subfamilia.nombre })) } as unknown as ListaDesplegablesFichaArticulo;
+                }
+              });
 
               break;
           }

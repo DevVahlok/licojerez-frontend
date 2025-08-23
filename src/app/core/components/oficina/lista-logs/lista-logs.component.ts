@@ -7,7 +7,7 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
 import { UtilsService } from 'src/app/core/services/utils-v2/utils.service';
 
 interface LogInterno {
-  id: number,
+  id_log: number,
   fecha: string,
   usuario: string,
   accion: string,
@@ -48,7 +48,7 @@ export class ListaLogsComponent {
       this.spinner = 1;
       this.listaLogs = data;
       await this._utils.delay(10);
-      this.viewport.scrollToIndex(this.listaLogs.length - 1, 'auto');
+      this.viewport.scrollToIndex(this.viewport.getDataLength() - 1, 'auto');
     }
   }
 

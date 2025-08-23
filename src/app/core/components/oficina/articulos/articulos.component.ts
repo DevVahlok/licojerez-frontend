@@ -17,7 +17,7 @@ export interface ListaDesplegablesFichaArticulo {
 }
 
 interface opcionBuscadorArticulo {
-  codigo: number,
+  id_articulo: number,
   nombre: string,
   ean13: string[]
 }
@@ -52,7 +52,7 @@ export class ArticulosComponent {
 
   seleccionarPrimero() {
     const opciones = this.opcionesBuscadorArticulosFiltrado;
-    if (opciones.length > 0) this.abrirFicha(opciones[0].codigo)
+    if (opciones.length > 0) this.abrirFicha(opciones[0].id_articulo)
   }
 
   activarListenerInputBuscador() {
@@ -67,11 +67,11 @@ export class ArticulosComponent {
         if (value === '') {
           this.opcionesBuscadorArticulosFiltrado = [];
         } else {
-          const { data } = await this._supabase.supabase.from('articulos_busqueda').select('*').or(`nombre.ilike.%${value}%,` + `codigo.ilike.%${value}%,` + `ean13_1.ilike.%${value}%,` + `ean13_2.ilike.%${value}%,` + `ean13_3.ilike.%${value}%,` + `ean13_4.ilike.%${value}%,` + `ean13_5.ilike.%${value}%`);
+          const { data } = await this._supabase.supabase.from('articulos_busqueda').select('*').or(`nombre.ilike.%${value}%,` + `id_articulo.ilike.%${value}%,` + `ean13_1.ilike.%${value}%,` + `ean13_2.ilike.%${value}%,` + `ean13_3.ilike.%${value}%,` + `ean13_4.ilike.%${value}%,` + `ean13_5.ilike.%${value}%`);
 
-          let resultado = data!?.map(articulo => { return { codigo: articulo.codigo, nombre: articulo.nombre, ean13: [articulo.ean13_1, articulo.ean13_2, articulo.ean13_3, articulo.ean13_4, articulo.ean13_5] } });
+          let resultado = data!?.map(articulo => { return { id_articulo: articulo.id_articulo, nombre: articulo.nombre, ean13: [articulo.ean13_1, articulo.ean13_2, articulo.ean13_3, articulo.ean13_4, articulo.ean13_5] } });
 
-          const indexCodigoIdentico = resultado.findIndex(articulo => articulo.codigo === value);
+          const indexCodigoIdentico = resultado.findIndex(articulo => articulo.id_articulo === value);
 
           if (indexCodigoIdentico <= 0 || indexCodigoIdentico >= resultado.length) {
 

@@ -74,11 +74,12 @@ export class ListaArticulosComponent {
     }
 
     forkJoin([
-      (from(this._supabase.supabase.from('articulos').select('*, proveedores(nombre), familias(nombre), subfamilias(nombre), ivas(valor_iva), marcas(nombre), articulos_grupos(grupo_codigo, grupos_articulos(nombre))').order('nombre')) as Observable<{ data: ArticuloSupabase[] }>).pipe(tap(() => incrementarCarga())),
+      (from(this._supabase.supabase.from('articulos').select(`*, proveedores(nombre), familias(nombre), subfamilias(nombre), ivas(valor_iva), marcas(nombre), articulos_grupos!articulos_grupos_id_articulo_fkey (id_articulo_grupo, grupos_articulos!articulos_grupos_id_grupo_fkey (id_grupo_articulo, nombre))`).order('nombre')) as Observable<{ data: ArticuloSupabase[] }>).pipe(tap(() => incrementarCarga())),
       (from(this._supabase.supabase.from('grupos_articulos').select('nombre').order('nombre')) as Observable<{ data: { nombre: string }[] }>).pipe(tap(() => incrementarCarga())),
       (from(this._supabase.supabase.from('config_componentes').select('*').eq('viewname', 'tabla-lista-articulos').eq('user', this.user.username).single()) as Observable<{ data: ConfigTabla }>).pipe(tap(() => incrementarCarga()))
     ]).subscribe({
       next: async ([{ data: filas }, { data: listaGrupos }, { data: configUsuario }]) => {
+        console.log(filas);
 
         filas = this.tratamientoFilas(filas);
 
@@ -181,19 +182,19 @@ export class ListaArticulosComponent {
       fila.ean13 = listaEans.join(', ');
 
       //Proveedor
-      if (fila.idProveedor !== null) fila.proveedor = fila.proveedores.nombre;
+      if (fila.id_proveedor !== null) fila.proveedor = fila.proveedores?.nombre;
 
       //Familia
-      if (fila.idFamilia !== null) fila.familia = fila.familias.nombre;
+      if (fila.id_familia !== null) fila.familia = fila.familias?.nombre;
 
       //Subfamilia
-      if (fila.idSubfamilia !== null) fila.subfamilia = fila.subfamilias.nombre;
+      if (fila.id_subfamilia !== null) fila.subfamilia = fila.subfamilias?.nombre;
 
       //IVA
-      if (fila.idIva !== null) fila.iva = fila.ivas.valor_iva;
+      if (fila.id_iva !== null) fila.iva = fila.ivas?.valor_iva;
 
       //Marca
-      if (fila.idMarca !== null) fila.marca = fila.marcas.nombre;
+      if (fila.id_marca !== null) fila.marca = fila.marcas?.nombre;
 
       //Grupos
       fila.grupos = fila.articulos_grupos.map(grupo => grupo.grupos_articulos.nombre).join(', ');

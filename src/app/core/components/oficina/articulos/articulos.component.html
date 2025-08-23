@@ -7,7 +7,7 @@
                 (keydown.enter)="seleccionarPrimero()">
             <mat-autocomplete #auto="matAutocomplete" (optionSelected)="abrirFicha($event.option.value)">
                 <ng-container *ngFor="let articulo of opcionesBuscadorArticulosFiltrado">
-                    <mat-option [value]="articulo.codigo"> {{articulo.nombre}} </mat-option>
+                    <mat-option [value]="articulo.id_articulo"> {{articulo.nombre}} </mat-option>
                 </ng-container>
             </mat-autocomplete>
         </mat-form-field>
