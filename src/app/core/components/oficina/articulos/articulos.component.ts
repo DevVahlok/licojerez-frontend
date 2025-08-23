@@ -67,7 +67,7 @@ export class ArticulosComponent {
         if (value === '') {
           this.opcionesBuscadorArticulosFiltrado = [];
         } else {
-          const { data } = await this._supabase.supabase.from('articulos_busqueda').select('*').or(`nombre.ilike.%${value}%,` + `id_articulo.ilike.%${value}%,` + `ean13_1.ilike.%${value}%,` + `ean13_2.ilike.%${value}%,` + `ean13_3.ilike.%${value}%,` + `ean13_4.ilike.%${value}%,` + `ean13_5.ilike.%${value}%`);
+          const { data } = await this._supabase.supabase.from('articulos_busqueda').select('*').or(`nombre.ilike.%${value}%, id_articulo.ilike.%${value}%, ean13_1.ilike.%${value}%, ean13_2.ilike.%${value}%, ean13_3.ilike.%${value}%, ean13_4.ilike.%${value}%, ean13_5.ilike.%${value}%`);
 
           let resultado = data!?.map(articulo => { return { id_articulo: articulo.id_articulo, nombre: articulo.nombre, ean13: [articulo.ean13_1, articulo.ean13_2, articulo.ean13_3, articulo.ean13_4, articulo.ean13_5] } });
 

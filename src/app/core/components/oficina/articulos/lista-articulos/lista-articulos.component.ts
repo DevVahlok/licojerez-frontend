@@ -79,7 +79,6 @@ export class ListaArticulosComponent {
       (from(this._supabase.supabase.from('config_componentes').select('*').eq('viewname', 'tabla-lista-articulos').eq('user', this.user.username).single()) as Observable<{ data: ConfigTabla }>).pipe(tap(() => incrementarCarga()))
     ]).subscribe({
       next: async ([{ data: filas }, { data: listaGrupos }, { data: configUsuario }]) => {
-        console.log(filas);
 
         filas = this.tratamientoFilas(filas);
 

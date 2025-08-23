@@ -135,7 +135,7 @@ export class FichaArticuloComponent {
   }
 
   async getVendedores() {
-    const { data, error } = await this._supabase.supabase.from('comisiones_articulos').select(`id_comision, comision,   vendedores (     *   ) `).eq('id_articulo', this.id);
+    const { data, error } = await this._supabase.supabase.from('comisiones_articulos').select(`id_comision, comision, vendedores (*)`).eq('id_articulo', this.id).order('comision');
 
     if (error) {
       //TODO: gestionar errores
@@ -162,8 +162,6 @@ export class FichaArticuloComponent {
   }
 
   async getArticulo() {
-
-    //TODO: interfaces en oficina.ts
 
     //TODO: aplicar sockets a cada desplegable (cada vez que se crea una subfamilia, por ejemplo), también en lista vendedores
 
