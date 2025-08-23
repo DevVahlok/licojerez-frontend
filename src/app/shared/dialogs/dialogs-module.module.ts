@@ -6,12 +6,14 @@ import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { MaterialModule } from 'src/app/modules/material.module';
 import { ClipboardModule } from '@angular/cdk/clipboard';
+import { DialogConfirmacion } from './dialog-confirmacion/dialog-confirmacion';
 
 
 
 @NgModule({
   declarations: [
-    DialogConfigTabla
+    DialogConfigTabla,
+    DialogConfirmacion
   ],
   imports: [
     CommonModule,
@@ -23,7 +25,8 @@ import { ClipboardModule } from '@angular/cdk/clipboard';
     ClipboardModule,
   ],
   exports: [
-    DialogConfigTabla
+    DialogConfigTabla,
+    DialogConfirmacion
   ]
 })
 export class DialogsModule { }

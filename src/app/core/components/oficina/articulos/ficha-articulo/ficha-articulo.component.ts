@@ -1,4 +1,4 @@
-import { Component, Input, SimpleChanges, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges, ViewEncapsulation } from '@angular/core';
 import { ListaDesplegablesFichaArticulo } from '../articulos.component';
 import { Articulo, Familia, IVA, Marca, Proveedor, Subfamilia } from 'src/app/models/oficina';
 import { RealtimeChannel } from '@supabase/supabase-js';
@@ -8,6 +8,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { SupabaseService } from 'src/app/core/services/supabase/supabase.service';
 import { from } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogConfirmacion } from 'src/app/shared/dialogs/dialog-confirmacion/dialog-confirmacion';
 
 @Component({
   selector: 'app-ficha-articulo',
@@ -72,8 +74,9 @@ export class FichaArticuloComponent {
     id_marca: new FormControl(-1),
     formato: new FormControl(null)
   });
+  @Output() cambiarTab = new EventEmitter<number>();
 
-  constructor(public _router: Router, public _supabase: SupabaseService, protected _snackbar: MatSnackBar) { }
+  constructor(public _router: Router, public _supabase: SupabaseService, protected _snackbar: MatSnackBar, private _dialog: MatDialog) { }
 
   async ngOnInit(): Promise<void> {
     this.spinner = true;
@@ -346,5 +349,26 @@ export class FichaArticuloComponent {
 
   ngOnDestroy() {
     this._supabase.supabase.removeChannel(this.suscripcionArticulo);
+  }
+
+  bajaArticulo() {
+    this._dialog.open(DialogConfirmacion, {
+      width: '400px',
+      data: { message: `¿Quieres dar de baja el artículo ${this.articulo.nombre}?` }
+    }).afterClosed().subscribe(async (res) => {
+
+      if (res) {
+        const { error } = await this._supabase.supabase.from('articulos').delete().eq('id_articulo', this.articulo.id_articulo);
+
+        if (error) {
+          this._snackbar.open(`Ha habido un error al eliminar el artículo ${this.articulo.nombre}`, undefined, { duration: 7000 });
+          this._supabase.anadirLog(`ha tenido un error al eliminar el artículo ${this.articulo.nombre} con id ${this.articulo.id_articulo}`, error.message);
+        } else {
+          this._supabase.anadirLog(`ha eliminado el artículo ${this.articulo.nombre} con id ${this.articulo.id_articulo}`);
+          this.getPrimerArticulo();
+          this.cambiarTab.emit(1);
+        }
+      }
+    })
   }
 }

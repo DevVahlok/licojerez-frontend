@@ -16,7 +16,7 @@
     <mat-tab-group [(selectedIndex)]="indexTabs">
 
         <mat-tab label="Ficha">
-            <app-ficha-articulo [id]="idArticulo"></app-ficha-articulo>
+            <app-ficha-articulo [id]="idArticulo" (cambiarTab)="cambiarTab($event)"></app-ficha-articulo>
         </mat-tab>
 
         <mat-tab label="Tabla">

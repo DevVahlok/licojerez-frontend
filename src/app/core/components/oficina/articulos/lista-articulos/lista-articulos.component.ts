@@ -143,7 +143,7 @@ export class ListaArticulosComponent {
         break;
 
       case 'cellDblClick':
-        this.abrirFicha.emit((evento.value as CellComponent).getRow().getData()['codigo']);
+        this.abrirFicha.emit((evento.value as CellComponent).getRow().getData()['id_articulo']);
         break;
 
       case 'dataFiltered':

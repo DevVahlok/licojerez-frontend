@@ -1,0 +1,18 @@
+@import '../../../../styles/variables';
+
+.container-general__dialog-confirmacion {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+
+  .boton-si {
+    margin-left: 15px;
+    background-color: $error;
+  }
+
+  .container-botones-accion {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+  }
+}

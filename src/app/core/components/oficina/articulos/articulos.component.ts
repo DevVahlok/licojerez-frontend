@@ -87,4 +87,8 @@ export class ArticulosComponent {
 
     });
   }
+
+  cambiarTab(index: number) {
+    this.indexTabs = index;
+  }
 }
