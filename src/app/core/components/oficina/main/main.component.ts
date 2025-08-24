@@ -134,7 +134,8 @@ export class MainComponent {
                 w: anchoEtiqueta - 2 * paddingInterno,
                 h: altoEtiqueta - 2 * paddingInterno,
                 lineWidth: 1,
-                dash: { length: 3, space: 3 }
+                dash: { length: 3, space: 3 },
+                lineColor: '#b2b2b2'
               }
             ],
             absolutePosition: { x, y }
@@ -158,27 +159,28 @@ export class MainComponent {
                     {
                       columns: [
                         {
-                          text: `${etiqueta.precio_final} €`,
+                          text: `${etiqueta.precio_final.toFixed(2).replace('.', ',')} €`,
                           style: 'precioConIva',
-                          width: anchoEtiqueta * 0.45
+                          width: anchoEtiqueta * 0.60,
+                          margin: [0, 14, 0, 0]
                         },
                         {
                           stack: [
                             { text: `ID: ${etiqueta.id_articulo}`, style: 'id', alignment: 'right' },
-                            { text: `${etiqueta.precio_sin_iva} €`, style: 'precioSinIva', alignment: 'right' }
+                            { text: `${etiqueta.precio_sin_iva.toFixed(2).replace('.', ',')} € + IVA`, style: 'precioSinIva', alignment: 'right', margin: [0, 40, 0, 0] }
                           ],
-                          width: anchoEtiqueta * 0.45
+                          width: anchoEtiqueta * 0.35
                         }
                       ],
                       columnGap: 2,
-                      margin: [0, 2, 0, 2]
+                      margin: [5, 5, 0, 2]
                     },
                     {
                       image: imageBase64,
                       width: anchoEtiqueta * 0.9,
                       opacity: 0.2,
                       alignment: 'center',
-                      margin: [0, -55, 0, 0]
+                      margin: [0, -97, 0, 0]
                     }
                   ],
                   layout: {
@@ -206,8 +208,8 @@ export class MainComponent {
       content: contenido,
       styles: {
         titulo: { fontSize: 12, bold: true },
-        precioConIva: { fontSize: 20, bold: true },
-        id: { fontSize: 10, italics: true },
+        precioConIva: { fontSize: 35, bold: true },
+        id: { fontSize: 10 },
         precioSinIva: { fontSize: 14 }
       },
       defaultStyle: { font: 'Roboto' }
