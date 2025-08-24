@@ -88,3 +88,10 @@ export interface ConfigTabla {
     }[],
     created_at: string
 }
+
+export interface Etiqueta {
+    id_articulo: number,
+    nombre: string,
+    precio_final: number,
+    precio_sin_iva: number
+}

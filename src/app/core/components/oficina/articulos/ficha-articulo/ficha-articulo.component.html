@@ -10,7 +10,7 @@
         <div class="toolbar">
             <button mat-button (click)="bajaArticulo()">Dar de baja</button>
             <button mat-button>Crear nuevo artículo</button>
-            <button mat-button>Añadir etiqueta</button>
+            <button mat-button (click)="anadirEtiqueta()">Añadir etiqueta</button>
         </div>
 
         <form [formGroup]="formArticulo" *ngIf="formArticulo">

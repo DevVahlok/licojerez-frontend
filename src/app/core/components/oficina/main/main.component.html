@@ -126,3 +126,26 @@
     </div>
 
 </mat-menu>
+
+<div class="container-cola-etiquetas__main" *ngIf="colaEtiquetas.length > 0">
+    <span class="texto">Etiquetas por imprimir: {{colaEtiquetas.length}}</span>
+    <button mat-button (click)="imprimirEtiquetas()"><mat-icon>print</mat-icon></button>
+</div>
+
+<!-- <div class="plantilla-etiqueta-articulo">
+
+    <h2>COCA COLA LATA 33CL 24 U</h2>
+
+    <div class="container-precios">
+        <div class="precio-con-iva">
+            <h1>17,68 €</h1>
+        </div>
+        <div class="precio-sin-iva">
+            <span class="id">ID: 0010</span>
+            <span class="precio">14,61 € + IVA</span>
+        </div>
+    </div>
+
+    <img src="assets/img/logo_licojerez_etiqueta.png">
+
+</div> -->

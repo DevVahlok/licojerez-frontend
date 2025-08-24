@@ -10,6 +10,7 @@ import { SupabaseService } from 'src/app/core/services/supabase/supabase.service
 import { from } from 'rxjs';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { DialogConfirmacion } from 'src/app/shared/dialogs/dialog-confirmacion/dialog-confirmacion';
+import { EtiquetasService } from 'src/app/core/services/etiquetas/etiquetas.service';
 
 interface Vendedor {
   codigo: number,
@@ -86,7 +87,7 @@ export class FichaArticuloComponent {
   @ViewChild('dialogEditarComision') dialogEditarComision: TemplateRef<any>;
   public comisionDefaultDialog = 0;
 
-  constructor(public _router: Router, public _supabase: SupabaseService, protected _snackbar: MatSnackBar, private _dialog: MatDialog) { }
+  constructor(public _router: Router, public _supabase: SupabaseService, protected _snackbar: MatSnackBar, private _dialog: MatDialog, private _etiquetas: EtiquetasService) { }
 
   async ngOnInit(): Promise<void> {
     this.spinner = true;
@@ -179,8 +180,6 @@ export class FichaArticuloComponent {
     //TODO: aplicar sockets a cada desplegable (cada vez que se crea una subfamilia, por ejemplo), también en lista vendedores
 
     //TODO: aplicar socket a la tabla de artículos (comprobar con edición y baja, por ejemplo)
-
-    //TODO: apartado comisiones (añadir, editar...)
 
     //TODO: apartado etiquetas
 
@@ -459,5 +458,14 @@ export class FichaArticuloComponent {
   editarComisionDefaultDialog() {
     this.formArticulo.get('comision_default')!.setValue(Number(this.comisionDefaultDialog));
     this.editarCampo('comision_default')
+  }
+
+  anadirEtiqueta() {
+    this._etiquetas.anadirEtiqueta({
+      id_articulo: this.id,
+      nombre: this.articulo.nombre,
+      precio_final: this.articulo.precio_venta,
+      precio_sin_iva: Math.round(this.articulo.precio_venta / (1 + Number(this.listasDesplegables.iva?.find(iva => Number(iva.codigo) === this.articulo.id_iva)?.nombre) / 100) * 100) / 100
+    })
   }
 }
