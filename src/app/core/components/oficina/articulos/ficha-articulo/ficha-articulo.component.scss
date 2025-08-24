@@ -172,3 +172,55 @@
         }
     }
 }
+
+.container-general__dialog-editar-comision {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+
+    .toolbar {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+        margin-bottom: 15px;
+
+        .mat-mdc-form-field {
+            width: 160px;
+
+            mat-label {
+                color: $texto;
+            }
+        }
+    }
+
+    .lista-vendedores {
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: flex-start;
+        max-height: 450px;
+        overflow-y: auto;
+        padding-right: 20px;
+
+        .vendedor {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+
+            .nombre {
+                height: fit-content;
+                margin: auto 25px auto 0;
+            }
+
+            .mat-mdc-form-field {
+                width: 55px;
+            }
+        }
+    }
+
+    .botones-accion {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+        margin: 15px 0;
+    }
+}

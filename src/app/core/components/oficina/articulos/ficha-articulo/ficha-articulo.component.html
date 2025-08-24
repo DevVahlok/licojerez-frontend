@@ -53,8 +53,7 @@
                         </mat-select>
                     </mat-form-field>
 
-                    <div
-                        [matTooltip]="this.formArticulo.get('stock')!.disabled ? 'Al ser de tipo Servicio, no se considera el stock' : ''">
+                    <div [matTooltip]="'El stock de modifica a partir de entradas y salidas'">
                         <mat-form-field>
                             <mat-label>Stock</mat-label>
                             <input matInput formControlName="stock" (input)="editarCampo('stock')">
@@ -63,7 +62,6 @@
                             <mat-error *ngIf="formArticulo?.get('stock')?.errors?.['pattern']">El campo debe
                                 ser numérico.</mat-error>
                         </mat-form-field>
-
                     </div>
 
                 </div>
@@ -197,27 +195,27 @@
 
                         <mat-form-field>
                             <mat-label>Comisión por defecto</mat-label>
-                            <input matInput formControlName="comision_default">
+                            <input matInput formControlName="comision_default"
+                                (input)="editarCampo('comision_default')">
                             <span matSuffix>%</span>
+                            <mat-error *ngIf="formArticulo?.get('comision_default')?.errors?.['pattern']">El campo debe
+                                ser numérico.</mat-error>
                         </mat-form-field>
 
                         <div class="container-comision">
-                            <h3>Comisión por vendedor <mat-icon [matTooltip]="'Editar comisiones'">edit</mat-icon></h3>
+                            <h3>Comisión por vendedor <mat-icon [matTooltip]="'Editar comisiones'"
+                                    (click)="abrirDialogEditarComisiones()">edit</mat-icon></h3>
 
                             <mat-form-field>
                                 <mat-label>Buscar vendedor...</mat-label>
                                 <input matInput [formControl]="inputVendedor" (input)="filtrarVendedores()">
                             </mat-form-field>
                             <div class="lista-comisiones">
-
                                 <ng-container *ngFor="let vendedor of listaVendedoresFiltrada">
-
                                     <div>
                                         <span>{{vendedor.nombre}} - {{vendedor.comision}}%</span>
                                     </div>
-
                                 </ng-container>
-
                             </div>
                         </div>
 
@@ -282,3 +280,49 @@
         </form>
     </div>
 </div>
+
+<ng-template #dialogEditarComision>
+
+    <div class="container-general__dialog-editar-comision">
+        <h1>Editar comisiones</h1>
+
+        <form [formGroup]="formArticulo">
+
+            <div class="toolbar">
+                <mat-form-field>
+                    <mat-label>Comisión por defecto</mat-label>
+                    <input matInput [(ngModel)]="comisionDefaultDialog" [ngModelOptions]="{standalone: true}"
+                        (input)="editarComisionDefaultDialog()">
+                    <span matSuffix>%</span>
+                    <mat-error *ngIf="formArticulo?.get('comision_default')?.errors?.['pattern']">El campo debe
+                        ser numérico.</mat-error>
+                </mat-form-field>
+            </div>
+
+            <div class="lista-vendedores">
+                <ng-container *ngFor="let vendedor of listaVendedoresDialog">
+
+                    <div class="vendedor">
+                        <span class="nombre">{{vendedor.nombre}}</span>
+                        <span class="comision">
+                            <mat-form-field>
+                                <input matInput [(ngModel)]="vendedor.comision" [ngModelOptions]="{standalone: true}"
+                                    (input)="modificarComision(vendedor)">
+                                <span matSuffix>%</span>
+                            </mat-form-field>
+                        </span>
+                    </div>
+
+                </ng-container>
+
+            </div>
+
+            <div class="botones-accion">
+                <button mat-button (click)="dialogRef.close()">Salir</button>
+            </div>
+
+        </form>
+
+    </div>
+
+</ng-template>
