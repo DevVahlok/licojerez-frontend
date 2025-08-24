@@ -128,8 +128,21 @@
 </mat-menu>
 
 <div class="container-cola-etiquetas__main" *ngIf="colaEtiquetas.length > 0">
-    <span class="texto">Etiquetas por imprimir: {{colaEtiquetas.length}}</span>
-    <button mat-button (click)="imprimirEtiquetas()"><mat-icon>print</mat-icon></button>
+
+    <div class="container-inicial">
+        <span class="texto">Etiquetas por imprimir: {{colaEtiquetas.length}}</span>
+        <button mat-icon-button (click)="toggleDetalleEtiquetas()">
+            <mat-icon>{{ detalleEtiquetas ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+        </button>
+        <button mat-button (click)="imprimirEtiquetas()"><mat-icon>print</mat-icon></button>
+    </div>
+
+    <div *ngIf="detalleEtiquetas" class="detalle-etiquetas">
+        <ng-container *ngFor="let etiqueta of colaEtiquetas;let index = index">
+            <div class="etiqueta"><span class="texto">{{etiqueta.nombre}}</span> <button (click)="borrarEtiqueta(index)"
+                    mat-icon-button><mat-icon>close</mat-icon></button></div>
+        </ng-container>
+    </div>
 </div>
 
 <!-- <div class="plantilla-etiqueta-articulo">

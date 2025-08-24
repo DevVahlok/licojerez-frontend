@@ -27,7 +27,6 @@ export interface ElementoMenuContextual {
   badge?: string
 }
 
-
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
@@ -47,6 +46,7 @@ export class MainComponent {
   public subContextual: Subscription;
   @ViewChild('trigger') contextMenu: MatMenuTrigger;
   public colaEtiquetas: Etiqueta[] = [];
+  public detalleEtiquetas = false;
 
   constructor(public _router: Router, public _dialog: MatDialog, private _supabase: SupabaseService, private _utils: UtilsService, private _etiquetas: EtiquetasService) { }
 
@@ -85,11 +85,20 @@ export class MainComponent {
 
   suscribirseColaEtiquetas() {
     this._etiquetas.etiquetas$.subscribe(etiquetas => {
+      if (this.colaEtiquetas.length === 0) this.detalleEtiquetas = false;
       this.colaEtiquetas = etiquetas;
     });
   }
 
   imprimirEtiquetas() {
     this._etiquetas.imprimirEtiquetas();
+  }
+
+  toggleDetalleEtiquetas() {
+    this.detalleEtiquetas = !this.detalleEtiquetas;
+  }
+
+  borrarEtiqueta(index: number) {
+    this.colaEtiquetas.splice(index, 1);
   }
 }

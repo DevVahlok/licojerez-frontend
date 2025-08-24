@@ -585,13 +585,63 @@
     z-index: 999999;
     color: $texto_alt;
     padding: 10px;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
 
-    button {
-        border-color: $texto_alt !important;
-        margin-left: 15px;
+    .container-inicial {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
 
-        * {
-            color: $texto_alt !important;
+        .texto {
+            margin: auto 0;
+        }
+
+        button {
+            border-color: $texto_alt !important;
+            margin: auto 0 auto 15px;
+
+            * {
+                color: $texto_alt !important;
+            }
+
+            &:hover {
+                border-color: $acento !important;
+
+                * {
+                    color: $acento !important;
+                }
+            }
+        }
+    }
+
+    .detalle-etiquetas {
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: flex-start;
+        margin-left: 10px;
+        max-height: 500px;
+        overflow-y: auto;
+        padding-right: 15px;
+
+        .etiqueta {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+
+            .texto {
+                height: fit-content;
+                margin: auto 0;
+            }
+
+            button {
+                &:hover {
+                    * {
+                        color: $error;
+                    }
+                }
+            }
         }
     }
 }
