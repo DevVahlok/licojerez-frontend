@@ -11,6 +11,7 @@ import { from } from 'rxjs';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { DialogConfirmacion } from 'src/app/shared/dialogs/dialog-confirmacion/dialog-confirmacion';
 import { EtiquetasService } from 'src/app/core/services/etiquetas/etiquetas.service';
+import { Title } from '@angular/platform-browser';
 
 interface Vendedor {
   codigo: number,
@@ -56,6 +57,7 @@ export class FichaArticuloComponent {
     marca: null,
   }
   @Input() id: number;
+  @Input() indexTabs: number;
   public articulo: Articulo;
   public formArticulo = new FormGroup({
     id_articulo: new FormControl(-1, Validators.required),
@@ -91,7 +93,7 @@ export class FichaArticuloComponent {
 
   //TODO: cuando stock tiene error de required, el texto de error ocupa mucho espacio y sobrepone el contenido
 
-  constructor(public _router: Router, public _supabase: SupabaseService, protected _snackbar: MatSnackBar, private _dialog: MatDialog, private _etiquetas: EtiquetasService) { }
+  constructor(public _router: Router, public _supabase: SupabaseService, protected _snackbar: MatSnackBar, private _dialog: MatDialog, private _etiquetas: EtiquetasService, private _title: Title) { }
 
   async ngOnInit(): Promise<void> {
     this.spinner = true;
@@ -102,6 +104,12 @@ export class FichaArticuloComponent {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['id']?.currentValue) {
       this.resetArticulo();
+    }
+
+    if (changes['indexTabs']?.currentValue !== null) {
+      if (this.indexTabs === 0) {
+        this._title.setTitle(this.articulo.nombre);
+      }
     }
   }
 
@@ -197,8 +205,6 @@ export class FichaArticuloComponent {
 
     //TODO: aplicar socket a la tabla de artículos (comprobar con edición y baja, por ejemplo)
 
-    //TODO: apartado crear artículo
-
     this.suscripcionArticulo = this._supabase.supabase.channel(`articulo-${this.id}`).on('postgres_changes', { event: '*', schema: 'public', table: 'articulos', filter: `codigo=eq.${this.id}` }, payload => {
       this.articulo = payload.new as Articulo;
       this.formArticulo.setValue(this.tratamientoPreFormulario())
@@ -214,22 +220,16 @@ export class FichaArticuloComponent {
     this.articulo = data;
     this.spinner = false;
 
+    if (this.indexTabs === 0) {
+      this._title.setTitle(this.articulo.nombre);
+    }
+
     const datosForm = this.tratamientoPreFormulario();
     this.formArticulo.setValue(datosForm);
     this.valoresAnteriores = datosForm;
 
     this.gestionarFormulario();
     this.getListasDesplegables();
-
-    console.log(this.formArticulo.valid);
-
-    console.log('id_articulo', this.formArticulo.get('id_articulo')?.status);
-    console.log('nombre', this.formArticulo.get('nombre')?.status);
-    console.log('fecha_alta', this.formArticulo.get('fecha_alta')?.valid);
-    console.log('tipo', this.formArticulo.get('tipo')?.valid);
-    console.log('stock', this.formArticulo.get('stock')?.valid);
-
-
   }
 
   gestionarFormulario() {
@@ -295,7 +295,6 @@ export class FichaArticuloComponent {
 
         if (this.nuevoArticulo) {
 
-          console.log('entra');
           if (this.formArticulo.valid) {
 
             const nuevoArticulo = this.formArticulo.getRawValue();
@@ -539,6 +538,8 @@ export class FichaArticuloComponent {
 
   async empezarNuevoArticulo() {
     this.nuevoArticulo = true;
+
+    this._title.setTitle('Creación Artículo');
 
     this.formArticulo.reset();
     this.listaVendedores = [];

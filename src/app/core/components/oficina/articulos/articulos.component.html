@@ -13,10 +13,11 @@
         </mat-form-field>
     </div>
 
-    <mat-tab-group [(selectedIndex)]="indexTabs">
+    <mat-tab-group [(selectedIndex)]="indexTabs" (selectedIndexChange)="cambiarTab($event)">
 
         <mat-tab label="Ficha">
-            <app-ficha-articulo [id]="idArticulo" (cambiarTab)="cambiarTab($event)"></app-ficha-articulo>
+            <app-ficha-articulo [id]="idArticulo" [indexTabs]="indexTabs"
+                (cambiarTab)="cambiarTab($event)"></app-ficha-articulo>
         </mat-tab>
 
         <mat-tab label="Tabla">

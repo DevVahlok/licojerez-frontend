@@ -55,10 +55,9 @@ export class ListaArticulosComponent {
   @Output() abrirFicha = new EventEmitter<number>();
   public listaIVAs: ElementoDesplegable[] = [];
 
-  constructor(private _title: Title, private _supabase: SupabaseService, private _utils: UtilsService, private _tabulator: TabulatorService, private _snackbar: MatSnackBar, public _dialog: MatDialog, private _etiquetas: EtiquetasService) { }
+  constructor(private _supabase: SupabaseService, private _utils: UtilsService, private _tabulator: TabulatorService, private _snackbar: MatSnackBar, public _dialog: MatDialog, private _etiquetas: EtiquetasService) { }
 
   async ngOnInit() {
-    this._title.setTitle('Artículos');
     this.user = await this._supabase.getUser();
     this.cargarTablaArticulos();
     this.cargarListaIVAs();

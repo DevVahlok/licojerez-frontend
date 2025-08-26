@@ -39,7 +39,7 @@ export class ArticulosComponent {
   constructor(private _title: Title, private _supabase: SupabaseService) { }
 
   ngOnInit() {
-    this._title.setTitle('Artículos');
+    this._title.setTitle('Listado de Artículos');
     this.activarListenerInputBuscador();
   }
 
@@ -47,7 +47,6 @@ export class ArticulosComponent {
     this.buscadorArticulo.setValue('');
     this.indexTabs = 0;
     this.idArticulo = id;
-    this._title.setTitle('Edición de Artículo');
   }
 
   seleccionarPrimero() {
@@ -90,5 +89,11 @@ export class ArticulosComponent {
 
   cambiarTab(index: number) {
     this.indexTabs = index;
+
+    switch (index) {
+      case 1:
+        this._title.setTitle('Listado de Artículos')
+        break;
+    }
   }
 }
