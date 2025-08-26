@@ -12,7 +12,10 @@ import { CellComponent, ColumnDefinition, EditorParams } from 'tabulator-tables'
 import { Router } from '@angular/router';
 import { ElementoMenuContextual } from '../../main/main.component';
 import { UserLicojerez } from 'src/app/models/general';
-import { Articulo, ConfigTabla } from 'src/app/models/oficina';
+import { Articulo, ConfigTabla, Etiqueta, IVA } from 'src/app/models/oficina';
+import { DialogConfirmacion } from 'src/app/shared/dialogs/dialog-confirmacion/dialog-confirmacion';
+import { ElementoDesplegable } from '../articulos.component';
+import { EtiquetasService } from 'src/app/core/services/etiquetas/etiquetas.service';
 
 type Override<T, R> = Omit<T, keyof R> & R;
 
@@ -50,18 +53,28 @@ export class ListaArticulosComponent {
   public user: UserLicojerez;
   public subContextual: Subscription;
   @Output() abrirFicha = new EventEmitter<number>();
+  public listaIVAs: ElementoDesplegable[] = [];
 
-  constructor(private _title: Title, private _supabase: SupabaseService, private _utils: UtilsService, private _tabulator: TabulatorService, private _snackbar: MatSnackBar, public _dialog: MatDialog, private _router: Router) { }
+  constructor(private _title: Title, private _supabase: SupabaseService, private _utils: UtilsService, private _tabulator: TabulatorService, private _snackbar: MatSnackBar, public _dialog: MatDialog, private _etiquetas: EtiquetasService) { }
 
   async ngOnInit() {
     this._title.setTitle('Artículos');
     this.user = await this._supabase.getUser();
     this.cargarTablaArticulos();
+    this.cargarListaIVAs();
+
     this.subContextual = this._utils.eventoMenuContextual.subscribe(res => {
       if (res.type === 'click') {
         this.opcionesMenuContextual(res.opcion)
       }
     })
+  }
+
+  async cargarListaIVAs() {
+    const { data, error } = await this._supabase.supabase.from<any, IVA[]>('ivas').select('*');
+    if (!error) {
+      this.listaIVAs = data?.map(iva => { return { codigo: iva.id_iva, nombre: iva.valor_iva }; });
+    }
   }
 
   cargarTablaArticulos() {
@@ -215,5 +228,20 @@ export class ListaArticulosComponent {
     delete (columnaGrupos!.headerFilterParams! as EditorParams & { valuesLookup?: string }).valuesLookup;
 
     return cabecera;
+  }
+
+  imprimirTodasLasEtiquetas() {
+
+    const listaEtiquetas = this.componenteTabla.tabla.getRows('all').filter(celda => celda.getData()['activo'] === 'Sí').map(celda => {
+      const articulo = celda.getData();
+      return { id_articulo: articulo['id_articulo'], nombre: articulo['nombre'], precio_final: articulo['precio_venta'], precio_sin_iva: Math.round(articulo['precio_venta'] / (1 + Number(this.listaIVAs?.find(iva => Number(iva.codigo) === articulo['id_iva'])?.nombre) / 100) * 100) / 100 }
+    });
+
+    this._dialog.open(DialogConfirmacion, {
+      width: '400px',
+      data: { message: `¿Quieres imprimir ${listaEtiquetas.length} etiquetas? Ocuparán ${Math.ceil(listaEtiquetas.length / 15)} folios.` }
+    }).afterClosed().subscribe(async (res) => {
+      if (res) this._etiquetas.imprimirEtiquetas(listaEtiquetas);
+    });
   }
 }

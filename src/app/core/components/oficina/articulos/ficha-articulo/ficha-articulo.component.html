@@ -5,12 +5,23 @@
     </div>
 
     <div *ngIf="!spinner">
-        <h1>{{articulo.nombre}}</h1>
+        <div class="container-titulo">
+            <div class="fill"></div>
+            <div class="encapsulador-titulo">
+                <h1>{{nuevoArticulo ? 'Creación artículo' : articulo.nombre}}</h1>
+            </div>
+            <div class="container-indicador-creacion">
+                <div [matTooltip]="'Debes de rellenar los campos obligatorios (*)'">
+                    <span *ngIf="nuevoArticulo">Artículo no guardado <span
+                            class="material-symbols-outlined">help</span></span>
+                </div>
+            </div>
+        </div>
 
         <div class="toolbar">
-            <button mat-button (click)="bajaArticulo()">Dar de baja</button>
-            <button mat-button>Crear nuevo artículo</button>
-            <button mat-button (click)="anadirEtiqueta()">Añadir etiqueta</button>
+            <button mat-button [disabled]="nuevoArticulo" (click)="bajaArticulo()">Dar de baja</button>
+            <button mat-button (click)="empezarNuevoArticulo()">Crear nuevo artículo</button>
+            <button mat-button [disabled]="nuevoArticulo" (click)="anadirEtiqueta()">Añadir etiqueta</button>
         </div>
 
         <form [formGroup]="formArticulo" *ngIf="formArticulo">
@@ -18,52 +29,58 @@
             <div class="container-izq">
 
                 <div class="fila">
-                    <mat-form-field class="campo-codigo">
-                        <mat-label>Código</mat-label>
-                        <input matInput formControlName="id_articulo">
-                    </mat-form-field>
 
-                    <mat-form-field class="campo-nombre">
-                        <mat-label>Nombre</mat-label>
-                        <input matInput formControlName="nombre" (input)="editarCampo('nombre')">
-                        <mat-error *ngIf="formArticulo?.get('nombre')?.errors?.['required']">El nombre es
-                            obligatorio</mat-error>
-                    </mat-form-field>
+                    <fieldset class="encapsulacion-datos-principales"
+                        [ngClass]="((formArticulo.get('id_articulo')?.status !== 'DISABLED' && formArticulo.get('id_articulo')?.status !== 'VALID')  || !formArticulo.get('nombre')?.valid || !formArticulo.get('tipo')?.valid || (formArticulo.get('stock')?.status !== 'DISABLED' && formArticulo.get('stock')?.status !== 'VALID')) ? 'faltan-campos' : ''">
+                        <legend>Datos principales</legend>
 
-                    <mat-form-field>
-                        <mat-label>Fecha alta</mat-label>
-                        <input matInput formControlName="fecha_alta">
-                    </mat-form-field>
-
-                    <div class="container-switch">
-                        <mat-slide-toggle formControlName="activo"
-                            (change)="editarCampo('activo')">Activo</mat-slide-toggle>
-                        <div
-                            [matTooltip]="this.formArticulo.get('tiene_lote')!.disabled ? (formArticulo.get('tipo')!.value === 'Servicio'  ? 'El artículo está marcado como tipo Servicio':'El stock debe de ser 0 para poder modificar el valor') : '' ">
-                            <mat-slide-toggle formControlName="tiene_lote" (change)="editarCampo('tiene_lote')">Tiene
-                                lotes</mat-slide-toggle>
-                        </div>
-                    </div>
-
-                    <mat-form-field>
-                        <mat-label>Tipo</mat-label>
-                        <mat-select formControlName="tipo" (selectionChange)="editarCampo('tipo')">
-                            <mat-option [value]="'Material'">Material</mat-option>
-                            <mat-option [value]="'Servicio'">Servicio</mat-option>
-                        </mat-select>
-                    </mat-form-field>
-
-                    <div [matTooltip]="'El stock de modifica a partir de entradas y salidas'">
-                        <mat-form-field>
-                            <mat-label>Stock</mat-label>
-                            <input matInput formControlName="stock" (input)="editarCampo('stock')">
-                            <mat-error *ngIf="formArticulo?.get('stock')?.errors?.['required']">El stock es
-                                obligatorio</mat-error>
-                            <mat-error *ngIf="formArticulo?.get('stock')?.errors?.['pattern']">El campo debe
-                                ser numérico.</mat-error>
+                        <mat-form-field class="campo-codigo">
+                            <mat-label>Código</mat-label>
+                            <input matInput formControlName="id_articulo">
                         </mat-form-field>
-                    </div>
 
+                        <mat-form-field class="campo-nombre">
+                            <mat-label>Nombre</mat-label>
+                            <input matInput formControlName="nombre" (input)="editarCampo('nombre')">
+                            <mat-error *ngIf="formArticulo?.get('nombre')?.errors?.['required']">El nombre es
+                                obligatorio</mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field>
+                            <mat-label>Fecha alta</mat-label>
+                            <input matInput formControlName="fecha_alta">
+                        </mat-form-field>
+
+                        <div class="container-switch">
+                            <mat-slide-toggle formControlName="activo"
+                                (change)="editarCampo('activo')">Activo</mat-slide-toggle>
+                            <div
+                                [matTooltip]="this.formArticulo.get('tiene_lote')!.disabled ? (formArticulo.get('tipo')!.value === 'Servicio'  ? 'El artículo está marcado como tipo Servicio':'El stock debe de ser 0 para poder modificar el valor') : '' ">
+                                <mat-slide-toggle formControlName="tiene_lote"
+                                    (change)="editarCampo('tiene_lote')">Tiene
+                                    lotes</mat-slide-toggle>
+                            </div>
+                        </div>
+
+                        <mat-form-field>
+                            <mat-label>Tipo</mat-label>
+                            <mat-select formControlName="tipo" (selectionChange)="editarCampo('tipo')">
+                                <mat-option [value]="'Material'">Material</mat-option>
+                                <mat-option [value]="'Servicio'">Servicio</mat-option>
+                            </mat-select>
+                        </mat-form-field>
+
+                        <div [matTooltip]="nuevoArticulo ? '' : 'El stock se modifica a partir de entradas y salidas'">
+                            <mat-form-field>
+                                <mat-label>Stock</mat-label>
+                                <input matInput formControlName="stock" (input)="editarCampo('stock')">
+                                <mat-error *ngIf="formArticulo?.get('stock')?.errors?.['required']">El stock es
+                                    obligatorio</mat-error>
+                                <mat-error *ngIf="formArticulo?.get('stock')?.errors?.['pattern']">El campo debe
+                                    ser numérico.</mat-error>
+                            </mat-form-field>
+                        </div>
+                    </fieldset>
                 </div>
 
                 <div class="fila">
@@ -152,7 +169,8 @@
 
                 <div class="fila">
 
-                    <fieldset class="fieldset-tarifas">
+                    <fieldset class="fieldset-tarifas"
+                        [ngClass]="((formArticulo.get('precio_coste')?.status !== 'DISABLED' && formArticulo.get('precio_coste')?.status !== 'VALID')  || !formArticulo.get('id_iva')?.valid || !formArticulo.get('precio_venta')?.valid || !formArticulo.get('margen')?.valid ) ? 'faltan-campos' : ''">
                         <legend>Tarifas</legend>
 
                         <div class="container-selector">

@@ -12,9 +12,43 @@
         margin-top: 50px;
     }
 
-    h1 {
-        width: 100%;
-        text-align: center;
+    .container-titulo {
+        display: flex;
+        margin-bottom: 25px;
+
+        .fill {
+            flex: 1;
+            display: flex;
+            margin-right: auto;
+        }
+
+        .encapsulador-titulo {
+            flex: 1;
+            display: flex;
+            height: fit-content;
+
+            h1 {
+                width: 100%;
+                text-align: center;
+                margin: 0;
+            }
+        }
+
+        .container-indicador-creacion {
+            flex: 1;
+            display: flex;
+            height: fit-content;
+            margin: auto 0;
+            justify-content: center;
+
+            .material-symbols-outlined {
+                vertical-align: middle;
+            }
+
+            * {
+                color: $error;
+            }
+        }
     }
 
     .toolbar {
@@ -25,6 +59,14 @@
 
         button {
             margin: auto 15px auto 0;
+
+            &:disabled {
+                border: $tabulator_fila_par !important;
+
+                * {
+                    color: $tabulator_fila_par !important;
+                }
+            }
         }
     }
 
@@ -51,6 +93,10 @@
         fieldset {
             border-color: $acento;
             border-radius: 5px;
+
+            &.faltan-campos {
+                border-color: $error;
+            }
         }
 
         legend {
@@ -67,17 +113,17 @@
                 display: flex;
                 flex-flow: row wrap;
                 justify-content: flex-start;
+                margin-bottom: 25px;
+
+                .encapsulacion-datos-principales {
+                    display: flex;
+                    flex-flow: row wrap;
+                    justify-content: flex-start;
+                }
 
                 &:nth-child(1) {
                     height: 80px;
-                }
-
-                &:nth-child(2) {
-                    margin-bottom: 25px;
-                }
-
-                &:nth-child(3) {
-                    margin-bottom: 25px;
+                    margin-bottom: 30px;
                 }
 
                 .campo-codigo {
@@ -90,11 +136,11 @@
 
                 .campo-precio-coste,
                 .campo-precio-venta {
-                    width: 100px;
+                    width: 125px;
                 }
 
                 .campo-margen {
-                    width: 80px;
+                    width: 100px;
                 }
 
                 .fieldset-tarifas {

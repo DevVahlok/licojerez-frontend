@@ -86,19 +86,30 @@ export class FichaArticuloComponent {
   public dialogRef: MatDialogRef<any>;
   @ViewChild('dialogEditarComision') dialogEditarComision: TemplateRef<any>;
   public comisionDefaultDialog = 0;
+  public nuevoArticulo: boolean = false;
+  private listaIDs: number[];
+
+  //TODO: cuando stock tiene error de required, el texto de error ocupa mucho espacio y sobrepone el contenido
 
   constructor(public _router: Router, public _supabase: SupabaseService, protected _snackbar: MatSnackBar, private _dialog: MatDialog, private _etiquetas: EtiquetasService) { }
 
   async ngOnInit(): Promise<void> {
     this.spinner = true;
     this.getPrimerArticulo();
+    this.getListaIDs();
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['id']?.currentValue) {
-      this.getArticulo();
-      this.getVendedores();
+      this.resetArticulo();
     }
+  }
+
+  resetArticulo() {
+    this.nuevoArticulo = false;
+    this.getArticulo();
+    this.getVendedores();
+    this.getListaIDs();
   }
 
   async getPrimerArticulo() {
@@ -106,6 +117,11 @@ export class FichaArticuloComponent {
     this.id = data.id_articulo;
     this.getArticulo();
     this.getVendedores();
+  }
+
+  async getListaIDs() {
+    const { data, error } = await this._supabase.supabase.from('articulos').select('id_articulo').order('id_articulo', { ascending: true });
+    this.listaIDs = data?.map(articulo => articulo.id_articulo)!;
   }
 
   getListasDesplegables() {
@@ -176,12 +192,10 @@ export class FichaArticuloComponent {
   }
 
   async getArticulo() {
-
+    this.spinner = true;
     //TODO: aplicar sockets a cada desplegable (cada vez que se crea una subfamilia, por ejemplo), también en lista vendedores
 
     //TODO: aplicar socket a la tabla de artículos (comprobar con edición y baja, por ejemplo)
-
-    //TODO: apartado etiquetas
 
     //TODO: apartado crear artículo
 
@@ -206,6 +220,16 @@ export class FichaArticuloComponent {
 
     this.gestionarFormulario();
     this.getListasDesplegables();
+
+    console.log(this.formArticulo.valid);
+
+    console.log('id_articulo', this.formArticulo.get('id_articulo')?.status);
+    console.log('nombre', this.formArticulo.get('nombre')?.status);
+    console.log('fecha_alta', this.formArticulo.get('fecha_alta')?.valid);
+    console.log('tipo', this.formArticulo.get('tipo')?.valid);
+    console.log('stock', this.formArticulo.get('stock')?.valid);
+
+
   }
 
   gestionarFormulario() {
@@ -260,126 +284,170 @@ export class FichaArticuloComponent {
   }
 
   editarCampo<K extends keyof Articulo>(campo: K) {
-    console.log('entra');
 
     const camposSinDelay = ['activo', 'tiene_lote', 'tipo']
 
     clearTimeout(this.timer);
 
-    if (this.formArticulo.get(campo)?.valid) {
-      this.timer = setTimeout(async () => {
+    this.timer = setTimeout(async () => {
 
-        if (this.formArticulo.get(campo)!.value === '') this.formArticulo.get(campo)!.setValue(null as any);
+      if (this.formArticulo.get(campo)?.valid) {
 
-        const { error } = await this._supabase.supabase.from('articulos').update({ [campo]: this.formArticulo.get(campo)!.value }).eq('id_articulo', this.id)
+        if (this.nuevoArticulo) {
 
-        if (error) {
-          this._snackbar.open(`Ha habido un error al modificar el campo: ${campo}`, undefined, { duration: 7000 });
-          this._supabase.anadirLog(`ha tenido un error al modificar el campo "${campo}" del artículo con código ${this.id}`, error.message);
-        } else {
-          this.articulo[campo] = this.formArticulo.get(campo)!.value as Articulo[K];
-          this._supabase.anadirLog(`ha modificado el campo "${campo}": ${this.valoresAnteriores[campo]} \u2192 ${this.formArticulo.get(campo)!.value} del artículo con código ${this.id}`);
-          this.valoresAnteriores[campo] = this.formArticulo.get(campo)!.value;
+          console.log('entra');
+          if (this.formArticulo.valid) {
 
-          if (campo === 'stock') {
-            if (Number(this.formArticulo.get(campo)!.value) === 0) {
-              this.formArticulo.get('tiene_lote')!.enable();
+            const nuevoArticulo = this.formArticulo.getRawValue();
+            delete (nuevoArticulo as any).fecha_alta;
+            delete (nuevoArticulo as any).formato;
+
+            const { data } = await this._supabase.supabase.from('articulos').select('*').eq('id_articulo', nuevoArticulo.id_articulo).order('id_articulo');
+
+            if (data!.length > 0) {
+              await this.getListaIDs();
+              nuevoArticulo.id_articulo = this.detectarSiguienteID();
+            }
+
+            //TODO: ver cómo se añaden las comisiones custom
+
+            const { error } = await this._supabase.supabase.from('articulos').insert(nuevoArticulo);
+
+            if (error) {
+
             } else {
-              this.formArticulo.get('tiene_lote')!.disable();
+              this._snackbar.open(`Artículo creado correctamente.`, undefined, { duration: 7000 });
+
+              this._dialog.open(DialogConfirmacion, {
+                width: '400px',
+                data: { message: `¿Quieres imprimir una etiqueta?` }
+              }).afterClosed().subscribe((res) => {
+                if (res) {
+                  this._etiquetas.anadirEtiqueta({
+                    id_articulo: nuevoArticulo.id_articulo!,
+                    nombre: nuevoArticulo.nombre!,
+                    precio_final: Number(nuevoArticulo.precio_venta!),
+                    precio_sin_iva: Math.round(Number(nuevoArticulo.precio_venta!) / (1 + Number(this.listasDesplegables.iva?.find(iva => Number(iva.codigo) === nuevoArticulo.id_iva)?.nombre) / 100) * 100) / 100
+                  })
+                }
+              });
+
+              this.id = this.formArticulo.getRawValue().id_articulo!;
+              this.resetArticulo();
             }
           }
 
-          const precio_venta = Number(this.formArticulo.get('precio_venta')!.value);
-          const precio_coste = Number(this.formArticulo.get('precio_coste')!.value);
-          const margen = Number(this.formArticulo.get('margen')!.value);
+        } else {
 
-          switch (campo) {
+          if (this.formArticulo.get(campo)!.value === '') this.formArticulo.get(campo)!.setValue(null as any);
 
-            case 'tipo':
+          const { error } = await this._supabase.supabase.from('articulos').update({ [campo]: this.formArticulo.get(campo)!.value }).eq('id_articulo', this.id)
 
-              if (this.formArticulo.get('tipo')!.value === 'Servicio') {
-                this.formArticulo.get('stock')!.setValue(0)
-                this.articulo.stock = 0;
-                this.formArticulo.get('stock')!.disable();
+          if (error) {
+            this._snackbar.open(`Ha habido un error al modificar el campo: ${campo}`, undefined, { duration: 7000 });
+            this._supabase.anadirLog(`ha tenido un error al modificar el campo "${campo}" del artículo con código ${this.id}`, error.message);
+          } else {
+            this.articulo[campo] = this.formArticulo.get(campo)!.value as Articulo[K];
+            this._supabase.anadirLog(`ha modificado el campo "${campo}": ${this.valoresAnteriores[campo]} \u2192 ${this.formArticulo.get(campo)!.value} del artículo con código ${this.id}`);
+            this.valoresAnteriores[campo] = this.formArticulo.get(campo)!.value;
+
+            if (campo === 'stock') {
+              if (Number(this.formArticulo.get(campo)!.value) === 0) {
+                this.formArticulo.get('tiene_lote')!.enable();
+              } else {
                 this.formArticulo.get('tiene_lote')!.disable();
-                const { error } = await this._supabase.supabase.from('articulos').update({ stock: 0 }).eq('id_articulo', this.id);
-                if (error) {
-                  this._supabase.anadirLog(`ha tenido un error al modificar el campo "stock" del artículo con código ${this.id}`, error.message);
+              }
+            }
+
+            const precio_venta = Number(this.formArticulo.get('precio_venta')!.value);
+            const precio_coste = Number(this.formArticulo.get('precio_coste')!.value);
+            const margen = Number(this.formArticulo.get('margen')!.value);
+
+            switch (campo) {
+
+              case 'tipo':
+
+                if (this.formArticulo.get('tipo')!.value === 'Servicio') {
+                  this.formArticulo.get('stock')!.setValue(0)
+                  this.articulo.stock = 0;
+                  this.formArticulo.get('stock')!.disable();
+                  this.formArticulo.get('tiene_lote')!.disable();
+                  const { error } = await this._supabase.supabase.from('articulos').update({ stock: 0 }).eq('id_articulo', this.id);
+                  if (error) {
+                    this._supabase.anadirLog(`ha tenido un error al modificar el campo "stock" del artículo con código ${this.id}`, error.message);
+                  } else {
+                    this._supabase.anadirLog(`ha modificado el campo "stock": ${this.valoresAnteriores['stock']} \u2192 ${this.formArticulo.get('stock')!.value} del artículo con código ${this.id}`);
+                  }
                 } else {
-                  this._supabase.anadirLog(`ha modificado el campo "stock": ${this.valoresAnteriores['stock']} \u2192 ${this.formArticulo.get('stock')!.value} del artículo con código ${this.id}`);
+                  this.formArticulo.get('stock')!.enable();
                 }
-              } else {
-                this.formArticulo.get('stock')!.enable();
-              }
 
-              break;
+                break;
 
-            case 'precio_venta':
+              case 'precio_venta':
 
-              const nuevoMargen = Math.round((((precio_venta - precio_coste) / precio_venta) * 100) * 100) / 100;
+                const nuevoMargen = Math.round((((precio_venta - precio_coste) / precio_venta) * 100) * 100) / 100;
 
-              this.formArticulo.get('margen')!.setValue(nuevoMargen);
-              this.articulo.margen = nuevoMargen;
+                this.formArticulo.get('margen')!.setValue(nuevoMargen);
+                this.articulo.margen = nuevoMargen;
 
-              //TODO: hay flickering
-
-              const { error: error2 } = await this._supabase.supabase.from('articulos').update({ margen: nuevoMargen }).eq('id_articulo', this.id);
-              if (error2) {
-                this._supabase.anadirLog(`ha tenido un error al modificar el campo "margen" del artículo con código ${this.id}`, error2.message);
-              } else {
-                this._supabase.anadirLog(`ha modificado el campo "margen": ${this.valoresAnteriores['margen']} \u2192 ${this.formArticulo.get('margen')!.value} del artículo con código ${this.id}`);
-              }
-
-              break;
-
-            case 'margen':
-
-              const nuevoPrecioVenta = Math.round((precio_coste / (1 - margen / 100)) * 10000) / 10000;
-
-              this.formArticulo.get('precio_venta')!.setValue(nuevoPrecioVenta);
-              this.articulo.precio_venta = nuevoPrecioVenta;
-
-              const { error: error3 } = await this._supabase.supabase.from('articulos').update({ precio_venta: nuevoPrecioVenta }).eq('id_articulo', this.id);
-              if (error3) {
-                this._supabase.anadirLog(`ha tenido un error al modificar el campo "precio_venta" del artículo con código ${this.id}`, error3.message);
-              } else {
-                this._supabase.anadirLog(`ha modificado el campo "precio_venta": ${this.valoresAnteriores['precio_venta']} \u2192 ${this.formArticulo.get('precio_venta')!.value} del artículo con código ${this.id}`);
-              }
-
-              break;
-
-            case 'id_familia':
-
-              this.listasDesplegables.subfamilia = null;
-              this.articulo.id_subfamilia = -1;
-              this.formArticulo.get('id_subfamilia')!.setValue(-1);
-
-              from(this._supabase.supabase.from('articulos').update({ id_subfamilia: null }).eq('id_articulo', this.formArticulo.get('id_articulo')!.value)).subscribe(({ data, error }) => {
-                if (error) {
-                  this._supabase.anadirLog(`ha tenido un error al modificar el campo "subfamilia" del artículo con código ${this.id}`, error.message);
+                const { error: error2 } = await this._supabase.supabase.from('articulos').update({ margen: nuevoMargen }).eq('id_articulo', this.id);
+                if (error2) {
+                  this._supabase.anadirLog(`ha tenido un error al modificar el campo "margen" del artículo con código ${this.id}`, error2.message);
                 } else {
-                  this._supabase.anadirLog(`ha modificado el campo "subfamilia": ${this.valoresAnteriores['id_subfamilia']} \u2192 "" del artículo con código ${this.id}`);
+                  this._supabase.anadirLog(`ha modificado el campo "margen": ${this.valoresAnteriores['margen']} \u2192 ${this.formArticulo.get('margen')!.value} del artículo con código ${this.id}`);
                 }
-              });
 
-              from(this._supabase.supabase.from('subfamilias').select('*').eq('id_familia', this.formArticulo.get('id_familia')!.value)).subscribe(({ data, error }) => {
-                if (!error) {
-                  const subfamilias = (data ?? []) as Subfamilia[];
-                  this.listasDesplegables = { ...this.listasDesplegables, subfamilia: subfamilias.map(subfamilia => ({ codigo: subfamilia.id_subfamilia, nombre: subfamilia.nombre })) } as unknown as ListaDesplegablesFichaArticulo;
-                  this.filtrarDesplegableSearch('subfamilia');
+                break;
+
+              case 'margen':
+
+                const nuevoPrecioVenta = Math.round((precio_coste / (1 - margen / 100)) * 10000) / 10000;
+
+                this.formArticulo.get('precio_venta')!.setValue(nuevoPrecioVenta);
+                this.articulo.precio_venta = nuevoPrecioVenta;
+
+                const { error: error3 } = await this._supabase.supabase.from('articulos').update({ precio_venta: nuevoPrecioVenta }).eq('id_articulo', this.id);
+                if (error3) {
+                  this._supabase.anadirLog(`ha tenido un error al modificar el campo "precio_venta" del artículo con código ${this.id}`, error3.message);
+                } else {
+                  this._supabase.anadirLog(`ha modificado el campo "precio_venta": ${this.valoresAnteriores['precio_venta']} \u2192 ${this.formArticulo.get('precio_venta')!.value} del artículo con código ${this.id}`);
                 }
-              });
 
-              break;
+                break;
 
-            case 'comision_default':
-              this.comisionDefaultDialog = Number(this.formArticulo.get(campo)!.value);
-              break;
+              case 'id_familia':
+
+                this.listasDesplegables.subfamilia = null;
+                this.articulo.id_subfamilia = -1;
+                this.formArticulo.get('id_subfamilia')!.setValue(-1);
+
+                from(this._supabase.supabase.from('articulos').update({ id_subfamilia: null }).eq('id_articulo', this.formArticulo.get('id_articulo')!.value)).subscribe(({ data, error }) => {
+                  if (error) {
+                    this._supabase.anadirLog(`ha tenido un error al modificar el campo "subfamilia" del artículo con código ${this.id}`, error.message);
+                  } else {
+                    this._supabase.anadirLog(`ha modificado el campo "subfamilia": ${this.valoresAnteriores['id_subfamilia']} \u2192 "" del artículo con código ${this.id}`);
+                  }
+                });
+
+                from(this._supabase.supabase.from('subfamilias').select('*').eq('id_familia', this.formArticulo.get('id_familia')!.value)).subscribe(({ data, error }) => {
+                  if (!error) {
+                    const subfamilias = (data ?? []) as Subfamilia[];
+                    this.listasDesplegables = { ...this.listasDesplegables, subfamilia: subfamilias.map(subfamilia => ({ codigo: subfamilia.id_subfamilia, nombre: subfamilia.nombre })) } as unknown as ListaDesplegablesFichaArticulo;
+                    this.filtrarDesplegableSearch('subfamilia');
+                  }
+                });
+
+                break;
+
+              case 'comision_default':
+                this.comisionDefaultDialog = Number(this.formArticulo.get(campo)!.value);
+                break;
+            }
           }
         }
-
-      }, (camposSinDelay.includes(campo) ? 0 : 500));
-    }
+      }
+    }, (camposSinDelay.includes(campo) ? 0 : 500));
   }
 
   ngOnDestroy() {
@@ -467,5 +535,36 @@ export class FichaArticuloComponent {
       precio_final: this.articulo.precio_venta,
       precio_sin_iva: Math.round(this.articulo.precio_venta / (1 + Number(this.listasDesplegables.iva?.find(iva => Number(iva.codigo) === this.articulo.id_iva)?.nombre) / 100) * 100) / 100
     })
+  }
+
+  async empezarNuevoArticulo() {
+    this.nuevoArticulo = true;
+
+    this.formArticulo.reset();
+    this.listaVendedores = [];
+    this.listaVendedoresFiltrada = [];
+
+    this.formArticulo.get('id_articulo')!.enable();
+    this.formArticulo.get('id_articulo')!.setValue(this.detectarSiguienteID());
+    this.formArticulo.get('stock')!.enable();
+    this.formArticulo.get('stock')!.setValue(0);
+    this.formArticulo.get('tiene_lote')!.enable();
+    this.formArticulo.get('precio_coste')!.enable();
+    this.formArticulo.get('activo')!.setValue(true);
+    this.formArticulo.get('tiene_lote')!.setValue(false);
+    this.formArticulo.get('comision_default')!.setValue(0);
+    this.formArticulo.get('fecha_alta')!.setValue(moment().format('DD/MM/yyyy'));
+  }
+
+  detectarSiguienteID(): number {
+    const set = new Set(this.listaIDs);
+    const min = Math.min(...this.listaIDs);
+    const max = Math.max(...this.listaIDs);
+
+    for (let i = min; i <= max; i++) {
+      if (!set.has(i)) return i;
+    }
+
+    return this.listaIDs[this.listaIDs.length - 1] + 1;
   }
 }

@@ -1,9 +1,9 @@
 <div class="container-general__lista-articulos">
 
-    <!--     <div class="toolbar">
+    <div class="toolbar">
         <button mat-button [matTooltip]="'Opciones'"
             [matMenuTriggerFor]="menuOpciones"><mat-icon>settings</mat-icon></button>
-    </div> -->
+    </div>
 
     <app-component-loading-manager [progress]="cargaTablaArticulos" [name]="'tablaArticulos'"
         [template]="containerTablaArticulos" (emitter)="eventosLoadingManager($event)"
@@ -19,13 +19,15 @@
     </div>
 </div>
 
-<!-- <mat-menu #menuOpciones="matMenu">
+<mat-menu #menuOpciones="matMenu">
 
     <div class="menu-opciones__lista-articulos">
-        <button mat-menu-item (click)="abrirDialogAdjuntarArchivo()">Importar Excel</button>
+        <!--  <button mat-menu-item (click)="abrirDialogAdjuntarArchivo()">Importar Excel</button> -->
+        <button mat-menu-item (click)="imprimirTodasLasEtiquetas()" *ngIf="listaIVAs.length > 0 && datosTabla">Imprimir
+            todas las etiquetas</button>
     </div>
 
-</mat-menu> -->
+</mat-menu>
 
 <ng-template #dialogErrorExcel>
 
