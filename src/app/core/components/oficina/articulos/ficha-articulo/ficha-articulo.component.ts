@@ -90,6 +90,7 @@ export class FichaArticuloComponent {
   public comisionDefaultDialog = 0;
   public nuevoArticulo: boolean = false;
   private listaIDs: number[];
+  private comisionesVendedoresNuevoArticulo: Vendedor[] = [];
 
   //TODO: cuando stock tiene error de required, el texto de error ocupa mucho espacio y sobrepone el contenido
 
@@ -115,6 +116,7 @@ export class FichaArticuloComponent {
 
   resetArticulo() {
     this.nuevoArticulo = false;
+    this.formArticulo.get('margen')!.enable();
     this.getArticulo();
     this.getVendedores();
     this.getListaIDs();
@@ -295,6 +297,10 @@ export class FichaArticuloComponent {
 
         if (this.nuevoArticulo) {
 
+          if (campo === 'comision_default') {
+            this.comisionDefaultDialog = Number(this.formArticulo.get(campo)!.value);
+          }
+
           if (this.formArticulo.valid) {
 
             const nuevoArticulo = this.formArticulo.getRawValue();
@@ -308,13 +314,18 @@ export class FichaArticuloComponent {
               nuevoArticulo.id_articulo = this.detectarSiguienteID();
             }
 
-            //TODO: ver cómo se añaden las comisiones custom
-
             const { error } = await this._supabase.supabase.from('articulos').insert(nuevoArticulo);
 
             if (error) {
 
             } else {
+
+              if (this.comisionesVendedoresNuevoArticulo.length > 0) {
+                this.comisionesVendedoresNuevoArticulo.filter(vendedor => vendedor.comision > 0).forEach(async (vendedor, i) => {
+                  const { error } = await this._supabase.supabase.from('comisiones_articulos').insert({ id_articulo: nuevoArticulo.id_articulo, id_vendedor: vendedor.codigo, comision: vendedor.comision });
+                })
+              }
+
               this._snackbar.open(`Artículo creado correctamente.`, undefined, { duration: 7000 });
 
               this._dialog.open(DialogConfirmacion, {
@@ -475,7 +486,6 @@ export class FichaArticuloComponent {
   }
 
   async abrirDialogEditarComisiones() {
-
     this.dialogRef = this._dialog.open(this.dialogEditarComision);
 
     const { data, error } = await this._supabase.supabase.from('vendedores').select('*').order('nombre');
@@ -483,7 +493,12 @@ export class FichaArticuloComponent {
     if (error) {
       //TODO: enseñar spinner, gestionar error
     } else {
-      this.listaVendedoresDialog = data?.map(vendedor => { return { codigo: vendedor.id_vendedor, nombre: vendedor.nombre, comision: 0 } })!;
+
+      if (this.nuevoArticulo) {
+        this.listaVendedoresDialog = data?.map(vendedor => { return { codigo: vendedor.id_vendedor, nombre: vendedor.nombre, comision: this.comisionesVendedoresNuevoArticulo.find(vend => vend.codigo === vendedor.id_vendedor)?.comision ?? 0 } })!;
+      } else {
+        this.listaVendedoresDialog = data?.map(vendedor => { return { codigo: vendedor.id_vendedor, nombre: vendedor.nombre, comision: 0 } })!;
+      }
 
       this.listaVendedores.forEach((vendedor) => {
         const vend = this.listaVendedoresDialog.find(vendedor2 => vendedor.nombre === vendedor2.nombre);
@@ -493,33 +508,45 @@ export class FichaArticuloComponent {
   }
 
   async modificarComision(vendedor: Vendedor) {
-    //TODO: meter logs
     vendedor.comision = Number(vendedor.comision);
 
     //TODO: meter error formato en input comision_default en el dialog (no funciona porque ahora es ngmodel)
 
-    const { data, error } = await this._supabase.supabase.from('comisiones_articulos').select('*').eq('id_articulo', this.articulo.id_articulo).eq('id_vendedor', vendedor.codigo);
+    if (this.nuevoArticulo) {
 
-    if (data!.length === 0) {
-      const { error } = await this._supabase.supabase.from('comisiones_articulos').insert({ id_articulo: this.id, id_vendedor: vendedor.codigo, comision: vendedor.comision });
-      if (error) {
-        //TODO: gestión error
-      }
-    } else if (data!.length === 1) {
-      if (vendedor.comision === 0) {
-        const { error } = await this._supabase.supabase.from('comisiones_articulos').delete().eq('id_articulo', this.id).eq('id_vendedor', vendedor.codigo);
-        if (error) {
-          //TODO: gestión error
-        }
+      const antiguoVendedor = this.comisionesVendedoresNuevoArticulo.find(vend => vend.codigo === vendedor.codigo);
+
+      if (antiguoVendedor) {
+        antiguoVendedor.comision = vendedor.comision;
       } else {
-        const { error } = await this._supabase.supabase.from('comisiones_articulos').update({ comision: vendedor.comision }).eq('id_articulo', this.id).eq('id_vendedor', vendedor.codigo);
+        this.comisionesVendedoresNuevoArticulo.push(vendedor);
+      }
+
+    } else {
+      //TODO: meter logs
+      const { data, error } = await this._supabase.supabase.from('comisiones_articulos').select('*').eq('id_articulo', this.articulo.id_articulo).eq('id_vendedor', vendedor.codigo);
+
+      if (data!.length === 0) {
+        const { error } = await this._supabase.supabase.from('comisiones_articulos').insert({ id_articulo: this.id, id_vendedor: vendedor.codigo, comision: vendedor.comision });
         if (error) {
           //TODO: gestión error
         }
+      } else if (data!.length === 1) {
+        if (vendedor.comision === 0) {
+          const { error } = await this._supabase.supabase.from('comisiones_articulos').delete().eq('id_articulo', this.id).eq('id_vendedor', vendedor.codigo);
+          if (error) {
+            //TODO: gestión error
+          }
+        } else {
+          const { error } = await this._supabase.supabase.from('comisiones_articulos').update({ comision: vendedor.comision }).eq('id_articulo', this.id).eq('id_vendedor', vendedor.codigo);
+          if (error) {
+            //TODO: gestión error
+          }
+        }
       }
+      this.getVendedores();
+      this.inputVendedor.setValue('');
     }
-    this.getVendedores();
-    this.inputVendedor.setValue('');
   }
 
   editarComisionDefaultDialog() {
@@ -538,6 +565,7 @@ export class FichaArticuloComponent {
 
   async empezarNuevoArticulo() {
     this.nuevoArticulo = true;
+    this.comisionesVendedoresNuevoArticulo = [];
 
     this._title.setTitle('Creación Artículo');
 
@@ -550,7 +578,7 @@ export class FichaArticuloComponent {
     this.formArticulo.get('stock')!.enable();
     this.formArticulo.get('stock')!.setValue(0);
     this.formArticulo.get('tiene_lote')!.enable();
-    this.formArticulo.get('precio_coste')!.enable();
+    this.formArticulo.get('margen')!.disable();
     this.formArticulo.get('activo')!.setValue(true);
     this.formArticulo.get('tiene_lote')!.setValue(false);
     this.formArticulo.get('comision_default')!.setValue(0);

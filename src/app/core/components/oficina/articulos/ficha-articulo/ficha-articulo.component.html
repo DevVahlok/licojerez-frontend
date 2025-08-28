@@ -170,7 +170,7 @@
                 <div class="fila">
 
                     <fieldset class="fieldset-tarifas"
-                        [ngClass]="((formArticulo.get('precio_coste')?.status !== 'DISABLED' && formArticulo.get('precio_coste')?.status !== 'VALID')  || !formArticulo.get('id_iva')?.valid || !formArticulo.get('precio_venta')?.valid || !formArticulo.get('margen')?.valid ) ? 'faltan-campos' : ''">
+                        [ngClass]="(!formArticulo.get('id_iva')?.valid || !formArticulo.get('precio_venta')?.valid ) ? 'faltan-campos' : ''">
                         <legend>Tarifas</legend>
 
                         <div class="container-selector">
@@ -185,14 +185,16 @@
                             <mat-spinner [diameter]="35" *ngIf="!listasDesplegables.iva"></mat-spinner>
                         </div>
 
-                        <div
-                            [matTooltip]="'El precio coste se calcula automáticamente a partir de las entradas registradas'">
-                            <mat-form-field class="campo-precio-coste">
-                                <mat-label>Precio coste</mat-label>
-                                <input matInput formControlName="precio_coste">
-                                <span matSuffix>€</span>
-                            </mat-form-field>
-                        </div>
+                        <ng-container *ngIf="!nuevoArticulo">
+                            <div
+                                [matTooltip]="'El precio coste se calcula automáticamente a partir de las entradas registradas'">
+                                <mat-form-field class="campo-precio-coste">
+                                    <mat-label>Precio coste</mat-label>
+                                    <input matInput formControlName="precio_coste">
+                                    <span matSuffix>€</span>
+                                </mat-form-field>
+                            </div>
+                        </ng-container>
 
                         <mat-form-field class="campo-precio-venta">
                             <mat-label>Precio venta</mat-label>
@@ -200,11 +202,13 @@
                             <span matSuffix>€</span>
                         </mat-form-field>
 
-                        <mat-form-field class="campo-margen">
-                            <mat-label>Margen</mat-label>
-                            <input matInput formControlName="margen" (input)="editarCampo('margen')">
-                            <span matSuffix>%</span>
-                        </mat-form-field>
+                        <ng-container *ngIf="!nuevoArticulo">
+                            <mat-form-field class="campo-margen">
+                                <mat-label>Margen</mat-label>
+                                <input matInput formControlName="margen" (input)="editarCampo('margen')">
+                                <span matSuffix>%</span>
+                            </mat-form-field>
+                        </ng-container>
 
                     </fieldset>
 
