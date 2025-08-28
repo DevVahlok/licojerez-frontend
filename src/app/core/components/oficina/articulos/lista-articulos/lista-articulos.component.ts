@@ -16,6 +16,7 @@ import { Articulo, ConfigTabla, Etiqueta, IVA } from 'src/app/models/oficina';
 import { DialogConfirmacion } from 'src/app/shared/dialogs/dialog-confirmacion/dialog-confirmacion';
 import { ElementoDesplegable } from '../articulos.component';
 import { EtiquetasService } from 'src/app/core/services/etiquetas/etiquetas.service';
+import { RealtimeChannel } from '@supabase/supabase-js';
 
 type Override<T, R> = Omit<T, keyof R> & R;
 
@@ -54,6 +55,8 @@ export class ListaArticulosComponent {
   public subContextual: Subscription;
   @Output() abrirFicha = new EventEmitter<number>();
   public listaIVAs: ElementoDesplegable[] = [];
+  private suscripcionListaArticulos: RealtimeChannel;
+  private listaArticulos: ArticuloSupabase[];
 
   constructor(private _supabase: SupabaseService, private _utils: UtilsService, private _tabulator: TabulatorService, private _snackbar: MatSnackBar, public _dialog: MatDialog, private _etiquetas: EtiquetasService) { }
 
@@ -94,6 +97,8 @@ export class ListaArticulosComponent {
 
         filas = this.tratamientoFilas(filas);
 
+        this.listaArticulos = filas;
+
         if (this.componenteTabla?.tabla) {
           this.componenteTabla.sustituirDatos(this._utils.convertirEnFormatoTabla(filas))
         } else {
@@ -106,10 +111,13 @@ export class ListaArticulosComponent {
               height: '500px',
               movableColumns: true,
               layout: 'fitDataStretch',
-              actionBar: { config: true, download: true }
+              actionBar: { config: true, download: true },
+              index: 'id_articulo'
             },
             styles: { theme: 'dark' }
           }
+
+          this.iniciarSocketListaArticulos();
         }
       },
       error: (err) => { this.cargaTablaArticulos = -1; }
@@ -242,5 +250,72 @@ export class ListaArticulosComponent {
     }).afterClosed().subscribe(async (res) => {
       if (res) this._etiquetas.imprimirEtiquetas(listaEtiquetas);
     });
+  }
+
+  iniciarSocketListaArticulos() {
+
+    const articuloIndexMap = new Map<string, number>();
+
+    this.listaArticulos.forEach((art, i) => {
+      articuloIndexMap.set(String(art.id_articulo), i);
+    });
+
+    let codigosPendientes = new Set<string>();
+    let timeoutActualizar: any = null;
+
+    this.suscripcionListaArticulos = this._supabase.supabase.channel('articulos').on('postgres_changes', { event: '*', schema: 'public', table: 'articulos' }, (payload) => {
+
+      switch (payload.eventType) {
+        case 'INSERT':
+          this.componenteTabla.tabla.addData([payload.new]);
+
+          codigosPendientes.add(payload.new['id_articulo']);
+          break;
+
+        case 'UPDATE':
+          this.componenteTabla.tabla.updateData([payload.new]);
+
+          codigosPendientes.add(payload.new['id_articulo']);
+          break;
+
+        case 'DELETE':
+          this.componenteTabla.tabla.deleteRow(payload.old['id_articulo']);
+
+          const index = articuloIndexMap.get(payload.old['id_articulo']);
+          if (index !== undefined) {
+            this.listaArticulos.splice(index, 1);
+            articuloIndexMap.delete(payload.old['id_articulo']);
+          }
+          break;
+      }
+
+
+      if (timeoutActualizar) clearTimeout(timeoutActualizar);
+      timeoutActualizar = setTimeout(async () => {
+        if (codigosPendientes.size === 0) return;
+
+        const codigos = Array.from(codigosPendientes);
+        codigosPendientes.clear();
+
+        const { data, error } = await this._supabase.supabase.from('articulos').select(`*, proveedores(nombre), familias(nombre), subfamilias(nombre), ivas(valor_iva), marcas(nombre), articulos_grupos!articulos_grupos_id_articulo_fkey (id_articulo_grupo, grupos_articulos!articulos_grupos_id_grupo_fkey (id_grupo_articulo, nombre))`).in('id_articulo', codigos);
+
+        if (error) return;
+
+        data.forEach((articulo: ArticuloSupabase) => {
+          const index = articuloIndexMap.get(String(articulo.id_articulo));
+          if (index !== undefined) {
+            this.listaArticulos[index] = articulo;
+          } else {
+            this.listaArticulos.push(articulo);
+            articuloIndexMap.set(String(articulo.id_articulo), this.listaArticulos.length - 1);
+          }
+        });
+
+      }, 150);
+    }).subscribe();
+  }
+
+  ngOnDestroy() {
+    this._supabase.supabase.removeChannel(this.suscripcionListaArticulos);
   }
 }

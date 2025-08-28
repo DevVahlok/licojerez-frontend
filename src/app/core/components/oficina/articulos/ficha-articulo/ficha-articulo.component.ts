@@ -26,7 +26,6 @@ interface Vendedor {
   encapsulation: ViewEncapsulation.None
 })
 export class FichaArticuloComponent {
-
   public spinner: boolean = false;
   private timer: NodeJS.Timeout;
   private suscripcionArticulo: RealtimeChannel;
@@ -45,7 +44,6 @@ export class FichaArticuloComponent {
     iva: [],
     marca: [],
   }
-
   public listaVendedores: Vendedor[] = [];
   public listaVendedoresFiltrada: any = [];
   public inputVendedor = new FormControl('');
@@ -204,8 +202,6 @@ export class FichaArticuloComponent {
   async getArticulo() {
     this.spinner = true;
     //TODO: aplicar sockets a cada desplegable (cada vez que se crea una subfamilia, por ejemplo), también en lista vendedores
-
-    //TODO: aplicar socket a la tabla de artículos (comprobar con edición y baja, por ejemplo)
 
     this.suscripcionArticulo = this._supabase.supabase.channel(`articulo-${this.id}`).on('postgres_changes', { event: '*', schema: 'public', table: 'articulos', filter: `codigo=eq.${this.id}` }, payload => {
       this.articulo = payload.new as Articulo;
