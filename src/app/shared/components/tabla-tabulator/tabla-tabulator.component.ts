@@ -23,7 +23,8 @@ export interface DataTablaTabulator {
       upload?: boolean,
       download?: boolean,
       config?: boolean
-    }
+    },
+    index?: string
   },
   styles?: {
     theme?: 'light' | 'dark'
@@ -111,6 +112,7 @@ export class TablaTabulatorComponent implements OnInit {
       height: this.data.options.height,
       headerFilterLiveFilterDelay: 0,
       debugInvalidOptions: false,
+      index: this.data?.options?.index
     }
 
     tableOptions?.columns?.forEach(col => {
