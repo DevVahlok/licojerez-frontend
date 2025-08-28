@@ -1,0 +1,16 @@
+<mat-dialog-content class="container-general__dialog-confirmacion">
+
+    <h1>Advertencia</h1>
+
+    <div [innerHTML]="data.message"></div>
+
+    <div mat-dialog-actions *ngIf="!data.singleButton" class="container-botones-accion">
+        <button mat-button (click)="salir(false)">No</button>
+        <button mat-button (click)="salir(true)" class="boton-si">Sí</button>
+    </div>
+
+    <div mat-dialog-actions class="container-botones-accion" *ngIf="data.singleButton">
+        <button mat-button (click)="salir(true)">Aceptar</button>
+    </div>
+
+</mat-dialog-content>

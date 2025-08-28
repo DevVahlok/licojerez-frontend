@@ -1,0 +1,33 @@
+<div class="container-general__articulos">
+
+    <div class="toolbar">
+        <mat-form-field>
+            <mat-label>Buscar artículo</mat-label>
+            <input type="text" matInput [formControl]="buscadorArticulo" [matAutocomplete]="auto"
+                (keydown.enter)="seleccionarPrimero()">
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="abrirFicha($event.option.value)">
+                <ng-container *ngFor="let articulo of opcionesBuscadorArticulosFiltrado">
+                    <mat-option [value]="articulo.id_articulo"> {{articulo.nombre}} </mat-option>
+                </ng-container>
+            </mat-autocomplete>
+        </mat-form-field>
+    </div>
+
+    <mat-tab-group [(selectedIndex)]="indexTabs" (selectedIndexChange)="cambiarTab($event)">
+
+        <mat-tab label="Ficha">
+            <app-ficha-articulo [id]="idArticulo" [indexTabs]="indexTabs"
+                (cambiarTab)="cambiarTab($event)"></app-ficha-articulo>
+        </mat-tab>
+
+        <mat-tab label="Tabla">
+            <app-lista-articulos (abrirFicha)="abrirFicha($event)"></app-lista-articulos>
+        </mat-tab>
+
+        <mat-tab label="Historial">
+
+
+        </mat-tab>
+
+    </mat-tab-group>
+</div>

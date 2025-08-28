@@ -3,12 +3,11 @@ import { RouterModule, Routes } from '@angular/router';
 import { MainComponent } from './core/components/oficina/main/main.component';
 import { LoginComponent } from './core/components/login/login.component';
 import { PrincipalComponent } from './core/components/principal/principal.component';
-import { ListaArticulosComponent } from './core/components/oficina/lista-articulos/lista-articulos.component';
 import { AuthGuard } from './core/services/guard/auth.guard';
 import { ListaLogsComponent } from './core/components/oficina/lista-logs/lista-logs.component';
 import { ListaProveedoresComponent } from './core/components/oficina/lista-proveedores/lista-proveedores.component';
-import { FichaArticuloComponent } from './core/components/oficina/ficha-articulo/ficha-articulo.component';
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
+import { ArticulosComponent } from './core/components/oficina/articulos/articulos.component';
 
 const routes: Routes = [
   {
@@ -17,22 +16,22 @@ const routes: Routes = [
       {
         path: 'articulos',
         canActivate: [AuthGuard],
-        component: ListaArticulosComponent
+        component: ArticulosComponent
       },
       {
         path: 'proveedores',
         canActivate: [AuthGuard],
         component: ListaProveedoresComponent
       },
-      {
-        path: 'articulo',
-        canActivate: [AuthGuard],
-        component: FichaArticuloComponent
-      },
+      /* {
+       path: 'articulo',
+       canActivate: [AuthGuard],
+       component: FichaArticuloComponent
+     }, */
       {
         path: 'articulo/:id',
         canActivate: [AuthGuard],
-        component: FichaArticuloComponent
+        component: ArticulosComponent
       },
       {
         path: 'logs',

@@ -25,7 +25,7 @@ export class TabulatorService {
   getHeaderTablaArticulos(): ColumnDefinition[] {
 
     const columnas: Columna[] = [
-      { title: 'Código', field: 'codigo', type: 'string' },
+      { title: 'Código', field: 'id_articulo', type: 'string' },
       { title: 'Nombre', field: 'nombre', type: 'string' },
       { title: 'Precio coste', field: 'precio_coste', type: 'number', formatter: 'money' },
       { title: 'Precio venta', field: 'precio_venta', type: 'number', formatter: 'money' },
@@ -187,9 +187,6 @@ export class TabulatorService {
   }
 
   async tratamientoConfigTabla(cabecera: ColumnDefinition[], viewname: string, config: ConfigTablaTabulator[]): Promise<ConfigTablaTabulator[]> {
-
-    console.log(config);
-
 
     if (!this.user) {
       this.user = await this._supabase.getUser();

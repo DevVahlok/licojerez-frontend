@@ -6,6 +6,8 @@ import { UtilsService } from 'src/app/core/services/utils-v2/utils.service';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { Subscription } from 'rxjs';
 import { UserLicojerez } from 'src/app/models/general';
+import { EtiquetasService } from 'src/app/core/services/etiquetas/etiquetas.service';
+import { Etiqueta } from 'src/app/models/oficina';
 
 interface OpcionMenuLateral {
   title: string,
@@ -25,7 +27,6 @@ export interface ElementoMenuContextual {
   badge?: string
 }
 
-
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
@@ -44,17 +45,15 @@ export class MainComponent {
   public listaElementosContextual: ElementoMenuContextual[] = [];
   public subContextual: Subscription;
   @ViewChild('trigger') contextMenu: MatMenuTrigger;
+  public colaEtiquetas: Etiqueta[] = [];
+  public detalleEtiquetas = false;
 
-  constructor(public _router: Router, public _dialog: MatDialog, private _supabase: SupabaseService, private _utils: UtilsService) { }
+  constructor(public _router: Router, public _dialog: MatDialog, private _supabase: SupabaseService, private _utils: UtilsService, private _etiquetas: EtiquetasService) { }
 
   async ngOnInit() {
     this.user = await this._supabase.getUser();
-
-    this.subContextual = this._utils.eventoMenuContextual.subscribe(res => {
-      if (res.type === 'open') {
-        this.abrirMenuContextual(res.options, res.position, res.copyElement, res.name);
-      }
-    })
+    this.suscribirseMenuContextual();
+    this.suscribirseColaEtiquetas();
   }
 
   cerrarSesion() {
@@ -74,5 +73,32 @@ export class MainComponent {
       this.contextMenu.menuData = { 'item': copiar ? copiar : null, 'name': name }
       this.contextMenu.openMenu();
     }
+  }
+
+  suscribirseMenuContextual() {
+    this.subContextual = this._utils.eventoMenuContextual.subscribe(res => {
+      if (res.type === 'open') {
+        this.abrirMenuContextual(res.options, res.position, res.copyElement, res.name);
+      }
+    })
+  }
+
+  suscribirseColaEtiquetas() {
+    this._etiquetas.etiquetas$.subscribe(etiquetas => {
+      if (this.colaEtiquetas.length === 0) this.detalleEtiquetas = false;
+      this.colaEtiquetas = etiquetas;
+    });
+  }
+
+  imprimirEtiquetas() {
+    this._etiquetas.imprimirEtiquetas();
+  }
+
+  toggleDetalleEtiquetas() {
+    this.detalleEtiquetas = !this.detalleEtiquetas;
+  }
+
+  borrarEtiqueta(index: number) {
+    this.colaEtiquetas.splice(index, 1);
   }
 }

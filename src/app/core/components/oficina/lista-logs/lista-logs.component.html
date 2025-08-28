@@ -14,23 +14,25 @@
 
     <div *ngIf="spinner === 1">
 
-        <cdk-virtual-scroll-viewport appendOnly itemSize="10" class="container-lista-logs" #viewport>
+        <cdk-virtual-scroll-viewport itemSize="25" class="container-lista-logs" #viewport>
 
             <ng-container *cdkVirtualFor="let log of listaLogs; let index = index;">
 
-                <h3 class="contador-dias"
-                    *ngIf="!listaLogs[index-1] || (listaLogs[index-1] && !moment(listaLogs[index-1]?.fecha)?.isSame(moment(log?.fecha),'day'))">
-                    {{moment(log.fecha
-                    ).format('LL')}}</h3>
+                <div class="log">
+                    <h3 class="contador-dias"
+                        *ngIf="!listaLogs[index-1] || (listaLogs[index-1] && !moment(listaLogs[index-1]?.fecha)?.isSame(moment(log?.fecha),'day'))">
+                        {{moment(log.fecha
+                        ).format('LL')}}</h3>
 
-                <div>
-                    <span>{{log.fecha | date: 'dd/MM/yyyy HH:mm:ss'}} </span> <span class="texto">El usuario
-                        {{log.usuario}} {{log.accion}}</span>
-                    <ng-container *ngIf="log.detalles">
-                        <button mat-button [matTooltip]="'Ver más detalles'" class="boton-detalles"
-                            matTooltipPosition="right"
-                            (click)="abrirPopupDetalles(log.detalles)"><mat-icon>code</mat-icon></button>
-                    </ng-container>
+                    <div>
+                        <span>{{log.fecha | date: 'dd/MM/yyyy HH:mm:ss'}} </span> <span class="texto">El usuario
+                            {{log.usuario}} {{log.accion}}</span>
+                        <ng-container *ngIf="log.detalles">
+                            <button mat-button [matTooltip]="'Ver más detalles'" class="boton-detalles"
+                                matTooltipPosition="right"
+                                (click)="abrirPopupDetalles(log.detalles)"><mat-icon>code</mat-icon></button>
+                        </ng-container>
+                    </div>
                 </div>
 
             </ng-container>

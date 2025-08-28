@@ -1,0 +1,66 @@
+@import './../../../../../../styles/variables';
+
+.container-general__lista-articulos {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+
+    h1 {
+        width: 100%;
+        text-align: center;
+        color: $acento;
+    }
+
+    .toolbar {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-end;
+
+        .boton-crear-articulo {
+            mat-icon {
+                margin-right: 5px !important;
+            }
+        }
+    }
+
+    .container-input-excel {
+        visibility: hidden;
+    }
+}
+
+.container-general__dialog-error-excel {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+
+    .container-lista-registro {
+        height: 500px;
+        width: 700px;
+
+        .cdk-virtual-scroll-content-wrapper {
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: flex-start;
+
+            .texto {
+                display: flex;
+                flex-flow: row nowrap;
+                justify-content: space-between;
+
+                span {
+                    width: 50%;
+                }
+            }
+        }
+    }
+
+    .detalles-errores {
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: flex-start;
+
+        .texto {
+            margin-bottom: 5px;
+        }
+    }
+}
