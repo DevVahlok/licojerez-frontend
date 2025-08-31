@@ -26,7 +26,6 @@ interface Vendedor {
   encapsulation: ViewEncapsulation.None
 })
 export class FichaArticuloComponent {
-  public spinner: boolean = false;
   private timer: NodeJS.Timeout;
   private suscripcionArticulo: RealtimeChannel;
   private valoresAnteriores: Articulo;
@@ -45,7 +44,7 @@ export class FichaArticuloComponent {
     marca: [],
   }
   public listaVendedores: Vendedor[] = [];
-  public listaVendedoresFiltrada: any = [];
+  public listaVendedoresFiltrada: Vendedor[] = [];
   public inputVendedor = new FormControl('');
   public listasDesplegables: ListaDesplegablesFichaArticulo = {
     proveedor: null,
@@ -89,13 +88,13 @@ export class FichaArticuloComponent {
   public nuevoArticulo: boolean = false;
   private listaIDs: number[];
   private comisionesVendedoresNuevoArticulo: Vendedor[] = [];
-
-  //TODO: cuando stock tiene error de required, el texto de error ocupa mucho espacio y sobrepone el contenido
+  public cargaDialogComisiones: -1 | 0 | 1 = 0;
+  public cargaVendedores: -1 | 0 | 1 = 0;
+  public cargaArticulo: -1 | 0 | 1 = 0;
 
   constructor(public _router: Router, public _supabase: SupabaseService, protected _snackbar: MatSnackBar, private _dialog: MatDialog, private _etiquetas: EtiquetasService, private _title: Title) { }
 
   async ngOnInit(): Promise<void> {
-    this.spinner = true;
     this.getPrimerArticulo();
     this.getListaIDs();
   }
@@ -121,10 +120,17 @@ export class FichaArticuloComponent {
   }
 
   async getPrimerArticulo() {
-    const { data } = await this._supabase.supabase.from('articulos').select('*').order('id_articulo', { ascending: true }).limit(1).single();
-    this.id = data.id_articulo;
-    this.getArticulo();
-    this.getVendedores();
+    this.cargaArticulo = 0;
+    const { data, error } = await this._supabase.supabase.from('articulos').select('*').order('id_articulo', { ascending: true }).limit(1).single();
+
+    if (error) {
+      this.cargaArticulo = 1;
+    } else {
+      this.cargaArticulo = -1;
+      this.id = data.id_articulo;
+      this.getArticulo();
+      this.getVendedores();
+    }
   }
 
   async getListaIDs() {
@@ -173,11 +179,13 @@ export class FichaArticuloComponent {
   }
 
   async getVendedores() {
+    this.cargaVendedores = 0;
     const { data, error } = await this._supabase.supabase.from('comisiones_articulos').select(`id_comision, comision, vendedores (*)`).eq('id_articulo', this.id).order('comision', { ascending: false });
 
     if (error) {
-      //TODO: gestionar errores
+      this.cargaVendedores = -1;
     } else {
+      this.cargaVendedores = 1;
       this.listaVendedores = (data as unknown as { vendedores: { nombre: string, created_at: string, id_vendedor: number }, id_comision: number, comision: number }[]).map(vendedor => { return { codigo: vendedor.id_comision, nombre: vendedor.vendedores.nombre, comision: vendedor.comision } })
     }
 
@@ -200,7 +208,7 @@ export class FichaArticuloComponent {
   }
 
   async getArticulo() {
-    this.spinner = true;
+    this.cargaArticulo = 0;
     //TODO: aplicar sockets a cada desplegable (cada vez que se crea una subfamilia, por ejemplo), también en lista vendedores
 
     this.suscripcionArticulo = this._supabase.supabase.channel(`articulo-${this.id}`).on('postgres_changes', { event: '*', schema: 'public', table: 'articulos', filter: `codigo=eq.${this.id}` }, payload => {
@@ -211,23 +219,22 @@ export class FichaArticuloComponent {
     const { data, error } = await this._supabase.supabase.from('articulos').select('*').eq('id_articulo', this.id).single();
 
     if (error) {
-      //TODO: mostrar error
-      return;
+      this.cargaArticulo = -1;
+    } else {
+      this.cargaArticulo = 1;
+      this.articulo = data;
+
+      if (this.indexTabs === 0) {
+        this._title.setTitle(this.articulo.nombre);
+      }
+
+      const datosForm = this.tratamientoPreFormulario();
+      this.formArticulo.setValue(datosForm);
+      this.valoresAnteriores = datosForm;
+
+      this.gestionarFormulario();
+      this.getListasDesplegables();
     }
-
-    this.articulo = data;
-    this.spinner = false;
-
-    if (this.indexTabs === 0) {
-      this._title.setTitle(this.articulo.nombre);
-    }
-
-    const datosForm = this.tratamientoPreFormulario();
-    this.formArticulo.setValue(datosForm);
-    this.valoresAnteriores = datosForm;
-
-    this.gestionarFormulario();
-    this.getListasDesplegables();
   }
 
   gestionarFormulario() {
@@ -313,8 +320,9 @@ export class FichaArticuloComponent {
             const { error } = await this._supabase.supabase.from('articulos').insert(nuevoArticulo);
 
             if (error) {
-
+              this._supabase.anadirLog(`ha tenido un error al crear el artículo "${nuevoArticulo.nombre}"`, error.message);
             } else {
+              this._supabase.anadirLog(`ha creado el artículo "${nuevoArticulo.nombre}" con código ${nuevoArticulo.id_articulo}`);
 
               if (this.comisionesVendedoresNuevoArticulo.length > 0) {
                 this.comisionesVendedoresNuevoArticulo.filter(vendedor => vendedor.comision > 0).forEach(async (vendedor, i) => {
@@ -481,15 +489,20 @@ export class FichaArticuloComponent {
     })
   }
 
-  async abrirDialogEditarComisiones() {
+  abrirDialogEditarComisiones() {
     this.dialogRef = this._dialog.open(this.dialogEditarComision);
+    this.cargarComisiones();
+  }
+
+  async cargarComisiones() {
+    this.cargaDialogComisiones = 0;
 
     const { data, error } = await this._supabase.supabase.from('vendedores').select('*').order('nombre');
 
     if (error) {
-      //TODO: enseñar spinner, gestionar error
+      this.cargaDialogComisiones = -1;
     } else {
-
+      this.cargaDialogComisiones = 1;
       if (this.nuevoArticulo) {
         this.listaVendedoresDialog = data?.map(vendedor => { return { codigo: vendedor.id_vendedor, nombre: vendedor.nombre, comision: this.comisionesVendedoresNuevoArticulo.find(vend => vend.codigo === vendedor.id_vendedor)?.comision ?? 0 } })!;
       } else {
@@ -506,8 +519,6 @@ export class FichaArticuloComponent {
   async modificarComision(vendedor: Vendedor) {
     vendedor.comision = Number(vendedor.comision);
 
-    //TODO: meter error formato en input comision_default en el dialog (no funciona porque ahora es ngmodel)
-
     if (this.nuevoArticulo) {
 
       const antiguoVendedor = this.comisionesVendedoresNuevoArticulo.find(vend => vend.codigo === vendedor.codigo);
@@ -519,27 +530,35 @@ export class FichaArticuloComponent {
       }
 
     } else {
-      //TODO: meter logs
+
       const { data, error } = await this._supabase.supabase.from('comisiones_articulos').select('*').eq('id_articulo', this.articulo.id_articulo).eq('id_vendedor', vendedor.codigo);
 
       if (data!.length === 0) {
         const { error } = await this._supabase.supabase.from('comisiones_articulos').insert({ id_articulo: this.id, id_vendedor: vendedor.codigo, comision: vendedor.comision });
+
         if (error) {
-          //TODO: gestión error
+          this._snackbar.open(`Ha habido un error al añadir la comisión de "${vendedor.nombre}"`, undefined, { duration: 7000 });
+          this._supabase.anadirLog(`ha tenido un error al añadir la comisión: "${vendedor.nombre} (${vendedor.comision}%)" al artículo "${this.articulo.nombre} con id ${this.articulo.id_articulo}"`, error.message);
+        } else {
+          this._supabase.anadirLog(`ha añadido la comisión: "${vendedor.nombre} (${vendedor.comision}%)" al artículo "${this.articulo.nombre} con id ${this.articulo.id_articulo}"`);
         }
+
       } else if (data!.length === 1) {
         if (vendedor.comision === 0) {
           const { error } = await this._supabase.supabase.from('comisiones_articulos').delete().eq('id_articulo', this.id).eq('id_vendedor', vendedor.codigo);
           if (error) {
-            //TODO: gestión error
+            this._snackbar.open(`Ha habido un error al eliminar la comisión de "${vendedor.nombre}"`, undefined, { duration: 7000 });
+            this._supabase.anadirLog(`ha tenido un error al eliminar la comisión de: "${vendedor.nombre}" del artículo "${this.articulo.nombre} con id ${this.articulo.id_articulo}"`, error.message);
           }
         } else {
           const { error } = await this._supabase.supabase.from('comisiones_articulos').update({ comision: vendedor.comision }).eq('id_articulo', this.id).eq('id_vendedor', vendedor.codigo);
           if (error) {
-            //TODO: gestión error
+            this._snackbar.open(`Ha habido un error al modificar la comisión de "${vendedor.nombre}"`, undefined, { duration: 7000 });
+            this._supabase.anadirLog(`ha tenido un error al modificar la comisión de: "${vendedor.nombre}" a "${vendedor.comision}%" del artículo "${this.articulo.nombre} con id ${this.articulo.id_articulo}"`, error.message);
           }
         }
       }
+
       this.getVendedores();
       this.inputVendedor.setValue('');
     }

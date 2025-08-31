@@ -37,3 +37,27 @@ body {
         margin: auto;
     }
 }
+
+.container-error {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+
+    .material-symbols-outlined {
+        color: $error;
+        width: 75px;
+        height: 75px;
+        font-size: 75px;
+        margin: 0 auto 25px auto;
+    }
+
+    .texto {
+        margin: 0 auto;
+    }
+
+    button {
+        width: fit-content;
+        margin: 25px auto 0 auto;
+    }
+
+}
