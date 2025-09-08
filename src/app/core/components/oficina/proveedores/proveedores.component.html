@@ -1,0 +1,28 @@
+<div class="container-general__proveedores">
+
+    <div class="toolbar">
+        <mat-form-field>
+            <mat-label>Buscar proveedor</mat-label>
+            <input type="text" matInput [formControl]="buscadorProveedor" [matAutocomplete]="auto"
+                (keydown.enter)="seleccionarPrimero()">
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="abrirFicha($event.option.value)">
+                <ng-container *ngFor="let proveedor of opcionesBuscadorProveedoresFiltrado">
+                    <mat-option [value]="proveedor.id_proveedor"> {{proveedor.nombre_fiscal}} </mat-option>
+                </ng-container>
+            </mat-autocomplete>
+        </mat-form-field>
+    </div>
+
+    <mat-tab-group [(selectedIndex)]="indexTabs" (selectedIndexChange)="cambiarTab($event)">
+
+        <mat-tab label="Ficha">
+            <app-ficha-proveedor [id]="idProveedor" [indexTabs]="indexTabs"
+                (cambiarTab)="cambiarTab($event)"></app-ficha-proveedor>
+        </mat-tab>
+
+        <mat-tab label="Tabla">
+            <app-lista-proveedores (abrirFicha)="abrirFicha($event)"></app-lista-proveedores>
+        </mat-tab>
+
+    </mat-tab-group>
+</div>

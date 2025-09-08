@@ -48,6 +48,15 @@ export class TabulatorService {
     return this.complementarColumnas(columnas);
   }
 
+  getHeaderTablaProveedores(): ColumnDefinition[] {
+
+    const columnas: Columna[] = [
+
+    ]
+
+    return this.complementarColumnas(columnas);
+  }
+
   private complementarColumnas(listaColumnas: Columna[]): ColumnDefinition[] {
 
     let devol: ColumnDefinition[] = [];

@@ -1,15 +1,12 @@
-import { Component, ElementRef, EventEmitter, Output, TemplateRef, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import { DataTablaTabulator, TablaTabulatorComponent, TablaTabulatorEvent } from 'src/app/shared/components/tabla-tabulator/tabla-tabulator.component';
 import { SupabaseService } from '../../../../services/supabase/supabase.service';
 import { UtilsService } from '../../../../services/utils-v2/utils.service';
-import { Title } from '@angular/platform-browser';
 import { LoadingManagerEvent } from 'src/app/shared/layers/component-loading-manager/component-loading-manager.component';
 import { forkJoin, from, Observable, Subscription, tap } from 'rxjs';
 import { TabulatorService } from 'src/app/core/services/tabulator/tabulator.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { CellComponent, ColumnDefinition, EditorParams } from 'tabulator-tables';
-import { Router } from '@angular/router';
 import { ElementoMenuContextual } from '../../main/main.component';
 import { UserLicojerez } from 'src/app/models/general';
 import { Articulo, ConfigTabla, Etiqueta, IVA } from 'src/app/models/oficina';
@@ -47,10 +44,7 @@ interface ArticuloSupabase extends Override<Articulo, { activo: string, tiene_lo
 export class ListaArticulosComponent {
   public datosTabla: DataTablaTabulator;
   public cargaTablaArticulos: number = 0;
-  @ViewChild('inputArchivo') inputArchivo: ElementRef;
   @ViewChild('componenteTabla') componenteTabla: TablaTabulatorComponent;
-  @ViewChild('dialogErrorExcel') dialogErrorExcel: TemplateRef<null>;
-  public errorExcel: { message: string, field: string, data: { nombre: string }[] };
   public user: UserLicojerez;
   public subContextual: Subscription;
   @Output() abrirFicha = new EventEmitter<number>();
@@ -58,7 +52,7 @@ export class ListaArticulosComponent {
   private suscripcionListaArticulos: RealtimeChannel;
   private listaArticulos: ArticuloSupabase[];
 
-  constructor(private _supabase: SupabaseService, private _utils: UtilsService, private _tabulator: TabulatorService, private _snackbar: MatSnackBar, public _dialog: MatDialog, private _etiquetas: EtiquetasService) { }
+  constructor(private _supabase: SupabaseService, private _utils: UtilsService, private _tabulator: TabulatorService, private _dialog: MatDialog, private _etiquetas: EtiquetasService) { }
 
   async ngOnInit() {
     this.user = await this._supabase.getUser();
@@ -124,31 +118,6 @@ export class ListaArticulosComponent {
     });
   }
 
-  async onFileChange(evento: Event) {
-
-    this.componenteTabla.visibilidadSpinner = true;
-
-    const respuesta = await this._supabase.subirExcelTablaArticulos((evento.target as HTMLInputElement).files![0]);
-
-    if (!respuesta.success) {
-      if (respuesta.error === 'supabase') {
-        this._snackbar.open(`Ha habido un error al añadir los artículos.`, undefined, { duration: 7000 });
-      } else {
-        this.errorExcel = { data: respuesta.data!, field: respuesta.errorField!, message: respuesta.showError! }
-        this._dialog.open(this.dialogErrorExcel);
-      }
-    }
-
-    this.cargarTablaArticulos();
-
-    this.componenteTabla.visibilidadSpinner = false;
-    this.inputArchivo.nativeElement.value = null;
-  }
-
-  abrirDialogAdjuntarArchivo() {
-    this.inputArchivo.nativeElement.click();
-  }
-
   async recibirEventosTabulator(evento: TablaTabulatorEvent) {
 
     switch (evento.action) {
@@ -159,6 +128,7 @@ export class ListaArticulosComponent {
         break;
 
       case 'cellContext':
+        //TODO:  .getRow().getData()['codigo'] --- seguro funciona? no es id_articulo?
         this._utils.abrirMenuContextual(evento.value.event, [{ title: 'Abrir ficha del artículo', field: 'abrir-ficha', value: (evento.value.celda as CellComponent).getRow().getData()['codigo'] }], { x: evento.value.event.clientX, y: evento.value.event.clientY }, (evento.value.celda as CellComponent).getValue())
         break;
 

@@ -1,0 +1,12 @@
+<div class="container-general__lista-proveedores">
+
+    <app-component-loading-manager [progress]="cargaTablaProveedores" [name]="'tablaProveedores'"
+        [template]="containerTablaProveedores" (emitter)="eventosLoadingManager($event)"
+        [size]="{height: '600px',width:'100%'}">
+        <ng-template #containerTablaProveedores>
+            <app-tabla-tabulator [data]="datosTabla" (emitter)="recibirEventosTabulator($event)" *ngIf="datosTabla"
+                #componenteTabla></app-tabla-tabulator>
+        </ng-template>
+    </app-component-loading-manager>
+
+</div>
