@@ -381,19 +381,14 @@ export class FichaArticuloComponent {
 
               case 'tipo':
 
-                if (this.formArticulo.get('tipo')!.value === 'Servicio') {
-                  this.formArticulo.get('stock')!.setValue(0)
-                  this.articulo.stock = 0;
-                  this.formArticulo.get('stock')!.disable();
-                  this.formArticulo.get('tiene_lote')!.disable();
-                  const { error } = await this._supabase.supabase.from('articulos').update({ stock: 0 }).eq('id_articulo', this.id);
-                  if (error) {
-                    this._supabase.anadirLog(`ha tenido un error al modificar el campo "stock" del artículo con código ${this.id}`, error.message);
-                  } else {
-                    this._supabase.anadirLog(`ha modificado el campo "stock": ${this.valoresAnteriores['stock']} \u2192 ${this.formArticulo.get('stock')!.value} del artículo con código ${this.id}`);
-                  }
+                this.formArticulo.get('stock')!.setValue(0)
+                this.articulo.stock = 0;
+                this.formArticulo.get('tiene_lote')!.disable();
+                const { error } = await this._supabase.supabase.from('articulos').update({ stock: 0 }).eq('id_articulo', this.id);
+                if (error) {
+                  this._supabase.anadirLog(`ha tenido un error al modificar el campo "stock" del artículo con código ${this.id}`, error.message);
                 } else {
-                  this.formArticulo.get('stock')!.enable();
+                  this._supabase.anadirLog(`ha modificado el campo "stock": ${this.valoresAnteriores['stock']} \u2192 ${this.formArticulo.get('stock')!.value} del artículo con código ${this.id}`);
                 }
 
                 break;
@@ -590,7 +585,6 @@ export class FichaArticuloComponent {
 
     this.formArticulo.get('id_articulo')!.enable();
     this.formArticulo.get('id_articulo')!.setValue(this.detectarSiguienteID());
-    this.formArticulo.get('stock')!.enable();
     this.formArticulo.get('stock')!.setValue(0);
     this.formArticulo.get('tiene_lote')!.enable();
     this.formArticulo.get('margen')!.disable();

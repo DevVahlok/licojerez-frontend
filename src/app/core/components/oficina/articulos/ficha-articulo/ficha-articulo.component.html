@@ -37,7 +37,7 @@
                 <div class="fila">
 
                     <fieldset class="encapsulacion-datos-principales"
-                        [ngClass]="((formArticulo.get('id_articulo')?.status !== 'DISABLED' && formArticulo.get('id_articulo')?.status !== 'VALID')  || !formArticulo.get('nombre')?.valid || !formArticulo.get('tipo')?.valid || (formArticulo.get('stock')?.status !== 'DISABLED' && formArticulo.get('stock')?.status !== 'VALID')) ? 'faltan-campos' : ''">
+                        [ngClass]="((formArticulo.get('id_articulo')?.status !== 'DISABLED' && formArticulo.get('id_articulo')?.status !== 'VALID')  || !formArticulo.get('nombre')?.valid || !formArticulo.get('tipo')?.valid) ? 'faltan-campos' : ''">
                         <legend>Datos principales</legend>
 
                         <mat-form-field class="campo-codigo">
