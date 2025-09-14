@@ -30,7 +30,7 @@ interface opcionBuscadorArticulo {
 export class ArticulosComponent {
 
   public idArticulo: number;
-  public indexTabs = 1;
+  public indexTabs = 0;
   public buscadorArticulo = new FormControl('');
   public opcionesBuscadorArticulos: opcionBuscadorArticulo[] = [];
   public opcionesBuscadorArticulosFiltrado: opcionBuscadorArticulo[] = [];

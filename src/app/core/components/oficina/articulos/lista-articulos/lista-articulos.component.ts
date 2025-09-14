@@ -216,7 +216,8 @@ export class ListaArticulosComponent {
 
     this._dialog.open(DialogConfirmacion, {
       width: '400px',
-      data: { message: `¿Quieres imprimir ${listaEtiquetas.length} etiquetas? Ocuparán ${Math.ceil(listaEtiquetas.length / 15)} folios.` }
+      data: { message: `¿Quieres imprimir ${listaEtiquetas.length} etiquetas? Ocuparán ${Math.ceil(listaEtiquetas.length / 15)} folios.` },
+      disableClose: true
     }).afterClosed().subscribe(async (res) => {
       if (res) this._etiquetas.imprimirEtiquetas(listaEtiquetas);
     });

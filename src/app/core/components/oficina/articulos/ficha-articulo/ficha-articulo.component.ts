@@ -334,7 +334,8 @@ export class FichaArticuloComponent {
 
               this._dialog.open(DialogConfirmacion, {
                 width: '400px',
-                data: { message: `¿Quieres imprimir una etiqueta?` }
+                data: { message: `¿Quieres imprimir una etiqueta?` },
+                disableClose: true
               }).afterClosed().subscribe((res) => {
                 if (res) {
                   this._etiquetas.anadirEtiqueta({
@@ -466,7 +467,8 @@ export class FichaArticuloComponent {
   bajaArticulo() {
     this._dialog.open(DialogConfirmacion, {
       width: '400px',
-      data: { message: `¿Quieres dar de baja el artículo ${this.articulo.nombre}?` }
+      data: { message: `¿Quieres dar de baja el artículo ${this.articulo.nombre}?` },
+      disableClose: true
     }).afterClosed().subscribe(async (res) => {
 
       if (res) {
@@ -485,7 +487,7 @@ export class FichaArticuloComponent {
   }
 
   abrirDialogEditarComisiones() {
-    this.dialogRef = this._dialog.open(this.dialogEditarComision);
+    this.dialogRef = this._dialog.open(this.dialogEditarComision, { disableClose: true });
     this.cargarComisiones();
   }
 
@@ -587,10 +589,12 @@ export class FichaArticuloComponent {
     this.formArticulo.get('id_articulo')!.setValue(this.detectarSiguienteID());
     this.formArticulo.get('stock')!.setValue(0);
     this.formArticulo.get('tiene_lote')!.enable();
+    this.formArticulo.get('precio_venta')!.setValue(0);
     this.formArticulo.get('margen')!.disable();
     this.formArticulo.get('activo')!.setValue(true);
     this.formArticulo.get('tiene_lote')!.setValue(false);
-    this.formArticulo.get('comision_default')!.setValue(0);
+    this.formArticulo.get('comision_default')!.setValue(3);
+    this.formArticulo.get('id_iva')!.setValue(1);
     this.formArticulo.get('fecha_alta')!.setValue(moment().format('DD/MM/yyyy'));
   }
 

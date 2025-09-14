@@ -54,6 +54,6 @@ export class ListaLogsComponent {
 
   abrirPopupDetalles(texto: string) {
     this.detalleLog = texto;
-    this._dialog.open(this.dialogDetalleLog);
+    this._dialog.open(this.dialogDetalleLog, { disableClose: true });
   }
 }

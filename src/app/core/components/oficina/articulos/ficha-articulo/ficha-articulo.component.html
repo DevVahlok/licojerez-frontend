@@ -176,7 +176,7 @@
                 <div class="fila">
 
                     <fieldset class="fieldset-tarifas"
-                        [ngClass]="(!formArticulo.get('id_iva')?.valid || !formArticulo.get('precio_venta')?.valid ) ? 'faltan-campos' : ''">
+                        [ngClass]="(!formArticulo.get('id_iva')?.valid) ? 'faltan-campos' : ''">
                         <legend>Tarifas</legend>
 
                         <div class="container-selector">
