@@ -10,10 +10,8 @@ export interface ElementoDesplegable {
 
 interface opcionBuscadorProveedor {
   id_proveedor: number,
-  nombre_fiscal: string,
-  nombre_comercial: string,
-  cif: string,
-  nombre_centro: string[]
+  nombre: string,
+  cif: string
 }
 
 @Component({
@@ -49,37 +47,36 @@ export class ProveedoresComponent {
   }
 
   activarListenerInputBuscador() {
-    /*     this.buscadorProveedor.valueChanges.subscribe(async value => {
-          clearTimeout(this.timer);
-    
-          if (!value) value = '';
-          value = value.replace(/,/g, ' ');
-    
-          this.timer = setTimeout(async () => {
-    
-            if (value === '') {
-              this.opcionesBuscadorProveedoresFiltrado = [];
-            } else {
-             // const { data } = await this._supabase.supabase.from('articulos_busqueda').select('*').or(`nombre.ilike.%${value}%, id_articulo.ilike.%${value}%, ean13_1.ilike.%${value}%, ean13_2.ilike.%${value}%, ean13_3.ilike.%${value}%, ean13_4.ilike.%${value}%, ean13_5.ilike.%${value}%`);
-              const { data } = await this._supabase.supabase.from('proveedores_busqueda').select('*').or(`nombre.ilike.%${value}%, id_articulo.ilike.%${value}%, ean13_1.ilike.%${value}%, ean13_2.ilike.%${value}%, ean13_3.ilike.%${value}%, ean13_4.ilike.%${value}%, ean13_5.ilike.%${value}%`);
-    
-              let resultado = data!?.map(articulo => { return { id_articulo: articulo.id_articulo, nombre: articulo.nombre, ean13: [articulo.ean13_1, articulo.ean13_2, articulo.ean13_3, articulo.ean13_4, articulo.ean13_5] } });
-    
-              const indexCodigoIdentico = resultado.findIndex(articulo => articulo.id_articulo === value);
-    
-              if (indexCodigoIdentico <= 0 || indexCodigoIdentico >= resultado.length) {
-    
-              } else {
-                const elemento = resultado.splice(indexCodigoIdentico, 1)[0];
-                resultado.unshift(elemento);
-              }
-    
-              this.opcionesBuscadorProveedoresFiltrado = resultado;
-            }
-    
-          }, 200);
-    
-        }); */
+    this.buscadorProveedor.valueChanges.subscribe(async value => {
+      clearTimeout(this.timer);
+
+      if (!value) value = '';
+      value = value.replace(/,/g, ' ');
+
+      this.timer = setTimeout(async () => {
+
+        if (value === '') {
+          this.opcionesBuscadorProveedoresFiltrado = [];
+        } else {
+          const { data } = await this._supabase.supabase.from('proveedores_busqueda').select('*').or(`nombre.ilike.%${value}%, id_proveedor.ilike.%${value}%, cif.ilike.%${value}%`);
+
+          let resultado = data!?.map(proveedor => { return { id_proveedor: proveedor.id_proveedor, nombre: proveedor.nombre, cif: proveedor.cif } });
+
+          const indexCodigoIdentico = resultado.findIndex(proveedor => proveedor.id_proveedor === value);
+
+          if (indexCodigoIdentico <= 0 || indexCodigoIdentico >= resultado.length) {
+
+          } else {
+            const elemento = resultado.splice(indexCodigoIdentico, 1)[0];
+            resultado.unshift(elemento);
+          }
+
+          this.opcionesBuscadorProveedoresFiltrado = resultado;
+        }
+
+      }, 200);
+
+    });
   }
 
   cambiarTab(index: number) {
