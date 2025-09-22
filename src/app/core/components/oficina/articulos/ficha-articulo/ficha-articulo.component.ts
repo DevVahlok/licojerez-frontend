@@ -12,6 +12,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { DialogConfirmacion } from 'src/app/shared/dialogs/dialog-confirmacion/dialog-confirmacion';
 import { EtiquetasService } from 'src/app/core/services/etiquetas/etiquetas.service';
 import { Title } from '@angular/platform-browser';
+import { UtilsService } from 'src/app/core/services/utils-v2/utils.service';
 
 interface Vendedor {
   codigo: number,
@@ -92,7 +93,7 @@ export class FichaArticuloComponent {
   public cargaVendedores: -1 | 0 | 1 = 0;
   public cargaArticulo: -1 | 0 | 1 = 0;
 
-  constructor(public _router: Router, public _supabase: SupabaseService, protected _snackbar: MatSnackBar, private _dialog: MatDialog, private _etiquetas: EtiquetasService, private _title: Title) { }
+  constructor(public _router: Router, public _supabase: SupabaseService, protected _snackbar: MatSnackBar, private _dialog: MatDialog, private _etiquetas: EtiquetasService, private _title: Title, private _utils: UtilsService) { }
 
   async ngOnInit(): Promise<void> {
     this.getPrimerArticulo();
@@ -106,7 +107,7 @@ export class FichaArticuloComponent {
 
     if (changes['indexTabs']?.currentValue !== null) {
       if (this.indexTabs === 0) {
-        this._title.setTitle(this.articulo.nombre);
+        this._title.setTitle(this.articulo?.nombre);
       }
     }
   }
@@ -211,7 +212,7 @@ export class FichaArticuloComponent {
     this.cargaArticulo = 0;
     //TODO: aplicar sockets a cada desplegable (cada vez que se crea una subfamilia, por ejemplo), también en lista vendedores
 
-    this.suscripcionArticulo = this._supabase.supabase.channel(`articulo-${this.id}`).on('postgres_changes', { event: '*', schema: 'public', table: 'articulos', filter: `codigo=eq.${this.id}` }, payload => {
+    this.suscripcionArticulo = this._supabase.supabase.channel(`articulo-${this.id}`).on('postgres_changes', { event: '*', schema: 'public', table: 'articulos', filter: `id_articulo=eq.${this.id}` }, payload => {
       this.articulo = payload.new as Articulo;
       this.formArticulo.setValue(this.tratamientoPreFormulario())
     }).subscribe();
@@ -314,7 +315,7 @@ export class FichaArticuloComponent {
 
             if (data!.length > 0) {
               await this.getListaIDs();
-              nuevoArticulo.id_articulo = this.detectarSiguienteID();
+              nuevoArticulo.id_articulo = this._utils.detectarSiguienteID(this.listaIDs);
             }
 
             const { error } = await this._supabase.supabase.from('articulos').insert(nuevoArticulo);
@@ -586,7 +587,7 @@ export class FichaArticuloComponent {
     this.listaVendedoresFiltrada = [];
 
     this.formArticulo.get('id_articulo')!.enable();
-    this.formArticulo.get('id_articulo')!.setValue(this.detectarSiguienteID());
+    this.formArticulo.get('id_articulo')!.setValue(this._utils.detectarSiguienteID(this.listaIDs));
     this.formArticulo.get('stock')!.setValue(0);
     this.formArticulo.get('tiene_lote')!.enable();
     this.formArticulo.get('precio_venta')!.setValue(0);
@@ -596,17 +597,5 @@ export class FichaArticuloComponent {
     this.formArticulo.get('comision_default')!.setValue(3);
     this.formArticulo.get('id_iva')!.setValue(1);
     this.formArticulo.get('fecha_alta')!.setValue(moment().format('DD/MM/yyyy'));
-  }
-
-  detectarSiguienteID(): number {
-    const set = new Set(this.listaIDs);
-    const min = Math.min(...this.listaIDs);
-    const max = Math.max(...this.listaIDs);
-
-    for (let i = min; i <= max; i++) {
-      if (!set.has(i)) return i;
-    }
-
-    return this.listaIDs[this.listaIDs.length - 1] + 1;
   }
 }

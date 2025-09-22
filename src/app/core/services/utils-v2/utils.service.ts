@@ -60,4 +60,16 @@ export class UtilsService {
     evento.preventDefault();
     this.eventoMenuContextual.emit({ type: 'open', options: opciones, position: posicion, copyElement: copiar, name })
   }
+
+  detectarSiguienteID(listaIDs: number[]): number {
+    const set = new Set(listaIDs);
+    const min = Math.min(...listaIDs);
+    const max = Math.max(...listaIDs);
+
+    for (let i = min; i <= max; i++) {
+      if (!set.has(i)) return i;
+    }
+
+    return listaIDs[listaIDs.length - 1] + 1;
+  }
 }

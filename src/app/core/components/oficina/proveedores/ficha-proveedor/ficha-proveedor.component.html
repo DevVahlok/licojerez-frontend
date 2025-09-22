@@ -1,1 +1,118 @@
-<p>ficha-proveedor works!</p>
+<div class="container-general__ficha-proveedor">
+
+    <div *ngIf="cargaProveedor === 0" class="container-spinner">
+        <mat-spinner></mat-spinner>
+    </div>
+
+    <div *ngIf="cargaProveedor === -1" class="container-error">
+        <span class="material-symbols-outlined">warning</span>
+        <span class="texto">Ha habido un error al cargar los datos.</span>
+        <button mat-button (click)="getProveedor()">Reintentar</button>
+    </div>
+
+    <div *ngIf="cargaProveedor === 1">
+        <div class="container-titulo">
+            <div class="fill"></div>
+            <div class="encapsulador-titulo">
+                <h1>{{nuevoProveedor ? 'Creación proveedor' : proveedor.nombre}}</h1>
+            </div>
+            <div class="container-indicador-creacion">
+                <div [matTooltip]="'Debes de rellenar los campos obligatorios (*)'">
+                    <span *ngIf="nuevoProveedor">Proveedor no guardado <span
+                            class="material-symbols-outlined">help</span></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <button mat-button [disabled]="nuevoProveedor" (click)="bajaProveedor()">Dar de baja</button>
+            <button mat-button (click)="empezarNuevoProveedor()">Crear nuevo proveedor</button>
+        </div>
+
+        <form [formGroup]="formProveedor" *ngIf="formProveedor">
+
+            <div class="container-izq">
+
+                <div class="fila">
+                    <fieldset class="encapsulacion-datos-principales"
+                        [ngClass]="((formProveedor.get('id_proveedor')?.status !== 'DISABLED' && formProveedor.get('id_proveedor')?.status !== 'VALID')  || !formProveedor.get('nombre')?.valid || !formProveedor.get('cif')?.valid) ? 'faltan-campos' : ''">
+                        <legend>Datos principales</legend>
+
+                        <mat-form-field class="campo-codigo">
+                            <mat-label>Código</mat-label>
+                            <input matInput formControlName="id_proveedor">
+                        </mat-form-field>
+
+                        <mat-form-field class="campo-nombre">
+                            <mat-label>Nombre</mat-label>
+                            <input matInput formControlName="nombre" (input)="editarCampo('nombre')">
+                            <mat-error *ngIf="formProveedor?.get('nombre')?.errors?.['required']">El nombre es
+                                obligatorio</mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field>
+                            <mat-label>Fecha alta</mat-label>
+                            <input matInput formControlName="fecha_alta">
+                        </mat-form-field>
+
+                        <div class="container-switch">
+                            <mat-slide-toggle formControlName="activo"
+                                (change)="editarCampo('activo')">Activo</mat-slide-toggle>
+                        </div>
+
+                        <mat-form-field class="campo-cif">
+                            <mat-label>CIF</mat-label>
+                            <input matInput formControlName="cif" (input)="editarCampo('cif')">
+                            <mat-error *ngIf="formProveedor?.get('cif')?.errors?.['required']">El CIF es
+                                obligatorio</mat-error>
+                        </mat-form-field>
+                    </fieldset>
+                </div>
+
+                <div class="fila">
+                    <fieldset class="seccion-direccion">
+                        <legend>Dirección</legend>
+
+                        <div class="fila-direccion">
+                            <mat-form-field class="campo-direccion">
+                                <mat-label>Dirección</mat-label>
+                                <input matInput formControlName="direccion" (input)="editarCampo('direccion')">
+                            </mat-form-field>
+
+                            <mat-form-field class="campo-codigo-postal">
+                                <mat-label>Código Postal</mat-label>
+                                <input matInput formControlName="codigo_postal" (input)="editarCampo('codigo_postal')">
+                            </mat-form-field>
+
+                        </div>
+
+                        <div class="fila-direccion">
+                            <mat-form-field class="campo-ciudad">
+                                <mat-label>Ciudad</mat-label>
+                                <input matInput formControlName="ciudad" (input)="editarCampo('ciudad')">
+                            </mat-form-field>
+
+                            <mat-form-field>
+                                <mat-label>Provincia</mat-label>
+                                <input matInput formControlName="provincia" (input)="editarCampo('provincia')">
+                            </mat-form-field>
+                        </div>
+
+                    </fieldset>
+
+                    <fieldset class="seccion-tarifas">
+                        <legend>Tarifas</legend>
+
+                        <mat-form-field class="campo-descuento">
+                            <mat-label>Descuento</mat-label>
+                            <input matInput formControlName="descuento" (input)="editarCampo('descuento')">
+                            <span matSuffix>%</span>
+                            <mat-error *ngIf="formProveedor?.get('descuento')?.errors?.['pattern']">El descuento debe
+                                ser numérico.</mat-error>
+                        </mat-form-field>
+                    </fieldset>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

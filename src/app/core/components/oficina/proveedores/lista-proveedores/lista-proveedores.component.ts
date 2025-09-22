@@ -8,29 +8,9 @@ import { UtilsService } from 'src/app/core/services/utils-v2/utils.service';
 import { UserLicojerez } from 'src/app/models/general';
 import { ConfigTabla, Proveedor } from 'src/app/models/oficina';
 import { DataTablaTabulator, TablaTabulatorComponent, TablaTabulatorEvent } from 'src/app/shared/components/tabla-tabulator/tabla-tabulator.component';
-import { CellComponent, ColumnDefinition, EditorParams } from 'tabulator-tables';
+import { CellComponent } from 'tabulator-tables';
 import { ElementoMenuContextual } from '../../main/main.component';
 import { LoadingManagerEvent } from 'src/app/shared/layers/component-loading-manager/component-loading-manager.component';
-
-type Override<T, R> = Omit<T, keyof R> & R;
-
-interface ProveedorSupabase extends Override<Proveedor, { activo: string }> {
-  /*   proveedores: { nombre: string },
-    familias: { nombre: string },
-    subfamilias: { nombre: string },
-    ivas: { valor_iva: number },
-    marcas: { nombre: string },
-    articulos_grupos: { grupos_articulos: { nombre: string } }[],
-    ean13: string,
-    proveedor?: string,
-    familia?: string,
-    subfamilia?: string,
-    iva?: number,
-    marca?: string,
-    grupos?: string,
-    activo: string,
-    tiene_lote: string, */
-}
 
 @Component({
   selector: 'app-lista-proveedores',
@@ -45,7 +25,7 @@ export class ListaProveedoresComponent {
   public subContextual: Subscription;
   @Output() abrirFicha = new EventEmitter<number>();
   private suscripcionListaProveedores: RealtimeChannel;
-  private listaProveedores: ProveedorSupabase[];
+  private listaProveedores: Proveedor[];
 
   constructor(private _supabase: SupabaseService, private _utils: UtilsService, private _tabulator: TabulatorService, private _dialog: MatDialog) { }
 
@@ -65,16 +45,15 @@ export class ListaProveedoresComponent {
 
     const incrementarCarga = () => {
       if (this.cargaTablaProveedores !== -1) {
-        this.cargaTablaProveedores += 100 / 3;
+        this.cargaTablaProveedores += 100 / 2;
       }
     }
 
     forkJoin([
-      (from(this._supabase.supabase.from('articulos').select(`*, proveedores(nombre), familias(nombre), subfamilias(nombre), ivas(valor_iva), marcas(nombre), articulos_grupos!articulos_grupos_id_articulo_fkey (id_articulo_grupo, grupos_articulos!articulos_grupos_id_grupo_fkey (id_grupo_articulo, nombre))`).order('nombre')) as Observable<{ data: ProveedorSupabase[] }>).pipe(tap(() => incrementarCarga())),
-      (from(this._supabase.supabase.from('grupos_articulos').select('nombre').order('nombre')) as Observable<{ data: { nombre: string }[] }>).pipe(tap(() => incrementarCarga())),
+      (from(this._supabase.supabase.from('proveedores').select(`*`).order('nombre')) as Observable<{ data: Proveedor[] }>).pipe(tap(() => incrementarCarga())),
       (from(this._supabase.supabase.from('config_componentes').select('*').eq('viewname', 'tabla-lista-proveedores').eq('user', this.user.username).single()) as Observable<{ data: ConfigTabla }>).pipe(tap(() => incrementarCarga()))
     ]).subscribe({
-      next: async ([{ data: filas }, { data: listaGrupos }, { data: configUsuario }]) => {
+      next: async ([{ data: filas }, { data: configUsuario }]) => {
 
         filas = this.tratamientoFilas(filas);
 
@@ -84,7 +63,7 @@ export class ListaProveedoresComponent {
           this.componenteTabla.sustituirDatos(this._utils.convertirEnFormatoTabla(filas))
         } else {
           this.datosTabla = {
-            cabecera: this.tratamientoColumnas(this._tabulator.getHeaderTablaProveedores()),
+            cabecera: this._tabulator.getHeaderTablaProveedores(),
             tableData: this._utils.convertirEnFormatoTabla(filas),
             config: await this._tabulator.tratamientoConfigTabla(this._tabulator.getHeaderTablaProveedores(), 'tabla-lista-proveedores', configUsuario ? configUsuario.config : []),
             options: {
@@ -115,8 +94,7 @@ export class ListaProveedoresComponent {
         break;
 
       case 'cellContext':
-        //TODO:  .getRow().getData()['codigo'] --- seguro funciona? no es id_proveedor?
-        this._utils.abrirMenuContextual(evento.value.event, [{ title: 'Abrir ficha del proveedor', field: 'abrir-ficha', value: (evento.value.celda as CellComponent).getRow().getData()['codigo'] }], { x: evento.value.event.clientX, y: evento.value.event.clientY }, (evento.value.celda as CellComponent).getValue())
+        this._utils.abrirMenuContextual(evento.value.event, [{ title: 'Abrir ficha del proveedor', field: 'abrir-ficha', value: (evento.value.celda as CellComponent).getRow().getData()['id_proveedor'] }], { x: evento.value.event.clientX, y: evento.value.event.clientY }, (evento.value.celda as CellComponent).getValue())
         break;
 
       case 'cellDblClick':
@@ -137,27 +115,21 @@ export class ListaProveedoresComponent {
     if (evento.type === 'reload') this.cargarTablaProveedores();
   }
 
-  tratamientoFilas(filas: ProveedorSupabase[]) {
+  tratamientoFilas(filas: Proveedor[]) {
 
     filas.forEach(fila => {
-
+      fila.activo = fila.activo ? 'Sí' : 'No' as any;
     });
 
     return filas;
   }
 
-  tratamientoColumnas(cabecera: ColumnDefinition[]) {
-
-
-    return cabecera;
-  }
-
   iniciarSocketListaProveedores() {
 
-    const articuloIndexMap = new Map<string, number>();
+    const proveedorIndexMap = new Map<string, number>();
 
     this.listaProveedores.forEach((art, i) => {
-      articuloIndexMap.set(String(art.id_proveedor), i);
+      proveedorIndexMap.set(String(art.id_proveedor), i);
     });
 
     let codigosPendientes = new Set<string>();
@@ -168,27 +140,26 @@ export class ListaProveedoresComponent {
       switch (payload.eventType) {
         case 'INSERT':
           this.componenteTabla.tabla.addData([payload.new]);
-
           codigosPendientes.add(payload.new['id_proveedor']);
           break;
 
         case 'UPDATE':
           this.componenteTabla.tabla.updateData([payload.new]);
-
           codigosPendientes.add(payload.new['id_proveedor']);
           break;
 
         case 'DELETE':
           this.componenteTabla.tabla.deleteRow(payload.old['id_proveedor']);
 
-          const index = articuloIndexMap.get(payload.old['id_proveedor']);
+          const index = proveedorIndexMap.get(payload.old['id_proveedor']);
           if (index !== undefined) {
             this.listaProveedores.splice(index, 1);
-            articuloIndexMap.delete(payload.old['id_proveedor']);
+            proveedorIndexMap.delete(payload.old['id_proveedor']);
           }
           break;
       }
 
+      this.componenteTabla.tabla.setData(this.tratamientoFilas(this.componenteTabla.tabla.getData()))
 
       if (timeoutActualizar) clearTimeout(timeoutActualizar);
       timeoutActualizar = setTimeout(async () => {
@@ -197,17 +168,17 @@ export class ListaProveedoresComponent {
         const codigos = Array.from(codigosPendientes);
         codigosPendientes.clear();
 
-        const { data, error } = await this._supabase.supabase.from('id_proveedor').select(`*, proveedores(nombre), familias(nombre), subfamilias(nombre), ivas(valor_iva), marcas(nombre), articulos_grupos!articulos_grupos_id_articulo_fkey (id_articulo_grupo, grupos_articulos!articulos_grupos_id_grupo_fkey (id_grupo_articulo, nombre))`).in('id_articulo', codigos);
+        const { data, error } = await this._supabase.supabase.from('proveedores').select(`*`).in('id_proveedor', codigos);
 
         if (error) return;
 
-        data.forEach((articulo: ProveedorSupabase) => {
-          const index = articuloIndexMap.get(String(articulo.id_proveedor));
+        data.forEach((proveedor: Proveedor) => {
+          const index = proveedorIndexMap.get(String(proveedor.id_proveedor));
           if (index !== undefined) {
-            this.listaProveedores[index] = articulo;
+            this.listaProveedores[index] = proveedor;
           } else {
-            this.listaProveedores.push(articulo);
-            articuloIndexMap.set(String(articulo.id_proveedor), this.listaProveedores.length - 1);
+            this.listaProveedores.push(proveedor);
+            proveedorIndexMap.set(String(proveedor.id_proveedor), this.listaProveedores.length - 1);
           }
         });
 

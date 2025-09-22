@@ -128,8 +128,7 @@ export class ListaArticulosComponent {
         break;
 
       case 'cellContext':
-        //TODO:  .getRow().getData()['codigo'] --- seguro funciona? no es id_articulo?
-        this._utils.abrirMenuContextual(evento.value.event, [{ title: 'Abrir ficha del artículo', field: 'abrir-ficha', value: (evento.value.celda as CellComponent).getRow().getData()['codigo'] }], { x: evento.value.event.clientX, y: evento.value.event.clientY }, (evento.value.celda as CellComponent).getValue())
+        this._utils.abrirMenuContextual(evento.value.event, [{ title: 'Abrir ficha del artículo', field: 'abrir-ficha', value: (evento.value.celda as CellComponent).getRow().getData()['id_articulo'] }], { x: evento.value.event.clientX, y: evento.value.event.clientY }, (evento.value.celda as CellComponent).getValue())
         break;
 
       case 'cellDblClick':
@@ -239,13 +238,11 @@ export class ListaArticulosComponent {
       switch (payload.eventType) {
         case 'INSERT':
           this.componenteTabla.tabla.addData([payload.new]);
-
           codigosPendientes.add(payload.new['id_articulo']);
           break;
 
         case 'UPDATE':
           this.componenteTabla.tabla.updateData([payload.new]);
-
           codigosPendientes.add(payload.new['id_articulo']);
           break;
 
@@ -260,6 +257,7 @@ export class ListaArticulosComponent {
           break;
       }
 
+      this.componenteTabla.tabla.setData(this.tratamientoFilas(this.componenteTabla.tabla.getData()))
 
       if (timeoutActualizar) clearTimeout(timeoutActualizar);
       timeoutActualizar = setTimeout(async () => {

@@ -7,7 +7,7 @@
     <div *ngIf="cargaArticulo === -1" class="container-error">
         <span class="material-symbols-outlined">warning</span>
         <span class="texto">Ha habido un error al cargar los datos.</span>
-        <button mat-button (click)="cargarComisiones()">Reintentar</button>
+        <button mat-button (click)="getArticulo()">Reintentar</button>
     </div>
 
     <div *ngIf="cargaArticulo === 1">
@@ -369,8 +369,6 @@
                 </ng-container>
 
             </div>
-
-
 
         </form>
 

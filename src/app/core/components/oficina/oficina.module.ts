@@ -15,6 +15,9 @@ import { FichaArticuloComponent } from './articulos/ficha-articulo/ficha-articul
 import { ArticulosComponent } from './articulos/articulos.component';
 import { FichaProveedorComponent } from './proveedores/ficha-proveedor/ficha-proveedor.component';
 import { ProveedoresComponent } from './proveedores/proveedores.component';
+import { ClientesComponent } from './clientes/clientes.component';
+import { FichaClienteComponent } from './clientes/ficha-cliente/ficha-cliente.component';
+import { ListaClientesComponent } from './clientes/lista-clientes/lista-clientes.component';
 
 
 
@@ -28,7 +31,10 @@ import { ProveedoresComponent } from './proveedores/proveedores.component';
     ArticulosComponent,
     FichaArticuloComponent,
     FichaProveedorComponent,
-    ProveedoresComponent
+    ProveedoresComponent,
+    ClientesComponent,
+    FichaClienteComponent,
+    ListaClientesComponent
   ],
   imports: [
     CommonModule,

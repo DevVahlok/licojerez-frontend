@@ -51,7 +51,16 @@ export class TabulatorService {
   getHeaderTablaProveedores(): ColumnDefinition[] {
 
     const columnas: Columna[] = [
-
+      { title: 'Código', field: 'id_proveedor', type: 'string' },
+      { title: 'Nombre', field: 'nombre', type: 'string' },
+      { title: 'Activo', field: 'activo', type: 'boolean', dropdown: true },
+      { title: 'Dirección', field: 'direccion', type: 'string' },
+      { title: 'Código Postal', field: 'codigo_postal', type: 'string' },
+      { title: 'Ciudad', field: 'ciudad', type: 'string' },
+      { title: 'Provincia', field: 'provincia', type: 'string' },
+      { title: 'CIF', field: 'cif', type: 'string' },
+      { title: 'Descuento', field: 'descuento', type: 'number', formatter: '%' },
+      { title: 'Fecha Alta', field: 'fecha_alta', type: 'string' },
     ]
 
     return this.complementarColumnas(columnas);

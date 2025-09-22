@@ -24,7 +24,7 @@ interface opcionBuscadorProveedor {
 export class ProveedoresComponent {
 
   public idProveedor: number;
-  public indexTabs = 1;
+  public indexTabs = 0;
   public buscadorProveedor = new FormControl('');
   public opcionesBuscadorProveedores: opcionBuscadorProveedor[] = [];
   public opcionesBuscadorProveedoresFiltrado: opcionBuscadorProveedor[] = [];
