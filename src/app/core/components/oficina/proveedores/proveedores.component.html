@@ -4,10 +4,13 @@
         <mat-form-field>
             <mat-label>Buscar proveedor</mat-label>
             <input type="text" matInput [formControl]="buscadorProveedor" [matAutocomplete]="auto"
-                (keydown.enter)="seleccionarPrimero()">
-            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="abrirFicha($event.option.value)">
+                (keydown.enter)="onEnter($event)">
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="abrirFicha($event.option.value)"
+                (optionActivated)="onOptionActivated($event)">
                 <ng-container *ngFor="let proveedor of opcionesBuscadorProveedoresFiltrado">
-                    <mat-option [value]="proveedor.id_proveedor"> {{proveedor.nombre}} </mat-option>
+                    <mat-option [value]="proveedor.id_proveedor">
+                        {{proveedor.nombre}}
+                    </mat-option>
                 </ng-container>
             </mat-autocomplete>
         </mat-form-field>

@@ -27,6 +27,7 @@ export class ProveedoresComponent {
   public opcionesBuscadorProveedores: opcionBuscadorProveedor[] = [];
   public opcionesBuscadorProveedoresFiltrado: opcionBuscadorProveedor[] = [];
   private timer: NodeJS.Timeout;
+  public hasActiveOption = false;
 
   constructor(private _title: Title, private _supabase: SupabaseService) { }
 
@@ -44,6 +45,16 @@ export class ProveedoresComponent {
   seleccionarPrimero() {
     const opciones = this.opcionesBuscadorProveedoresFiltrado;
     if (opciones.length > 0) this.abrirFicha(opciones[0].id_proveedor)
+  }
+
+  onOptionActivated(event: any) {
+    this.hasActiveOption = !!event.option;
+  }
+
+  onEnter(event: any) {
+    if (this.hasActiveOption) return;
+    event.preventDefault();
+    this.seleccionarPrimero();
   }
 
   activarListenerInputBuscador() {
@@ -70,6 +81,7 @@ export class ProveedoresComponent {
             const elemento = resultado.splice(indexCodigoIdentico, 1)[0];
             resultado.unshift(elemento);
           }
+          console.log(resultado);
 
           this.opcionesBuscadorProveedoresFiltrado = resultado;
         }

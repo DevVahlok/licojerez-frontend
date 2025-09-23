@@ -35,6 +35,7 @@ export class ArticulosComponent {
   public opcionesBuscadorArticulos: opcionBuscadorArticulo[] = [];
   public opcionesBuscadorArticulosFiltrado: opcionBuscadorArticulo[] = [];
   private timer: NodeJS.Timeout;
+  public hasActiveOption = false;
 
   constructor(private _title: Title, private _supabase: SupabaseService) { }
 
@@ -52,6 +53,16 @@ export class ArticulosComponent {
   seleccionarPrimero() {
     const opciones = this.opcionesBuscadorArticulosFiltrado;
     if (opciones.length > 0) this.abrirFicha(opciones[0].id_articulo)
+  }
+
+  onOptionActivated(event: any) {
+    this.hasActiveOption = !!event.option;
+  }
+
+  onEnter(event: any) {
+    if (this.hasActiveOption) return;
+    event.preventDefault();
+    this.seleccionarPrimero();
   }
 
   activarListenerInputBuscador() {
