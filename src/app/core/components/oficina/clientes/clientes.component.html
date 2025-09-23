@@ -1,1 +1,29 @@
-<p>clientes works!</p>
+<div class="container-general__clientes">
+
+    <div class="toolbar">
+        <mat-form-field>
+            <mat-label>Buscar cliente</mat-label>
+            <input type="text" matInput [formControl]="buscadorCliente" [matAutocomplete]="auto"
+                (keydown.enter)="onEnter($event)">
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="abrirFicha($event.option.value)"
+                (optionActivated)="onOptionActivated($event)">
+                <ng-container *ngFor="let cliente of opcionesBuscadorClientesFiltrado">
+                    <mat-option [value]="cliente.id_cliente"> {{cliente.nombre}} </mat-option>
+                </ng-container>
+            </mat-autocomplete>
+        </mat-form-field>
+    </div>
+
+    <mat-tab-group [(selectedIndex)]="indexTabs" (selectedIndexChange)="cambiarTab($event)">
+
+        <mat-tab label="Ficha">
+            <app-ficha-cliente [id]="idCliente" [indexTabs]="indexTabs"
+                (cambiarTab)="cambiarTab($event)"></app-ficha-cliente>
+        </mat-tab>
+
+        <mat-tab label="Tabla">
+            <app-lista-clientes (abrirFicha)="abrirFicha($event)"></app-lista-clientes>
+        </mat-tab>
+
+    </mat-tab-group>
+</div>

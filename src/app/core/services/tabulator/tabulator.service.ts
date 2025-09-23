@@ -66,6 +66,16 @@ export class TabulatorService {
     return this.complementarColumnas(columnas);
   }
 
+  getHeaderTablaClientes(): ColumnDefinition[] {
+
+    const columnas: Columna[] = [
+      { title: 'Código', field: 'id_cliente', type: 'string' },
+      { title: 'Activo', field: 'activo', type: 'boolean', dropdown: true },
+    ]
+
+    return this.complementarColumnas(columnas);
+  }
+
   private complementarColumnas(listaColumnas: Columna[]): ColumnDefinition[] {
 
     let devol: ColumnDefinition[] = [];

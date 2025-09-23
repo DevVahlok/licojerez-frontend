@@ -50,6 +50,11 @@ export interface Proveedor {
     web: string
 }
 
+export interface Cliente {
+    id_cliente: string,
+    activo: boolean
+}
+
 export interface Centro {
     id_centro: number,
     nombre: string,

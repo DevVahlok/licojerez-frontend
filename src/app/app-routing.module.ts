@@ -8,6 +8,7 @@ import { ListaLogsComponent } from './core/components/oficina/lista-logs/lista-l
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { ArticulosComponent } from './core/components/oficina/articulos/articulos.component';
 import { ProveedoresComponent } from './core/components/oficina/proveedores/proveedores.component';
+import { ClientesComponent } from './core/components/oficina/clientes/clientes.component';
 
 const routes: Routes = [
   {
@@ -22,6 +23,11 @@ const routes: Routes = [
         path: 'proveedores',
         canActivate: [AuthGuard],
         component: ProveedoresComponent
+      },
+      {
+        path: 'clientes',
+        canActivate: [AuthGuard],
+        component: ClientesComponent
       },
       {
         path: 'logs',
