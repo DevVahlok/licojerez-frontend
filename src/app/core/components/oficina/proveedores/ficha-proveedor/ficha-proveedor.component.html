@@ -40,7 +40,7 @@
 
                         <mat-form-field class="campo-codigo">
                             <mat-label>Código</mat-label>
-                            <input matInput formControlName="id_proveedor">
+                            <input matInput formControlName="id_proveedor" (input)="editarCampo('id_proveedor')">
                         </mat-form-field>
 
                         <mat-form-field class="campo-nombre">

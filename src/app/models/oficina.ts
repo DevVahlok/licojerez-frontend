@@ -51,16 +51,34 @@ export interface Proveedor {
 }
 
 export interface Cliente {
-    id_cliente: string,
-    activo: boolean
+    id_cliente: number,
+    activo: boolean,
+    fecha_alta: string,
+    nombre: string,
+    nombre_comercial: string,
+    domicilio: string,
+    domicilio_comercial: string,
+    codigo_postal: number,
+    localidad: string,
+    cif: string,
+    contacto: string,
+    telefono_1: number,
+    telefono_2: number,
+    email: string,
+    id_vendedor: number,
+    iban: string,
+    descuento: number,
+    recargo_equivalencia: boolean,
+    exento_iva: boolean
 }
 
 export interface Centro {
     id_centro: number,
     nombre: string,
-    zona: string,
     domicilio: string,
-    localidad: string
+    localidad: string,
+    fecha_alta: string,
+    codigo_postal: number
 }
 
 export interface Familia {

@@ -12,6 +12,32 @@ import { LoadingManagerEvent } from 'src/app/shared/layers/component-loading-man
 import { CellComponent } from 'tabulator-tables';
 import { ElementoMenuContextual } from '../../main/main.component';
 
+type Override<T, R> = Omit<T, keyof R> & R;
+
+interface ClienteSupabase extends Override<Cliente, { activo: string }> {
+  id_cliente: number,
+  activo: string,
+  fecha_alta: string,
+  nombre: string,
+  nombre_comercial: string,
+  domicilio: string,
+  domicilio_comercial: string,
+  codigo_postal: number,
+  localidad: string,
+  cif: string,
+  contacto: string,
+  telefono_1: number,
+  telefono_2: number,
+  email: string,
+  id_vendedor: number,
+  vendedores: { nombre: string },
+  vendedor: string,
+  iban: string,
+  descuento: number,
+  recargo_equivalencia: boolean,
+  exento_iva: boolean
+}
+
 @Component({
   selector: 'app-lista-clientes',
   templateUrl: './lista-clientes.component.html',
@@ -25,9 +51,11 @@ export class ListaClientesComponent {
   public subContextual: Subscription;
   @Output() abrirFicha = new EventEmitter<number>();
   private suscripcionListaClientes: RealtimeChannel;
-  private listaClientes: Cliente[];
+  private listaClientes: ClienteSupabase[];
 
   constructor(private _supabase: SupabaseService, private _utils: UtilsService, private _tabulator: TabulatorService, private _dialog: MatDialog) { }
+
+  //TODO: 'fecha inválida' en tabla
 
   async ngOnInit() {
     this.user = await this._supabase.getUser();
@@ -45,12 +73,12 @@ export class ListaClientesComponent {
 
     const incrementarCarga = () => {
       if (this.cargaTablaClientes !== -1) {
-        this.cargaTablaClientes += 100 / 2; //TODO: añadir +1 al poner la llamada de los centros
+        this.cargaTablaClientes += 100 / 2;
       }
     }
 
     forkJoin([
-      (from(this._supabase.supabase.from('clientes').select(`*`).order('nombre')) as Observable<{ data: Cliente[] }>).pipe(tap(() => incrementarCarga())),
+      (from(this._supabase.supabase.from('clientes').select(`*, vendedores(nombre)`).order('nombre')) as Observable<{ data: ClienteSupabase[] }>).pipe(tap(() => incrementarCarga())),
       (from(this._supabase.supabase.from('config_componentes').select('*').eq('viewname', 'tabla-lista-clientes').eq('user', this.user.username).single()) as Observable<{ data: ConfigTabla }>).pipe(tap(() => incrementarCarga()))
     ]).subscribe({
       next: async ([{ data: filas }, { data: configUsuario }]) => {
@@ -115,10 +143,11 @@ export class ListaClientesComponent {
     if (evento.type === 'reload') this.cargarTablaClientes();
   }
 
-  tratamientoFilas(filas: Cliente[]) {
+  tratamientoFilas(filas: ClienteSupabase[]) {
 
     filas.forEach(fila => {
-      fila.activo = fila.activo ? 'Sí' : 'No' as any;
+      if (fila.id_vendedor !== null) fila.vendedor = fila.vendedores?.nombre;
+      fila.activo = fila.activo ? 'Sí' : 'No';
     });
 
     return filas;
@@ -172,7 +201,7 @@ export class ListaClientesComponent {
 
         if (error) return;
 
-        data.forEach((cliente: Cliente) => {
+        data.forEach((cliente: ClienteSupabase) => {
           const index = clienteIndexMap.get(String(cliente.id_cliente));
           if (index !== undefined) {
             this.listaClientes[index] = cliente;
