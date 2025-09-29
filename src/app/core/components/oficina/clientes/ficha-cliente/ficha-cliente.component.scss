@@ -165,6 +165,13 @@
 
                 .seccion-tarifas {
                     width: 180px;
+                    display: flex;
+                    flex-flow: column nowrap;
+                    justify-content: flex-start;
+
+                    .campo-descuento {
+                        margin: 15px auto 0 auto;
+                    }
                 }
 
                 .seccion-contacto {
@@ -227,5 +234,24 @@
                 }
             }
         }
+    }
+}
+
+.container-general__dialog-gestionar-centros {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+
+    * {
+        color: $texto;
+    }
+
+    .mat-mdc-form-field:not(:last-of-type) {
+        margin-right: 25px;
+    }
+
+    .boton-salir {
+        width: fit-content;
+        margin: 15px auto;
     }
 }

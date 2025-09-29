@@ -74,11 +74,11 @@ export interface Cliente {
 
 export interface Centro {
     id_centro: number,
-    nombre: string,
-    domicilio: string,
-    localidad: string,
+    nombre: string | null,
+    domicilio: string | null,
+    localidad: string | null,
     fecha_alta: string,
-    codigo_postal: number
+    codigo_postal: number | null
 }
 
 export interface Familia {

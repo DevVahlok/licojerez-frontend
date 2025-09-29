@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
@@ -21,6 +21,7 @@ export class FichaClienteComponent {
   private timer: NodeJS.Timeout;
   private suscripcionCliente: RealtimeChannel;
   private valoresAnteriores: Cliente;
+  private valoresAnterioresCentros: Centro[];
   public cargaCliente: -1 | 0 | 1 = 0;
   private listaIDs: number[];
   public cliente: Cliente;
@@ -52,24 +53,15 @@ export class FichaClienteComponent {
   public formDesplegableVendedor = new FormControl(null);
   public listaDesplegableVendedor: ElementoDesplegable[] | null = [];
   public listaFiltradaDesplegableVendedor: ElementoDesplegable[] | null = [];
-  public listaCentros: Centro[] = [
-    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
-    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
-    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
-    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
-    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
-    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
-    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
-    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
-    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
-    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
-    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
-    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
-    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
-    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
-    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
-    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
-  ] //TODO: placeholder
+  public listaCentros: Centro[] = [];
+  public listaCentrosFiltrada: Centro[] = [];
+  public cargaCentros: -1 | 0 | 1 = 0;
+  @ViewChild('dialogGestionarCentros') dialogGestionarCentros: TemplateRef<any>;
+  public dialogRef: MatDialogRef<any>;
+
+  //TODO: añadir centro
+  //TODO: eliminar centro
+  //TODO: borrar centros al dar de baja cliente
 
   constructor(public _router: Router, public _supabase: SupabaseService, protected _snackbar: MatSnackBar, private _dialog: MatDialog, private _title: Title, private _utils: UtilsService) { }
 
@@ -94,6 +86,7 @@ export class FichaClienteComponent {
     this.nuevoCliente = false;
     this.getCliente();
     this.getListaIDs();
+    this.getCentros();
   }
 
   async getPrimerCliente() {
@@ -106,6 +99,7 @@ export class FichaClienteComponent {
       this.cargaCliente = -1;
       this.id = data.id_cliente;
       this.getCliente();
+      this.getCentros();
     }
   }
 
@@ -175,7 +169,7 @@ export class FichaClienteComponent {
   bajaCliente() {
     this._dialog.open(DialogConfirmacion, {
       width: '400px',
-      data: { message: `¿Quieres dar de baja el cliente ${this.cliente.nombre}?` },
+      data: { message: `¿Quieres dar de baja el cliente ${this.cliente.nombre}? También se eliminarán sus centros asignados.` },
       disableClose: true
     }).afterClosed().subscribe(async (res) => {
 
@@ -282,6 +276,52 @@ export class FichaClienteComponent {
 
     this.listaDesplegableVendedor = data?.map(prov => { return { codigo: prov.id_vendedor, nombre: prov.nombre } })!;
     this.filtrarDesplegableSearch();
+  }
+
+  async getCentros() {
+    this.cargaCentros = 0;
+
+    const { data, error } = await this._supabase.supabase.from('centros_clientes').select(`*`).eq('id_cliente', this.id).order('nombre', { ascending: false });
+
+    if (error) {
+      this.cargaCentros = -1;
+    } else {
+      this.cargaCentros = 1;
+      this.listaCentros = data;
+    }
+
+    this.listaCentrosFiltrada = structuredClone(this.listaCentros)
+  }
+
+  abrirDialogGestionarCentros() {
+    this.dialogRef = this._dialog.open(this.dialogGestionarCentros, { disableClose: true });
+    this.valoresAnterioresCentros = structuredClone(this.listaCentros);
+  }
+
+  editarCampoCentro(centro: Centro, campo: 'nombre' | 'domicilio' | 'localidad' | 'codigo_postal') {
+
+    clearTimeout(this.timer);
+
+    this.timer = setTimeout(async () => {
+
+      if (centro.nombre !== '') {
+        if (centro[campo] === '') {
+          centro[campo] = null;
+        }
+
+        const { error } = await this._supabase.supabase.from('centros_clientes').update({ [campo]: centro[campo] }).eq('id_centro', centro.id_centro)
+
+        if (error) {
+          this._snackbar.open(`Ha habido un error al modificar el campo: ${campo}`, undefined, { duration: 7000 });
+          this._supabase.anadirLog(`ha tenido un error al modificar el campo "${campo}" del centro con código ${centro.id_centro}`, error.message);
+        } else {
+          const centroAnterior = this.valoresAnterioresCentros.find(centroAnterior => centroAnterior.id_centro === centro.id_centro)!;
+          this._supabase.anadirLog(`ha modificado el campo "${campo}": ${centroAnterior[campo]} \u2192 ${centro[campo]} del centro con código ${centro.id_centro}`);
+          centroAnterior[campo] = centro[campo] as any; //TODO: evitar any
+        }
+      }
+
+    }, 500);
   }
 
   ngOnDestroy() {

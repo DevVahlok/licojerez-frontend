@@ -208,7 +208,8 @@
                             </div>
                         </ng-container>
                     </div>
-                    <button mat-button class="boton-gestionar-centros"><mat-icon>settings</mat-icon>Gestionar
+                    <button mat-button class="boton-gestionar-centros"
+                        (click)="abrirDialogGestionarCentros()"><mat-icon>settings</mat-icon>Gestionar
                         centros</button>
                 </fieldset>
             </div>
@@ -216,3 +217,51 @@
         </form>
     </div>
 </div>
+
+<ng-template #dialogGestionarCentros>
+    <div class="container-general__dialog-gestionar-centros">
+        <h1>Gestionar centros</h1>
+
+        <div class="toolbar">
+            <button mat-button>Añadir centro</button>
+        </div>
+
+        <div class="lista-centros">
+            <ng-container *ngFor="let centro of listaCentros;let index = index">
+                <div class="centro">
+
+                    <mat-form-field>
+                        <mat-label>Nombre</mat-label>
+                        <input matInput (input)="editarCampoCentro(centro,'nombre')" [(ngModel)]="centro.nombre"
+                            #nombreCtrl="ngModel" required>
+                        <mat-error *ngIf="nombreCtrl?.errors?.['required']">El nombre es
+                            obligatorio</mat-error>
+                    </mat-form-field>
+
+                    <mat-form-field>
+                        <mat-label>Domicilio</mat-label>
+                        <input matInput (input)="editarCampoCentro(centro,'domicilio')" [(ngModel)]="centro.domicilio">
+                    </mat-form-field>
+
+                    <mat-form-field>
+                        <mat-label>Localidad</mat-label>
+                        <input matInput (input)="editarCampoCentro(centro,'localidad')" [(ngModel)]="centro.localidad">
+                    </mat-form-field>
+
+                    <mat-form-field>
+                        <mat-label>Código Postal</mat-label>
+                        <input matInput (input)="editarCampoCentro(centro,'codigo_postal')"
+                            [(ngModel)]="centro.codigo_postal" #codigoPostalCtrl="ngModel">
+                        <mat-error *ngIf="codigoPostalCtrl?.errors?.['pattern']">El código
+                            postal no es válido.</mat-error>
+                    </mat-form-field>
+
+                    <button mat-icon-button><mat-icon>clear</mat-icon></button>
+                </div>
+            </ng-container>
+
+        </div>
+
+        <button mat-button class="boton-salir" (click)="dialogRef.close()">Salir</button>
+    </div>
+</ng-template>
