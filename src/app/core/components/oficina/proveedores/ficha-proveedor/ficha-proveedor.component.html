@@ -82,6 +82,8 @@
                             <mat-form-field class="campo-codigo-postal">
                                 <mat-label>Código Postal</mat-label>
                                 <input matInput formControlName="codigo_postal" (input)="editarCampo('codigo_postal')">
+                                <mat-error *ngIf="formProveedor?.get('codigo_postal')?.errors?.['pattern']">El código
+                                    postal no es válido.</mat-error>
                             </mat-form-field>
 
                         </div>

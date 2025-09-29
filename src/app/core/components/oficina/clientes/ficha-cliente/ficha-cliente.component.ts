@@ -10,6 +10,7 @@ import { SupabaseService } from 'src/app/core/services/supabase/supabase.service
 import { UtilsService } from 'src/app/core/services/utils-v2/utils.service';
 import { Centro, Cliente } from 'src/app/models/oficina';
 import { DialogConfirmacion } from 'src/app/shared/dialogs/dialog-confirmacion/dialog-confirmacion';
+import { ElementoDesplegable } from '../clientes.component';
 
 @Component({
   selector: 'app-ficha-cliente',
@@ -28,9 +29,9 @@ export class FichaClienteComponent {
     activo: new FormControl(false, Validators.required),
     fecha_alta: new FormControl('', Validators.required),
     nombre: new FormControl('', Validators.required),
-    nombre_comercial: new FormControl('', Validators.required),
-    domicilio: new FormControl('', Validators.required),
-    domicilio_comercial: new FormControl('', Validators.required),
+    nombre_comercial: new FormControl(''),
+    domicilio: new FormControl(''),
+    domicilio_comercial: new FormControl(''),
     codigo_postal: new FormControl(0, Validators.pattern(/^(0[1-9]|[1-4][0-9]|5[0-2])\d{3}$/)),
     localidad: new FormControl(''),
     cif: new FormControl('', [Validators.required, Validators.pattern(/^(?:\d{8}[A-Z]|[A-HJNP-SUVW]\d{7}[0-9A-J])$/)]),
@@ -48,6 +49,9 @@ export class FichaClienteComponent {
   @Input() id: number;
   @Input() indexTabs: number;
   @Output() cambiarTab = new EventEmitter<number>();
+  public formDesplegableVendedor = new FormControl(null);
+  public listaDesplegableVendedor: ElementoDesplegable[] | null = [];
+  public listaFiltradaDesplegableVendedor: ElementoDesplegable[] | null = [];
   public listaCentros: Centro[] = [
     { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
     { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
@@ -66,10 +70,6 @@ export class FichaClienteComponent {
     { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
     { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
   ] //TODO: placeholder
-
-  //TODO: revisar obligatoriedad de campos y el ngClass para cambiar colores de fielset
-  //TODO: añadir mat-errors
-  //TODO: hacer vendedor desplegable
 
   constructor(public _router: Router, public _supabase: SupabaseService, protected _snackbar: MatSnackBar, private _dialog: MatDialog, private _title: Title, private _utils: UtilsService) { }
 
@@ -139,6 +139,7 @@ export class FichaClienteComponent {
       this.valoresAnteriores = datosForm as Cliente;
 
       this.gestionarFormulario();
+      this.getDesplegableVendedores();
     }
   }
 
@@ -166,7 +167,6 @@ export class FichaClienteComponent {
     }
   }
 
-  //TODO: terminar
   gestionarFormulario() {
     this.formCliente.get('id_cliente')?.disable();
     this.formCliente.get('fecha_alta')?.disable();
@@ -210,7 +210,7 @@ export class FichaClienteComponent {
 
   editarCampo<K extends keyof Cliente>(campo: K) {
 
-    const camposSinDelay = ['activo'] //TODO: rellenar
+    const camposSinDelay = ['activo', 'id_vendedor', 'recargo_equivalencia', 'exento_iva']
 
     clearTimeout(this.timer);
 
@@ -263,6 +263,25 @@ export class FichaClienteComponent {
         }
       }
     }, (camposSinDelay.includes(campo) ? 0 : 500));
+  }
+
+  filtrarDesplegableSearch() {
+    this.listaFiltradaDesplegableVendedor = this.listaDesplegableVendedor;
+    this.formDesplegableVendedor.valueChanges.pipe().subscribe(() => {
+      if (!this.formDesplegableVendedor.value || this.formDesplegableVendedor.value === '') {
+        this.listaFiltradaDesplegableVendedor = this.listaDesplegableVendedor;
+      } else {
+        this.listaFiltradaDesplegableVendedor = this.listaDesplegableVendedor!?.filter(prov => prov.nombre.toLowerCase().includes((this.formDesplegableVendedor.value! as string).toLowerCase()));
+      }
+    });
+  }
+
+  async getDesplegableVendedores() {
+
+    const { data } = await this._supabase.supabase.from('vendedores').select('*').order('id_vendedor');
+
+    this.listaDesplegableVendedor = data?.map(prov => { return { codigo: prov.id_vendedor, nombre: prov.nombre } })!;
+    this.filtrarDesplegableSearch();
   }
 
   ngOnDestroy() {
