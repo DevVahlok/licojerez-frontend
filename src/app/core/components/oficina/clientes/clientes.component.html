@@ -6,7 +6,7 @@
             <input type="text" matInput [formControl]="buscadorCliente" [matAutocomplete]="auto"
                 (keydown.enter)="onEnter($event)">
             <mat-autocomplete #auto="matAutocomplete" (optionSelected)="abrirFicha($event.option.value)"
-                (optionActivated)="onOptionActivated($event)">
+                (optionActivated)="onOptionActivated($event)" class="lista-autocompletar-buscador">
                 <ng-container *ngFor="let cliente of opcionesBuscadorClientesFiltrado">
                     <mat-option [value]="cliente.id_cliente"> {{cliente.nombre}} </mat-option>
                 </ng-container>

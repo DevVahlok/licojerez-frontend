@@ -6,9 +6,24 @@
             <input type="text" matInput [formControl]="buscadorArticulo" [matAutocomplete]="auto"
                 (keydown.enter)="onEnter($event)">
             <mat-autocomplete #auto="matAutocomplete" (optionSelected)="abrirFicha($event.option.value)"
-                (optionActivated)="onOptionActivated($event)">
+                (optionActivated)="onOptionActivated($event)"
+                class="lista-autocompletar-buscador autocompletar-articulos">
+                <div class="cabecera-autocompletar-articulos mat-mdc-option"
+                    *ngIf="opcionesBuscadorArticulosFiltrado?.length! > 0">
+                    <span class="campo-id">Código</span>
+                    <span class="campo-nombre">Nombre</span>
+                    <span class="campo-stock">Stock</span>
+                    <span class="campo-precio-sin-iva">Precio venta</span>
+                    <span class="campo-precio-con-iva">Precio + IVA</span>
+                </div>
                 <ng-container *ngFor="let articulo of opcionesBuscadorArticulosFiltrado">
-                    <mat-option [value]="articulo.id_articulo"> {{articulo.nombre}} </mat-option>
+                    <mat-option [value]="articulo.id_articulo">
+                        <span class="campo-id">{{articulo.id_articulo}}</span>
+                        <span class="campo-nombre">{{articulo.nombre}}</span>
+                        <span class="campo-stock">{{articulo.stock}}</span>
+                        <span class="campo-precio-sin-iva">{{articulo.precio_sin_iva}}€</span>
+                        <span class="campo-precio-con-iva">{{articulo.precio_venta}}€</span>
+                    </mat-option>
                 </ng-container>
             </mat-autocomplete>
         </mat-form-field>

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { SupabaseService } from 'src/app/core/services/supabase/supabase.service';
+import { IVA } from 'src/app/models/oficina';
 
 export interface ElementoDesplegable {
   codigo: string,
@@ -19,7 +20,10 @@ export interface ListaDesplegablesFichaArticulo {
 interface opcionBuscadorArticulo {
   id_articulo: number,
   nombre: string,
-  ean13: string[]
+  ean13: string[],
+  stock: number,
+  precio_venta: string,
+  precio_sin_iva: string
 }
 
 @Component({
@@ -65,7 +69,12 @@ export class ArticulosComponent {
     this.seleccionarPrimero();
   }
 
-  activarListenerInputBuscador() {
+  async activarListenerInputBuscador() {
+
+    const { data, error } = await this._supabase.supabase.from<any, IVA[]>('ivas').select('*');
+
+    const listaIvas = data?.map(iva => { return { id_iva: iva.id_iva, valor_iva: iva.valor_iva } })
+
     this.buscadorArticulo.valueChanges.subscribe(async value => {
       clearTimeout(this.timer);
 
@@ -79,7 +88,16 @@ export class ArticulosComponent {
         } else {
           const { data } = await this._supabase.supabase.from('articulos_busqueda').select('*').or(`nombre.ilike.%${value}%, id_articulo.ilike.%${value}%, ean13_1.ilike.%${value}%, ean13_2.ilike.%${value}%, ean13_3.ilike.%${value}%, ean13_4.ilike.%${value}%, ean13_5.ilike.%${value}%`);
 
-          let resultado = data!?.map(articulo => { return { id_articulo: articulo.id_articulo, nombre: articulo.nombre, ean13: [articulo.ean13_1, articulo.ean13_2, articulo.ean13_3, articulo.ean13_4, articulo.ean13_5] } });
+          let resultado = data!?.map(articulo => {
+            return {
+              id_articulo: articulo.id_articulo,
+              nombre: articulo.nombre,
+              ean13: [articulo.ean13_1, articulo.ean13_2, articulo.ean13_3, articulo.ean13_4, articulo.ean13_5],
+              stock: articulo.stock,
+              precio_venta: (Math.trunc(articulo.precio_venta * 100) / 100).toFixed(4),
+              precio_sin_iva: (Math.trunc((articulo.precio_venta / (1 + listaIvas!.find(iva => iva.id_iva === articulo.id_iva)?.valor_iva / 100) * 100)) / 100).toFixed(4)
+            }
+          });
 
           const indexCodigoIdentico = resultado.findIndex(articulo => articulo.id_articulo === value);
 
@@ -89,6 +107,7 @@ export class ArticulosComponent {
             const elemento = resultado.splice(indexCodigoIdentico, 1)[0];
             resultado.unshift(elemento);
           }
+          console.log(resultado);
 
           this.opcionesBuscadorArticulosFiltrado = resultado;
         }

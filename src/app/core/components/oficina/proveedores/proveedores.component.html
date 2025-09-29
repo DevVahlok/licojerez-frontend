@@ -6,7 +6,7 @@
             <input type="text" matInput [formControl]="buscadorProveedor" [matAutocomplete]="auto"
                 (keydown.enter)="onEnter($event)">
             <mat-autocomplete #auto="matAutocomplete" (optionSelected)="abrirFicha($event.option.value)"
-                (optionActivated)="onOptionActivated($event)">
+                (optionActivated)="onOptionActivated($event)" class="lista-autocompletar-buscador">
                 <ng-container *ngFor="let proveedor of opcionesBuscadorProveedoresFiltrado">
                     <mat-option [value]="proveedor.id_proveedor">
                         {{proveedor.nombre}}

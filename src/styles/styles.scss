@@ -59,5 +59,59 @@ body {
         width: fit-content;
         margin: 25px auto 0 auto;
     }
+}
 
+.lista-autocompletar-buscador {
+    max-height: 80vh !important;
+    padding-top: 0 !important;
+    transform: translateX(-40%) !important;
+
+    .mat-mdc-option,
+    .mdc-list-item__primary-text {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-start;
+    }
+
+    &.autocompletar-articulos {
+        .campo-id {
+            display: block;
+            width: 60px;
+            margin-right: 10px;
+            text-align: end;
+        }
+
+        .campo-nombre {
+            width: 450px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            margin-right: 10px;
+        }
+
+        .campo-stock {
+            width: 60px;
+            text-align: end;
+            margin-right: 10px;
+        }
+
+        .campo-precio-sin-iva,
+        .campo-precio-con-iva {
+            width: 120px;
+            text-align: end;
+            margin-right: 10px;
+        }
+
+        .campo-precio-con-iva {
+            margin-right: 0 !important;
+        }
+    }
+
+    .cabecera-autocompletar-articulos {
+        pointer-events: none;
+        position: sticky;
+        top: 0;
+        background-color: white;
+        z-index: 99999;
+    }
 }
