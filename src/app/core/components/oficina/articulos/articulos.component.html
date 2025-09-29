@@ -8,7 +8,7 @@
             <mat-autocomplete #auto="matAutocomplete" (optionSelected)="abrirFicha($event.option.value)"
                 (optionActivated)="onOptionActivated($event)"
                 class="lista-autocompletar-buscador autocompletar-articulos">
-                <div class="cabecera-autocompletar-articulos mat-mdc-option"
+                <div class="cabecera-autocompletar mat-mdc-option"
                     *ngIf="opcionesBuscadorArticulosFiltrado?.length! > 0">
                     <span class="campo-id">Código</span>
                     <span class="campo-nombre">Nombre</span>

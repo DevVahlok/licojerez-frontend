@@ -73,13 +73,14 @@ body {
         justify-content: flex-start;
     }
 
+    .campo-id {
+        display: block;
+        width: 60px;
+        margin-right: 10px;
+        text-align: end;
+    }
+
     &.autocompletar-articulos {
-        .campo-id {
-            display: block;
-            width: 60px;
-            margin-right: 10px;
-            text-align: end;
-        }
 
         .campo-nombre {
             width: 450px;
@@ -107,7 +108,33 @@ body {
         }
     }
 
-    .cabecera-autocompletar-articulos {
+    &.autocompletar-proveedores {
+
+        .campo-nombre,
+        .campo-direccion {
+            width: 450px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            margin-right: 10px;
+        }
+    }
+
+    &.autocompletar-clientes {
+        transform: translateX(40%) !important;
+
+        .campo-nombre,
+        .campo-nombre_comercial,
+        .campo-domicilio {
+            width: 450px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            margin-right: 10px;
+        }
+    }
+
+    .cabecera-autocompletar {
         pointer-events: none;
         position: sticky;
         top: 0;

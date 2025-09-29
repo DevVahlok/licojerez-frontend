@@ -11,7 +11,8 @@ export interface ElementoDesplegable {
 interface opcionBuscadorProveedor {
   id_proveedor: number,
   nombre: string,
-  cif: string
+  cif: string,
+  direccion: string
 }
 
 @Component({
@@ -71,7 +72,7 @@ export class ProveedoresComponent {
         } else {
           const { data } = await this._supabase.supabase.from('proveedores_busqueda').select('*').or(`nombre.ilike.%${value}%, id_proveedor.ilike.%${value}%, cif.ilike.%${value}%`);
 
-          let resultado = data!?.map(proveedor => { return { id_proveedor: proveedor.id_proveedor, nombre: proveedor.nombre, cif: proveedor.cif } });
+          let resultado = data!?.map(proveedor => { return { id_proveedor: proveedor.id_proveedor, nombre: proveedor.nombre, cif: proveedor.cif, direccion: proveedor.direccion } });
 
           const indexCodigoIdentico = resultado.findIndex(proveedor => proveedor.id_proveedor === value);
 

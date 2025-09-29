@@ -93,7 +93,7 @@
         fieldset {
             border-color: $acento;
             border-radius: 5px;
-            height: 100px;
+            height: fit-content;
 
             &.faltan-campos {
                 border-color: $error;
@@ -109,6 +109,7 @@
             display: flex;
             flex-flow: column wrap;
             justify-content: flex-start;
+            width: 80%;
 
             .fila {
                 display: flex;
@@ -153,6 +154,7 @@
                     flex-flow: column nowrap;
                     justify-content: flex-start;
                     height: 170px;
+                    margin-right: 25px;
 
                     .fila-direccion {
                         display: flex;
@@ -162,7 +164,14 @@
                 }
 
                 .seccion-tarifas {
-                    margin-left: 25px;
+                    width: 180px;
+                }
+
+                .seccion-contacto {
+                    display: flex;
+                    flex-flow: column nowrap;
+                    justify-content: flex-start;
+                    margin-right: 25px;
                 }
             }
         }
@@ -171,6 +180,7 @@
             display: flex;
             flex-flow: column wrap;
             justify-content: flex-start;
+            width: 20%;
 
             .seccion-centros {
                 display: flex;
@@ -188,13 +198,16 @@
                     .centro {
                         display: flex;
                         flex-flow: row nowrap;
-                        justify-content: space-between;
+                        justify-content: flex-start;
                         padding: 15px;
 
                         .izq {
                             display: flex;
                             flex-flow: column nowrap;
                             justify-content: center;
+                            width: 20px;
+                            margin-right: 15px;
+                            text-align: end;
                         }
 
                         .der {

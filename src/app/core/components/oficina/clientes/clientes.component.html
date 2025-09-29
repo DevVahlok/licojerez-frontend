@@ -6,9 +6,22 @@
             <input type="text" matInput [formControl]="buscadorCliente" [matAutocomplete]="auto"
                 (keydown.enter)="onEnter($event)">
             <mat-autocomplete #auto="matAutocomplete" (optionSelected)="abrirFicha($event.option.value)"
-                (optionActivated)="onOptionActivated($event)" class="lista-autocompletar-buscador">
+                (optionActivated)="onOptionActivated($event)"
+                class="lista-autocompletar-buscador autocompletar-clientes">
+                <div class="cabecera-autocompletar mat-mdc-option"
+                    *ngIf="opcionesBuscadorClientesFiltrado?.length! > 0">
+                    <span class="campo-id">Código</span>
+                    <span class="campo-nombre">Nombre Fiscal</span>
+                    <span class="campo-nombre_comercial">Nombre Comercial</span>
+                    <span class="campo-domicilio">Domicilio</span>
+                </div>
                 <ng-container *ngFor="let cliente of opcionesBuscadorClientesFiltrado">
-                    <mat-option [value]="cliente.id_cliente"> {{cliente.nombre}} </mat-option>
+                    <mat-option [value]="cliente.id_cliente">
+                        <span class="campo-id">{{cliente.id_cliente}}</span>
+                        <span class="campo-nombre"> {{cliente.nombre}} </span>
+                        <span class="campo-nombre_comercial"> {{cliente.nombre_comercial}} </span>
+                        <span class="campo-domicilio"> {{cliente.domicilio}} </span>
+                    </mat-option>
                 </ng-container>
             </mat-autocomplete>
         </mat-form-field>

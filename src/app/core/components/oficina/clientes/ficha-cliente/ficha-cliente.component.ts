@@ -55,11 +55,19 @@ export class FichaClienteComponent {
     { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
     { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
     { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
+    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
+    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
+    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
+    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
+    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
+    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
+    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
+    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
+    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
+    { id_centro: 1, domicilio: 'calle córdoba 22', localidad: 'Jerez de la Frontera', nombre: 'Centro Córdoba', codigo_postal: 11408, fecha_alta: '20/03/2000' },
   ] //TODO: placeholder
 
-  //TODO: arreglar buscador
   //TODO: revisar obligatoriedad de campos y el ngClass para cambiar colores de fielset
-  //TODO: añadir campos al html
   //TODO: añadir mat-errors
   //TODO: hacer vendedor desplegable
 

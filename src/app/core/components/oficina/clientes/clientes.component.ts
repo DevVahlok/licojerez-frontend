@@ -10,7 +10,9 @@ export interface ElementoDesplegable {
 
 interface opcionBuscadorCliente {
   id_cliente: number,
-  nombre: string
+  nombre: string,
+  nombre_comercial: string,
+  domicilio: string
 }
 
 @Component({
@@ -70,7 +72,7 @@ export class ClientesComponent {
         } else {
           const { data } = await this._supabase.supabase.from('clientes_busqueda').select('*').or(`nombre.ilike.%${value}%, id_cliente.ilike.%${value}%`);
 
-          let resultado = data!?.map(cliente => { return { id_cliente: cliente.id_cliente, nombre: cliente.nombre } });
+          let resultado = data!?.map(cliente => { return { id_cliente: cliente.id_cliente, nombre: cliente.nombre, nombre_comercial: cliente.nombre_comercial, domicilio: cliente.domicilio } });
 
           const indexCodigoIdentico = resultado.findIndex(cliente => cliente.id_cliente === value);
 
