@@ -82,7 +82,6 @@ export class ProveedoresComponent {
             const elemento = resultado.splice(indexCodigoIdentico, 1)[0];
             resultado.unshift(elemento);
           }
-          console.log(resultado);
 
           this.opcionesBuscadorProveedoresFiltrado = resultado;
         }

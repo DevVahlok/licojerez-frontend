@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, Output, SimpleChanges, TemplateRef, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -15,15 +15,17 @@ import { ElementoDesplegable } from '../clientes.component';
 @Component({
   selector: 'app-ficha-cliente',
   templateUrl: './ficha-cliente.component.html',
-  styleUrls: ['./ficha-cliente.component.scss']
+  styleUrls: ['./ficha-cliente.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class FichaClienteComponent {
   private timer: NodeJS.Timeout;
   private suscripcionCliente: RealtimeChannel;
   private valoresAnteriores: Cliente;
-  private valoresAnterioresCentros: Centro[];
+  public listaCentrosDialog: Centro[];
   public cargaCliente: -1 | 0 | 1 = 0;
   private listaIDs: number[];
+  private listaIDsCentros: number[];
   public cliente: Cliente;
   public formCliente = new FormGroup({
     id_cliente: new FormControl(-1, Validators.required),
@@ -59,15 +61,12 @@ export class FichaClienteComponent {
   @ViewChild('dialogGestionarCentros') dialogGestionarCentros: TemplateRef<any>;
   public dialogRef: MatDialogRef<any>;
 
-  //TODO: añadir centro
-  //TODO: eliminar centro
-  //TODO: borrar centros al dar de baja cliente
-
   constructor(public _router: Router, public _supabase: SupabaseService, protected _snackbar: MatSnackBar, private _dialog: MatDialog, private _title: Title, private _utils: UtilsService) { }
 
   async ngOnInit(): Promise<void> {
     this.getPrimerCliente();
     this.getListaIDs();
+    this.getListaIDsCentros();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -86,6 +85,7 @@ export class FichaClienteComponent {
     this.nuevoCliente = false;
     this.getCliente();
     this.getListaIDs();
+    this.getListaIDsCentros();
     this.getCentros();
   }
 
@@ -106,6 +106,11 @@ export class FichaClienteComponent {
   async getListaIDs() {
     const { data, error } = await this._supabase.supabase.from('clientes').select('id_cliente').order('id_cliente', { ascending: true });
     this.listaIDs = data?.map(cliente => cliente.id_cliente)!;
+  }
+
+  async getListaIDsCentros() {
+    const { data, error } = await this._supabase.supabase.from('centros_clientes').select('id_centro').order('id_centro', { ascending: true });
+    this.listaIDsCentros = data?.map(centro => centro.id_centro)!;
   }
 
   async getCliente() {
@@ -295,7 +300,7 @@ export class FichaClienteComponent {
 
   abrirDialogGestionarCentros() {
     this.dialogRef = this._dialog.open(this.dialogGestionarCentros, { disableClose: true });
-    this.valoresAnterioresCentros = structuredClone(this.listaCentros);
+    this.listaCentrosDialog = structuredClone(this.listaCentros);
   }
 
   editarCampoCentro(centro: Centro, campo: 'nombre' | 'domicilio' | 'localidad' | 'codigo_postal') {
@@ -304,24 +309,76 @@ export class FichaClienteComponent {
 
     this.timer = setTimeout(async () => {
 
-      if (centro.nombre !== '') {
-        if (centro[campo] === '') {
-          centro[campo] = null;
+      if (centro.id_centro === -1) {
+
+        if (centro.nombre !== '') {
+          await this.getListaIDsCentros();
+          centro.id_centro = this._utils.detectarSiguienteID(this.listaIDsCentros);
+          centro.fecha_alta = moment().format('YYYY-MM-DD');
+
+          const { error } = await this._supabase.supabase.from('centros_clientes').insert(centro);
+
+          if (error) {
+            this._snackbar.open(`Ha habido un error al añadir el centro "${centro.nombre}"`, undefined, { duration: 7000 });
+            this._supabase.anadirLog(`ha tenido un error al añadir el centro: "${centro.nombre}" al cliente "${this.cliente.nombre} con id ${this.cliente.id_cliente}"`, error.message);
+          } else {
+            this._supabase.anadirLog(`ha añadido: "${centro.nombre}" al cliente "${this.cliente.nombre} con id ${this.cliente.id_cliente}"`);
+            this.listaCentros.push(centro);
+          }
         }
 
-        const { error } = await this._supabase.supabase.from('centros_clientes').update({ [campo]: centro[campo] }).eq('id_centro', centro.id_centro)
+      } else {
 
-        if (error) {
-          this._snackbar.open(`Ha habido un error al modificar el campo: ${campo}`, undefined, { duration: 7000 });
-          this._supabase.anadirLog(`ha tenido un error al modificar el campo "${campo}" del centro con código ${centro.id_centro}`, error.message);
-        } else {
-          const centroAnterior = this.valoresAnterioresCentros.find(centroAnterior => centroAnterior.id_centro === centro.id_centro)!;
-          this._supabase.anadirLog(`ha modificado el campo "${campo}": ${centroAnterior[campo]} \u2192 ${centro[campo]} del centro con código ${centro.id_centro}`);
-          centroAnterior[campo] = centro[campo] as any; //TODO: evitar any
+        if (centro.nombre !== '' && (!centro.codigo_postal || (/^(0[1-9]|[1-4][0-9]|5[0-2])\d{3}$/).test(String(centro.codigo_postal)))) {
+          if (centro[campo] === '') {
+            centro[campo] = null;
+          }
+          const { error } = await this._supabase.supabase.from('centros_clientes').update({ [campo]: centro[campo] }).eq('id_centro', centro.id_centro)
+
+          if (error) {
+            this._snackbar.open(`Ha habido un error al modificar el campo: ${campo}`, undefined, { duration: 7000 });
+            this._supabase.anadirLog(`ha tenido un error al modificar el campo "${campo}" del centro con código ${centro.id_centro}`, error.message);
+          } else {
+            const centroAnterior = this.listaCentros.find(centroAnterior => centroAnterior.id_centro === centro.id_centro)!;
+            this._supabase.anadirLog(`ha modificado el campo "${campo}": ${centroAnterior[campo]} \u2192 ${centro[campo]} del centro con código ${centro.id_centro}`);
+            centroAnterior[campo] = centro[campo] as any;
+          }
         }
       }
 
     }, 500);
+  }
+
+  anadirCentro() {
+    if (!this.listaCentrosDialog.some(centro => centro.id_centro === -1)) {
+      this.listaCentrosDialog.push({ id_centro: -1, domicilio: '', nombre: '', codigo_postal: null, localidad: null, fecha_alta: '', id_cliente: this.id })
+    }
+  }
+
+  eliminarCentro(centro: Centro) {
+
+    this._dialog.open(DialogConfirmacion, {
+      width: '400px',
+      data: { message: `¿Quieres eliminar el centro ${centro.nombre}?` },
+      disableClose: true
+    }).afterClosed().subscribe(async (res) => {
+
+      if (res) {
+        const { error } = await this._supabase.supabase.from('centros_clientes').delete().eq('id_centro', centro.id_centro);
+
+        if (error) {
+          this._snackbar.open(`Ha habido un error al eliminar el centro ${centro.nombre}`, undefined, { duration: 7000 });
+          this._supabase.anadirLog(`ha tenido un error al eliminar el centro ${centro.nombre} con id ${centro.id_centro}`, error.message);
+        } else {
+          this._supabase.anadirLog(`ha eliminado el centro ${centro.nombre} con id ${centro.id_centro}`);
+
+          const index = this.listaCentros.findIndex(centroAnterior => centroAnterior.id_centro === centro.id_centro)
+
+          this.listaCentros.splice(index, 1);
+          this.listaCentrosDialog.splice(index, 1);
+        }
+      }
+    })
   }
 
   ngOnDestroy() {

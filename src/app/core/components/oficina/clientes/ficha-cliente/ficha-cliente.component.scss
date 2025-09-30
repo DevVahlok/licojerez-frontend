@@ -242,12 +242,26 @@
     flex-flow: column nowrap;
     justify-content: flex-start;
 
-    * {
-        color: $texto;
+    .toolbar {
+        margin-bottom: 25px;
+    }
+
+    *:not(mat-error) {
+        color: $texto !important;
+    }
+
+    .mat-mdc-form-field-required-marker::after {
+        color: $texto !important;
     }
 
     .mat-mdc-form-field:not(:last-of-type) {
         margin-right: 25px;
+    }
+
+    .boton-eliminar:hover {
+        * {
+            color: $error !important;
+        }
     }
 
     .boton-salir {

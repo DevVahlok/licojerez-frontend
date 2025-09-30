@@ -79,6 +79,7 @@ export interface Centro {
     localidad: string | null,
     fecha_alta: string,
     codigo_postal: number | null
+    id_cliente: number,
 }
 
 export interface Familia {

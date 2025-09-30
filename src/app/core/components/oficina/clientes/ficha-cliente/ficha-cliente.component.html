@@ -223,11 +223,11 @@
         <h1>Gestionar centros</h1>
 
         <div class="toolbar">
-            <button mat-button>Añadir centro</button>
+            <button mat-button (click)="anadirCentro()">Añadir centro</button>
         </div>
 
         <div class="lista-centros">
-            <ng-container *ngFor="let centro of listaCentros;let index = index">
+            <ng-container *ngFor="let centro of listaCentrosDialog;let index = index">
                 <div class="centro">
 
                     <mat-form-field>
@@ -251,12 +251,14 @@
                     <mat-form-field>
                         <mat-label>Código Postal</mat-label>
                         <input matInput (input)="editarCampoCentro(centro,'codigo_postal')"
-                            [(ngModel)]="centro.codigo_postal" #codigoPostalCtrl="ngModel">
-                        <mat-error *ngIf="codigoPostalCtrl?.errors?.['pattern']">El código
+                            [(ngModel)]="centro.codigo_postal" #codigoPostalCtrl="ngModel"
+                            pattern="^(0[1-9]|[1-4][0-9]|5[0-2])\d{3}$">
+                        <mat-error *ngIf="codigoPostalCtrl?.hasError('pattern')">El código
                             postal no es válido.</mat-error>
                     </mat-form-field>
 
-                    <button mat-icon-button><mat-icon>clear</mat-icon></button>
+                    <button mat-icon-button (click)="eliminarCentro(centro)"
+                        class="boton-eliminar"><mat-icon>clear</mat-icon></button>
                 </div>
             </ng-container>
 
