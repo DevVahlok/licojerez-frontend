@@ -228,7 +228,7 @@ export class TablaTabulatorComponent implements OnInit {
       e.title = this.tabla.getColumns().find(e2 => e2.getField() === e.field)!.getDefinition().title
     });
 
-    this._dialog.open(DialogConfigTabla, { width: '500px', data: { listaColumnas: columnas } }).afterClosed().subscribe((res: any) => {
+    this._dialog.open(DialogConfigTabla, { width: '500px', data: { listaColumnas: columnas }, disableClose: true }).afterClosed().subscribe((res: any) => {
 
       if (res) {
 

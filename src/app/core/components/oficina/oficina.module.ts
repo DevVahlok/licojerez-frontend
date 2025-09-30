@@ -9,10 +9,15 @@ import { MainComponent } from './main/main.component';
 import { SharedComponentsModule } from 'src/app/shared/components/shared-components.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { RouterModule } from '@angular/router';
-import { ListaProveedoresComponent } from './lista-proveedores/lista-proveedores.component';
+import { ListaProveedoresComponent } from './proveedores/lista-proveedores/lista-proveedores.component';
 import { ConfiguracionArticulosComponent } from './configuracion-articulos/configuracion-articulos.component';
 import { FichaArticuloComponent } from './articulos/ficha-articulo/ficha-articulo.component';
 import { ArticulosComponent } from './articulos/articulos.component';
+import { FichaProveedorComponent } from './proveedores/ficha-proveedor/ficha-proveedor.component';
+import { ProveedoresComponent } from './proveedores/proveedores.component';
+import { ClientesComponent } from './clientes/clientes.component';
+import { FichaClienteComponent } from './clientes/ficha-cliente/ficha-cliente.component';
+import { ListaClientesComponent } from './clientes/lista-clientes/lista-clientes.component';
 
 
 
@@ -24,7 +29,12 @@ import { ArticulosComponent } from './articulos/articulos.component';
     ListaProveedoresComponent,
     ConfiguracionArticulosComponent,
     ArticulosComponent,
-    FichaArticuloComponent
+    FichaArticuloComponent,
+    FichaProveedorComponent,
+    ProveedoresComponent,
+    ClientesComponent,
+    FichaClienteComponent,
+    ListaClientesComponent
   ],
   imports: [
     CommonModule,

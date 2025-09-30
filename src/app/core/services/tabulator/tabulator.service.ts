@@ -48,6 +48,51 @@ export class TabulatorService {
     return this.complementarColumnas(columnas);
   }
 
+  getHeaderTablaProveedores(): ColumnDefinition[] {
+
+    const columnas: Columna[] = [
+      { title: 'Código', field: 'id_proveedor', type: 'string' },
+      { title: 'Nombre', field: 'nombre', type: 'string' },
+      { title: 'Activo', field: 'activo', type: 'boolean', dropdown: true },
+      { title: 'Dirección', field: 'direccion', type: 'string' },
+      { title: 'Código Postal', field: 'codigo_postal', type: 'string' },
+      { title: 'Ciudad', field: 'ciudad', type: 'string' },
+      { title: 'Provincia', field: 'provincia', type: 'string' },
+      { title: 'CIF', field: 'cif', type: 'string' },
+      { title: 'Descuento', field: 'descuento', type: 'number', formatter: '%' },
+      { title: 'Fecha Alta', field: 'fecha_alta', type: 'date' },
+    ]
+
+    return this.complementarColumnas(columnas);
+  }
+
+  getHeaderTablaClientes(): ColumnDefinition[] {
+
+    const columnas: Columna[] = [
+      { title: 'Código', field: 'id_cliente', type: 'string' },
+      { title: 'Nombre', field: 'nombre', type: 'string' },
+      { title: 'Nombre Comercial', field: 'nombre_comercial', type: 'string' },
+      { title: 'Domicilio', field: 'domicilio', type: 'string' },
+      { title: 'Domicilio Comercial', field: 'domicilio_comercial', type: 'string' },
+      { title: 'Código Postal', field: 'codigo_postal', type: 'string' },
+      { title: 'Localidad', field: 'localidad', type: 'string' },
+      { title: 'CIF', field: 'cif', type: 'string' },
+      { title: 'Contacto', field: 'contacto', type: 'string' },
+      { title: 'Teléfono 1', field: 'telefono_1', type: 'string' },
+      { title: 'Teléfono 2', field: 'telefono_2', type: 'string' },
+      { title: 'Email', field: 'email', type: 'string' },
+      { title: 'Vendedor', field: 'vendedor', type: 'string' },
+      { title: 'Activo', field: 'activo', type: 'boolean', dropdown: true },
+      { title: 'Fecha Alta', field: 'fecha_alta', type: 'date' },
+      { title: 'IBAN', field: 'iban', type: 'string' },
+      { title: 'Descuento', field: 'descuento', type: 'number' },
+      { title: 'Recargo Equivalencia', field: 'recargo_equivalencia', type: 'boolean', dropdown: true },
+      { title: 'Exento IVA', field: 'exento_iva', type: 'boolean', dropdown: true },
+    ]
+
+    return this.complementarColumnas(columnas);
+  }
+
   private complementarColumnas(listaColumnas: Columna[]): ColumnDefinition[] {
 
     let devol: ColumnDefinition[] = [];

@@ -1,0 +1,12 @@
+<div class="container-general__lista-clientes">
+
+    <app-component-loading-manager [progress]="cargaTablaClientes" [name]="'tablaClientes'"
+        [template]="containerTablaClientes" (emitter)="eventosLoadingManager($event)"
+        [size]="{height: '600px',width:'100%'}">
+        <ng-template #containerTablaClientes>
+            <app-tabla-tabulator [data]="datosTabla" (emitter)="recibirEventosTabulator($event)" *ngIf="datosTabla"
+                #componenteTabla></app-tabla-tabulator>
+        </ng-template>
+    </app-component-loading-manager>
+
+</div>

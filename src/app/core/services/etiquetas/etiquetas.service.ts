@@ -145,11 +145,17 @@ export class EtiquetasService {
 
     pdf.getBlob((blob) => {
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'etiquetas.pdf';
-      a.click();
-      URL.revokeObjectURL(url);
+
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = url;
+
+      iframe.onload = () => {
+        iframe.contentWindow?.focus();
+        iframe.contentWindow?.print();
+      };
+
+      document.body.appendChild(iframe);
 
       this.colaEtiquetas.next([]);
     });

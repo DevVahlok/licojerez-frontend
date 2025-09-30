@@ -32,7 +32,7 @@ export interface Proveedor {
     codigo_cuenta_cliente: string,
     codigo_postal: number,
     contacto: string,
-    created_at: string,
+    fecha_alta: string,
     descuento: number,
     direccion: string,
     domiciliacion_banco: string,
@@ -48,6 +48,38 @@ export interface Proveedor {
     telefono_1: number,
     telefono_2: number,
     web: string
+}
+
+export interface Cliente {
+    id_cliente: number,
+    activo: boolean,
+    fecha_alta: string,
+    nombre: string,
+    nombre_comercial: string,
+    domicilio: string,
+    domicilio_comercial: string,
+    codigo_postal: number,
+    localidad: string,
+    cif: string,
+    contacto: string,
+    telefono_1: number,
+    telefono_2: number,
+    email: string,
+    id_vendedor: number,
+    iban: string,
+    descuento: number,
+    recargo_equivalencia: boolean,
+    exento_iva: boolean
+}
+
+export interface Centro {
+    id_centro: number,
+    nombre: string | null,
+    domicilio: string | null,
+    localidad: string | null,
+    fecha_alta: string,
+    codigo_postal: number | null
+    id_cliente: number,
 }
 
 export interface Familia {

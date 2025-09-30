@@ -5,9 +5,10 @@ import { LoginComponent } from './core/components/login/login.component';
 import { PrincipalComponent } from './core/components/principal/principal.component';
 import { AuthGuard } from './core/services/guard/auth.guard';
 import { ListaLogsComponent } from './core/components/oficina/lista-logs/lista-logs.component';
-import { ListaProveedoresComponent } from './core/components/oficina/lista-proveedores/lista-proveedores.component';
 import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 import { ArticulosComponent } from './core/components/oficina/articulos/articulos.component';
+import { ProveedoresComponent } from './core/components/oficina/proveedores/proveedores.component';
+import { ClientesComponent } from './core/components/oficina/clientes/clientes.component';
 
 const routes: Routes = [
   {
@@ -21,17 +22,12 @@ const routes: Routes = [
       {
         path: 'proveedores',
         canActivate: [AuthGuard],
-        component: ListaProveedoresComponent
+        component: ProveedoresComponent
       },
-      /* {
-       path: 'articulo',
-       canActivate: [AuthGuard],
-       component: FichaArticuloComponent
-     }, */
       {
-        path: 'articulo/:id',
+        path: 'clientes',
         canActivate: [AuthGuard],
-        component: ArticulosComponent
+        component: ClientesComponent
       },
       {
         path: 'logs',

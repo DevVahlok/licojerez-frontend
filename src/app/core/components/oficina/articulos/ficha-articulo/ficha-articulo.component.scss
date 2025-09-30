@@ -93,6 +93,7 @@
         fieldset {
             border-color: $acento;
             border-radius: 5px;
+            height: 100px;
 
             &.faltan-campos {
                 border-color: $error;
@@ -183,18 +184,43 @@
                     }
                 }
 
-                .container-comision {
-                    color: $texto;
+                .fieldset-comisiones {
+                    height: auto !important;
 
-                    h3 {
-                        mat-icon {
-                            vertical-align: middle;
-                            margin-left: 10px;
-                            cursor: pointer;
+                    .encapsulador-container-comision {
+                        height: 90px;
+                    }
 
-                            &:hover {
-                                color: $acento;
+                    .container-comision {
+                        color: $texto;
+
+                        .encapsulador-boton-dialog-comisiones {
+                            width: fit-content;
+                        }
+
+                        h3 {
+                            display: flex;
+                            flex-flow: row nowrap;
+                            justify-content: flex-start;
+
+                            .texto {
+                                align-self: center;
                             }
+
+                            button {
+                                align-self: center;
+
+                                &:hover {
+                                    color: $acento;
+                                }
+                            }
+                        }
+
+                        .container-spinner {
+                            display: flex;
+                            flex-flow: row nowrap;
+                            justify-content: center;
+                            margin: 15px auto;
                         }
                     }
                 }
@@ -210,6 +236,7 @@
                 display: flex;
                 flex-flow: column wrap;
                 justify-content: flex-start;
+                height: auto !important;
             }
 
             .encapsulador-ean13 {
@@ -224,14 +251,23 @@
     flex-flow: column nowrap;
     justify-content: flex-start;
 
+    .container-spinner {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+        margin: 50px auto;
+    }
+
     .toolbar {
         display: flex;
         flex-flow: row nowrap;
         justify-content: center;
         margin-bottom: 15px;
+        height: 70px;
 
         .mat-mdc-form-field {
-            width: 160px;
+            width: 190px;
+            height: fit-content;
 
             mat-label {
                 color: $texto;

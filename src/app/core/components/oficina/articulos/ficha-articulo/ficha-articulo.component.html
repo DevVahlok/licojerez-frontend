@@ -1,10 +1,16 @@
 <div class="container-general__ficha-articulo">
 
-    <div *ngIf="spinner" class="container-spinner">
+    <div *ngIf="cargaArticulo === 0" class="container-spinner">
         <mat-spinner></mat-spinner>
     </div>
 
-    <div *ngIf="!spinner">
+    <div *ngIf="cargaArticulo === -1" class="container-error">
+        <span class="material-symbols-outlined">warning</span>
+        <span class="texto">Ha habido un error al cargar los datos.</span>
+        <button mat-button (click)="getArticulo()">Reintentar</button>
+    </div>
+
+    <div *ngIf="cargaArticulo === 1">
         <div class="container-titulo">
             <div class="fill"></div>
             <div class="encapsulador-titulo">
@@ -31,12 +37,12 @@
                 <div class="fila">
 
                     <fieldset class="encapsulacion-datos-principales"
-                        [ngClass]="((formArticulo.get('id_articulo')?.status !== 'DISABLED' && formArticulo.get('id_articulo')?.status !== 'VALID')  || !formArticulo.get('nombre')?.valid || !formArticulo.get('tipo')?.valid || (formArticulo.get('stock')?.status !== 'DISABLED' && formArticulo.get('stock')?.status !== 'VALID')) ? 'faltan-campos' : ''">
+                        [ngClass]="((formArticulo.get('id_articulo')?.status !== 'DISABLED' && formArticulo.get('id_articulo')?.status !== 'VALID')  || !formArticulo.get('nombre')?.valid || !formArticulo.get('tipo')?.valid) ? 'faltan-campos' : ''">
                         <legend>Datos principales</legend>
 
                         <mat-form-field class="campo-codigo">
                             <mat-label>Código</mat-label>
-                            <input matInput formControlName="id_articulo">
+                            <input matInput formControlName="id_articulo" (input)="editarCampo('id_articulo')">
                         </mat-form-field>
 
                         <mat-form-field class="campo-nombre">
@@ -170,7 +176,7 @@
                 <div class="fila">
 
                     <fieldset class="fieldset-tarifas"
-                        [ngClass]="(!formArticulo.get('id_iva')?.valid || !formArticulo.get('precio_venta')?.valid ) ? 'faltan-campos' : ''">
+                        [ngClass]="(!formArticulo.get('id_iva')?.valid) ? 'faltan-campos' : ''">
                         <legend>Tarifas</legend>
 
                         <div class="container-selector">
@@ -212,21 +218,31 @@
 
                     </fieldset>
 
-                    <fieldset>
+                    <fieldset class="fieldset-comisiones">
                         <legend>Comisiones</legend>
 
-                        <mat-form-field>
-                            <mat-label>Comisión por defecto</mat-label>
-                            <input matInput formControlName="comision_default"
-                                (input)="editarCampo('comision_default')">
-                            <span matSuffix>%</span>
-                            <mat-error *ngIf="formArticulo?.get('comision_default')?.errors?.['pattern']">El campo debe
-                                ser numérico.</mat-error>
-                        </mat-form-field>
+                        <div class="encapsulador-container-comision">
+                            <mat-form-field>
+                                <mat-label>Comisión por defecto</mat-label>
+                                <input matInput formControlName="comision_default"
+                                    (input)="editarCampo('comision_default')">
+                                <span matSuffix>%</span>
+                                <mat-error *ngIf="formArticulo?.get('comision_default')?.errors?.['pattern']">El campo
+                                    debe
+                                    ser numérico.</mat-error>
+                            </mat-form-field>
+                        </div>
+
 
                         <div class="container-comision">
-                            <h3>Comisión por vendedor <mat-icon [matTooltip]="'Editar comisiones'"
-                                    (click)="abrirDialogEditarComisiones()">edit</mat-icon></h3>
+                            <h3><span class="texto">Comisión por vendedor</span>
+                                <div class="encapsulador-boton-dialog-comisiones"
+                                    [matTooltip]="cargaVendedores === -1 ? 'Ha habido un error al cargar los vendedores' : ''">
+                                    <button mat-icon-button (click)="abrirDialogEditarComisiones()"
+                                        [disabled]="cargaVendedores !==1"><mat-icon
+                                            [matTooltip]="'Editar comisiones'">edit</mat-icon></button>
+                                </div>
+                            </h3>
 
                             <mat-form-field>
                                 <mat-label>Buscar vendedor...</mat-label>
@@ -238,6 +254,10 @@
                                         <span>{{vendedor.nombre}} - {{vendedor.comision}}%</span>
                                     </div>
                                 </ng-container>
+                            </div>
+
+                            <div *ngIf="cargaVendedores === 0" class="container-spinner">
+                                <mat-spinner></mat-spinner>
                             </div>
                         </div>
 
@@ -308,15 +328,26 @@
     <div class="container-general__dialog-editar-comision">
         <h1>Editar comisiones</h1>
 
-        <form [formGroup]="formArticulo">
+        <div *ngIf="cargaDialogComisiones === 0" class="container-spinner">
+            <mat-spinner></mat-spinner>
+        </div>
+
+        <div *ngIf="cargaDialogComisiones === -1" class="container-error">
+            <span class="material-symbols-outlined">warning</span>
+            <span class="texto">Ha habido un error al cargar los datos.</span>
+            <button mat-button (click)="cargarComisiones()">Reintentar</button>
+        </div>
+
+        <form [formGroup]="formArticulo" *ngIf="cargaDialogComisiones === 1">
 
             <div class="toolbar">
                 <mat-form-field>
                     <mat-label>Comisión por defecto</mat-label>
                     <input matInput [(ngModel)]="comisionDefaultDialog" [ngModelOptions]="{standalone: true}"
-                        (input)="editarComisionDefaultDialog()">
+                        (input)="editarComisionDefaultDialog()" #comisionDefaultCtrl="ngModel"
+                        pattern="^-?\d+(\.\d+)?$">
                     <span matSuffix>%</span>
-                    <mat-error *ngIf="formArticulo?.get('comision_default')?.errors?.['pattern']">El campo debe
+                    <mat-error *ngIf="comisionDefaultCtrl.hasError('pattern')">El campo debe
                         ser numérico.</mat-error>
                 </mat-form-field>
             </div>
@@ -339,11 +370,11 @@
 
             </div>
 
-            <div class="botones-accion">
-                <button mat-button (click)="dialogRef.close()">Salir</button>
-            </div>
-
         </form>
+
+        <div class="botones-accion">
+            <button mat-button (click)="dialogRef.close()">Salir</button>
+        </div>
 
     </div>
 

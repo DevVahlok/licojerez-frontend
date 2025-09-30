@@ -39,6 +39,7 @@ export class MainComponent {
   public opcionesMenuLateral: OpcionMenuLateral[] = [
     { title: 'Artículos', icon: 'liquor', iconFont: 'material-symbols-outlined', url: '/oficina/articulos' },
     { title: 'Proveedores', icon: 'local_shipping', iconFont: 'material-symbols-outlined', url: '/oficina/proveedores' },
+    { title: 'Clientes', icon: 'group', iconFont: 'material-symbols-outlined', url: '/oficina/clientes' },
     { title: 'Logs', icon: 'checkbook', iconFont: 'material-symbols-outlined', url: '/oficina/logs' },
   ];
   public contextMenuPosition = { x: '0px', y: '0px' };

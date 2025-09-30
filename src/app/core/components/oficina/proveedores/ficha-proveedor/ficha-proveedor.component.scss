@@ -1,0 +1,218 @@
+@import './../../../../../../styles/variables';
+
+.container-general__ficha-proveedor {
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: flex-start;
+
+    .container-spinner {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: center;
+        margin-top: 50px;
+    }
+
+    .container-titulo {
+        display: flex;
+        margin-bottom: 25px;
+
+        .fill {
+            flex: 1;
+            display: flex;
+            margin-right: auto;
+        }
+
+        .encapsulador-titulo {
+            flex: 1;
+            display: flex;
+            height: fit-content;
+
+            h1 {
+                width: 100%;
+                text-align: center;
+                margin: 0;
+            }
+        }
+
+        .container-indicador-creacion {
+            flex: 1;
+            display: flex;
+            height: fit-content;
+            margin: auto 0;
+            justify-content: center;
+
+            .material-symbols-outlined {
+                vertical-align: middle;
+            }
+
+            * {
+                color: $error;
+            }
+        }
+    }
+
+    .toolbar {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: flex-start;
+        margin-bottom: 50px;
+
+        button {
+            margin: auto 15px auto 0;
+
+            &:disabled {
+                border: $tabulator_fila_par !important;
+
+                * {
+                    color: $tabulator_fila_par !important;
+                }
+            }
+        }
+    }
+
+    form {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: space-around;
+
+        .mat-mdc-form-field {
+            margin-right: 25px;
+            height: fit-content;
+        }
+
+        .container-selector {
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: flex-start;
+
+            .mat-mdc-progress-spinner {
+                margin: auto 0 auto 10px;
+            }
+        }
+
+        fieldset {
+            border-color: $acento;
+            border-radius: 5px;
+            height: 100px;
+
+            &.faltan-campos {
+                border-color: $error;
+            }
+        }
+
+        legend {
+            color: $texto;
+            padding: 0 15px;
+        }
+
+        .container-izq {
+            display: flex;
+            flex-flow: column wrap;
+            justify-content: flex-start;
+
+            .fila {
+                display: flex;
+                flex-flow: row wrap;
+                justify-content: flex-start;
+                margin-bottom: 25px;
+
+                .encapsulacion-datos-principales {
+                    display: flex;
+                    flex-flow: row wrap;
+                    justify-content: flex-start;
+                }
+
+                .campo-codigo {
+                    width: 80px;
+                }
+
+                .campo-nombre,
+                .campo-direccion,
+                .campo-ciudad {
+                    width: 450px;
+                }
+
+                .container-switch {
+                    margin: 25px 100px auto 0;
+                }
+
+                .campo-codigo-postal {
+                    width: 130px;
+                }
+
+                .campo-cif {
+                    width: 140px;
+                }
+
+                .campo-descuento {
+                    width: 130px;
+                }
+
+                .seccion-direccion {
+                    display: flex;
+                    flex-flow: column nowrap;
+                    justify-content: flex-start;
+                    height: 170px;
+
+                    .fila-direccion {
+                        display: flex;
+                        flex-flow: row nowrap;
+                        justify-content: flex-start;
+                    }
+                }
+
+                .seccion-tarifas {
+                    margin-left: 25px;
+                }
+            }
+        }
+
+        .container-der {
+            display: flex;
+            flex-flow: column wrap;
+            justify-content: flex-start;
+
+            .seccion-centros {
+                display: flex;
+                flex-flow: column wrap;
+                justify-content: flex-start;
+                height: 400px;
+
+                .lista-centros {
+                    height: 320px;
+                    overflow-y: auto;
+                    padding-right: 15px;
+                    border: 1px solid $fondo;
+                    border-radius: 5px;
+
+                    .centro {
+                        display: flex;
+                        flex-flow: row nowrap;
+                        justify-content: space-between;
+                        padding: 15px;
+
+                        .izq {
+                            display: flex;
+                            flex-flow: column nowrap;
+                            justify-content: center;
+                        }
+
+                        .der {
+                            display: flex;
+                            flex-flow: column nowrap;
+                            justify-content: space-between;
+                        }
+                    }
+                }
+
+                .boton-gestionar-centros {
+                    margin-top: 20px;
+
+                    mat-icon {
+                        margin-right: 10px !important;
+                    }
+                }
+            }
+        }
+    }
+}
