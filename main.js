@@ -22,6 +22,7 @@ createWindow = () => {
         appWin.webContents.openDevTools();
     } else {
         appWin.loadFile(path.join(__dirname, '/dist/index.html'));
+        appWin.maximize();
     }
 
     appWin.setMenu(null);
