@@ -4,6 +4,9 @@
 /tmp
 /out-tsc
 /bazel-out
+/dist
+/release
+/release-build
 
 # Node
 /node_modules

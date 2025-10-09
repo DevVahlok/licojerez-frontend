@@ -43,7 +43,6 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule],
-  providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }] //TODO: eliminar cuando se quite el host de github pages
+  exports: [RouterModule]
 })
 export class AppRoutingModule { }
