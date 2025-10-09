@@ -28,8 +28,11 @@
                     El usuario / contraseña es incorrecta
                 </mat-error>
             </mat-form-field>
-            <button mat-button class="boton-inicio-sesion" (click)="login()" type="submit">Iniciar
+            <button mat-button class="boton-inicio-sesion" [ngClass]="carga ? 'cargando':''" (click)="login()"
+                [disabled]="!formLogin.valid" type="submit">Iniciar
                 sesión</button>
+            <mat-progress-bar mode="indeterminate"
+                [ngStyle]="{visibility: carga ? 'visible':'hidden'}"></mat-progress-bar>
         </form>
 
     </div>

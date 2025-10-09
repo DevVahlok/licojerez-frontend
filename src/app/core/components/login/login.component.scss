@@ -30,6 +30,15 @@
                 width: 500px;
                 margin: 0 auto;
 
+                .mat-mdc-input-element {
+                    color: $texto_alt !important;
+                    caret-color: $texto_alt !important;
+                }
+
+                .mdc-line-ripple::before {
+                    border-bottom-color: $texto_alt !important;
+                }
+
                 .mat-icon {
                     color: $fondo;
                 }
@@ -53,6 +62,22 @@
                         color: $texto !important;
                     }
                 }
+
+                &.cargando {
+                    border-bottom-left-radius: 0;
+                    border-bottom-right-radius: 0;
+                }
+
+                &:disabled {
+                    background-color: $tabulator_fila_impar;
+                }
+            }
+
+            .mat-mdc-progress-bar {
+                width: 500px;
+                margin: 0 auto;
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
             }
         }
     }

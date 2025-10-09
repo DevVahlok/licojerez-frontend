@@ -22,6 +22,7 @@ export class LoginComponent {
     password: new FormControl('', [Validators.required]),
   });
   public ocultarPassword: boolean = true;
+  public carga: boolean = false;
 
   constructor(private _title: Title, private _router: Router, private _supabase: SupabaseService) { }
 
@@ -40,11 +41,13 @@ export class LoginComponent {
   }
 
   async login() {
+    this.carga = true;
     const datos = this.formLogin.getRawValue();
 
     if (datos.user !== '' && datos.password !== '') {
 
       const { data, error } = await this._supabase.signIn(datos.user!, datos.password!);
+      this.carga = false;
 
       if (error) {
         this.formLogin.get('password')?.setErrors({ incorrect: true })
