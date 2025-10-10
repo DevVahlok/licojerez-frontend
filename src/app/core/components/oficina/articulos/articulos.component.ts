@@ -40,6 +40,7 @@ export class ArticulosComponent {
   public opcionesBuscadorArticulosFiltrado: opcionBuscadorArticulo[] = [];
   private timer: NodeJS.Timeout;
   public hasActiveOption = false;
+  public mostrarInactivos = false;
 
   constructor(private _title: Title, private _supabase: SupabaseService) { }
 
@@ -86,7 +87,14 @@ export class ArticulosComponent {
         if (value === '') {
           this.opcionesBuscadorArticulosFiltrado = [];
         } else {
-          const { data } = await this._supabase.supabase.from('articulos_busqueda').select('*').or(`nombre.ilike.%${value}%, id_articulo.ilike.%${value}%, ean13_1.ilike.%${value}%, ean13_2.ilike.%${value}%, ean13_3.ilike.%${value}%, ean13_4.ilike.%${value}%, ean13_5.ilike.%${value}%`);
+
+          let query = this._supabase.supabase.from('articulos_busqueda').select('*').or(`nombre.ilike.%${value}%, id_articulo.ilike.%${value}%, ean13_1.ilike.%${value}%, ean13_2.ilike.%${value}%, ean13_3.ilike.%${value}%, ean13_4.ilike.%${value}%, ean13_5.ilike.%${value}%`).order('nombre');
+
+          if (!this.mostrarInactivos) {
+            query.eq('activo', true);
+          }
+
+          const { data } = await query;
 
           let resultado = data!?.map(articulo => {
             return {
@@ -101,9 +109,7 @@ export class ArticulosComponent {
 
           const indexCodigoIdentico = resultado.findIndex(articulo => articulo.id_articulo === value);
 
-          if (indexCodigoIdentico <= 0 || indexCodigoIdentico >= resultado.length) {
-
-          } else {
+          if (!(indexCodigoIdentico <= 0 || indexCodigoIdentico >= resultado.length)) {
             const elemento = resultado.splice(indexCodigoIdentico, 1)[0];
             resultado.unshift(elemento);
           }

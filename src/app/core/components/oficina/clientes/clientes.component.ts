@@ -29,6 +29,7 @@ export class ClientesComponent {
   public opcionesBuscadorClientesFiltrado: opcionBuscadorCliente[] = [];
   private timer: NodeJS.Timeout;
   public hasActiveOption = false;
+  public mostrarInactivos = false;
 
   constructor(private _title: Title, private _supabase: SupabaseService) { }
 
@@ -70,15 +71,20 @@ export class ClientesComponent {
         if (value === '') {
           this.opcionesBuscadorClientesFiltrado = [];
         } else {
-          const { data } = await this._supabase.supabase.from('clientes_busqueda').select('*').or(`nombre.ilike.%${value}%, id_cliente.ilike.%${value}%`);
+
+          let query = this._supabase.supabase.from('clientes_busqueda').select('*').or(`nombre.ilike.%${value}%, id_cliente.ilike.%${value}%`).order('nombre');
+
+          if (!this.mostrarInactivos) {
+            query.eq('activo', true);
+          }
+
+          const { data } = await query;
 
           let resultado = data!?.map(cliente => { return { id_cliente: cliente.id_cliente, nombre: cliente.nombre, nombre_comercial: cliente.nombre_comercial, domicilio: cliente.domicilio } });
 
           const indexCodigoIdentico = resultado.findIndex(cliente => cliente.id_cliente === value);
 
-          if (indexCodigoIdentico <= 0 || indexCodigoIdentico >= resultado.length) {
-
-          } else {
+          if (!(indexCodigoIdentico <= 0 || indexCodigoIdentico >= resultado.length)) {
             const elemento = resultado.splice(indexCodigoIdentico, 1)[0];
             resultado.unshift(elemento);
           }

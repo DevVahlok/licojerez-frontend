@@ -16,8 +16,8 @@
                     <span class="campo-precio-sin-iva">Precio venta</span>
                     <span class="campo-precio-con-iva">Precio + IVA</span>
                 </div>
-                <ng-container *ngFor="let articulo of opcionesBuscadorArticulosFiltrado">
-                    <mat-option [value]="articulo.id_articulo">
+                <ng-container *ngFor="let articulo of opcionesBuscadorArticulosFiltrado; let index = index">
+                    <mat-option [value]="articulo.id_articulo" [ngClass]="index % 2 === 0 ? 'par' : 'impar'">
                         <span class="campo-id">{{articulo.id_articulo}}</span>
                         <span class="campo-nombre">{{articulo.nombre}}</span>
                         <span class="campo-stock">{{articulo.stock}}</span>
@@ -27,6 +27,7 @@
                 </ng-container>
             </mat-autocomplete>
         </mat-form-field>
+        <mat-slide-toggle [(ngModel)]="mostrarInactivos">Mostrar inactivos</mat-slide-toggle>
     </div>
 
     <mat-tab-group [(selectedIndex)]="indexTabs" (selectedIndexChange)="cambiarTab($event)">
@@ -38,11 +39,6 @@
 
         <mat-tab label="Tabla">
             <app-lista-articulos (abrirFicha)="abrirFicha($event)"></app-lista-articulos>
-        </mat-tab>
-
-        <mat-tab label="Historial">
-
-
         </mat-tab>
 
     </mat-tab-group>

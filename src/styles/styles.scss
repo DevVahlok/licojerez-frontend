@@ -71,6 +71,26 @@ body {
         display: flex;
         flex-flow: row nowrap;
         justify-content: flex-start;
+
+        &.par {
+            background-color: $buscador_fila_par;
+        }
+
+        &.impar {
+            background-color: $buscador_fila_impar;
+        }
+    }
+
+    .mdc-list-item__primary-text {
+        span:not(:last-of-type) {
+            border-right: 1px solid $texto;
+            padding-right: 10px;
+        }
+    }
+
+    .mdc-list-item {
+        min-height: 20px !important;
+        height: 20px !important;
     }
 
     .campo-id {
@@ -140,5 +160,16 @@ body {
         top: 0;
         background-color: white;
         z-index: 99999;
+        min-height: 30px !important;
+        height: 30px !important;
+
+        span {
+            padding: 15px 0;
+
+            &:not(:last-of-type) {
+                border-right: 1px solid $texto;
+                padding-right: 10px;
+            }
+        }
     }
 }

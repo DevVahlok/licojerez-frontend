@@ -15,8 +15,8 @@
                     <span class="campo-nombre_comercial">Nombre Comercial</span>
                     <span class="campo-domicilio">Domicilio</span>
                 </div>
-                <ng-container *ngFor="let cliente of opcionesBuscadorClientesFiltrado">
-                    <mat-option [value]="cliente.id_cliente">
+                <ng-container *ngFor="let cliente of opcionesBuscadorClientesFiltrado;let index = index">
+                    <mat-option [value]="cliente.id_cliente" [ngClass]="index % 2 === 0 ? 'par' : 'impar'">
                         <span class="campo-id">{{cliente.id_cliente}}</span>
                         <span class="campo-nombre"> {{cliente.nombre}} </span>
                         <span class="campo-nombre_comercial"> {{cliente.nombre_comercial}} </span>
@@ -25,6 +25,7 @@
                 </ng-container>
             </mat-autocomplete>
         </mat-form-field>
+        <mat-slide-toggle [(ngModel)]="mostrarInactivos">Mostrar inactivos</mat-slide-toggle>
     </div>
 
     <mat-tab-group [(selectedIndex)]="indexTabs" (selectedIndexChange)="cambiarTab($event)">

@@ -29,6 +29,7 @@ export class ProveedoresComponent {
   public opcionesBuscadorProveedoresFiltrado: opcionBuscadorProveedor[] = [];
   private timer: NodeJS.Timeout;
   public hasActiveOption = false;
+  public mostrarInactivos = false;
 
   constructor(private _title: Title, private _supabase: SupabaseService) { }
 
@@ -70,15 +71,20 @@ export class ProveedoresComponent {
         if (value === '') {
           this.opcionesBuscadorProveedoresFiltrado = [];
         } else {
-          const { data } = await this._supabase.supabase.from('proveedores_busqueda').select('*').or(`nombre.ilike.%${value}%, id_proveedor.ilike.%${value}%, cif.ilike.%${value}%`);
+
+          let query = this._supabase.supabase.from('proveedores_busqueda').select('*').or(`nombre.ilike.%${value}%, id_proveedor.ilike.%${value}%, cif.ilike.%${value}%`).order('nombre');
+
+          if (!this.mostrarInactivos) {
+            query.eq('activo', true);
+          }
+
+          const { data } = await query;
 
           let resultado = data!?.map(proveedor => { return { id_proveedor: proveedor.id_proveedor, nombre: proveedor.nombre, cif: proveedor.cif, direccion: proveedor.direccion } });
 
           const indexCodigoIdentico = resultado.findIndex(proveedor => proveedor.id_proveedor === value);
 
-          if (indexCodigoIdentico <= 0 || indexCodigoIdentico >= resultado.length) {
-
-          } else {
+          if (!(indexCodigoIdentico <= 0 || indexCodigoIdentico >= resultado.length)) {
             const elemento = resultado.splice(indexCodigoIdentico, 1)[0];
             resultado.unshift(elemento);
           }
