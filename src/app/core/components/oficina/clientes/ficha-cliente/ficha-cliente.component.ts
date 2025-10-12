@@ -37,7 +37,7 @@ export class FichaClienteComponent {
     domicilio_comercial: new FormControl(''),
     codigo_postal: new FormControl(0, Validators.pattern(/^(0[1-9]|[1-4][0-9]|5[0-2])\d{3}$/)),
     localidad: new FormControl(''),
-    cif: new FormControl('', [Validators.required, Validators.pattern(/^(?:\d{8}[A-Z]|[A-HJNP-SUVW]\d{7}[0-9A-J])$/)]),
+    cif: new FormControl('', [Validators.required, this._utils.identificadorEspanolValidator()]),
     contacto: new FormControl(''),
     telefono_1: new FormControl(0, Validators.pattern(/^[6789]\d{8}$/)),
     telefono_2: new FormControl(0, Validators.pattern(/^[6789]\d{8}$/)),

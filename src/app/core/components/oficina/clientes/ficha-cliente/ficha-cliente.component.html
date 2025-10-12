@@ -71,8 +71,12 @@
                             <input matInput formControlName="cif" (input)="editarCampo('cif')">
                             <mat-error *ngIf="formCliente?.get('cif')?.errors?.['required']">El DNI / CIF es
                                 obligatorio</mat-error>
-                            <mat-error *ngIf="formCliente?.get('cif')?.errors?.['pattern']">El DNI / CIF no es
-                                válido.</mat-error>
+                            <mat-error *ngIf="formCliente?.get('cif')?.errors?.['formatoInvalido']">El formato es
+                                inválido</mat-error>
+                            <mat-error *ngIf="formCliente?.get('cif')?.errors?.['letraIncorrecta']">La letra es
+                                incorrecta</mat-error>
+                            <mat-error *ngIf="formCliente?.get('cif')?.errors?.['digitoControlIncorrecto']">El dígito
+                                de control es incorrecto</mat-error>
                         </mat-form-field>
                     </fieldset>
                 </div>

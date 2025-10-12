@@ -31,7 +31,7 @@ export class FichaProveedorComponent {
     codigo_postal: new FormControl(0, Validators.pattern(/^(0[1-9]|[1-4][0-9]|5[0-2])\d{3}$/)),
     ciudad: new FormControl(''),
     provincia: new FormControl(''),
-    cif: new FormControl('', [Validators.required, Validators.pattern(/^[ABCDEFGHJNPQRSUVW]\d{7}[0-9A-J]$/)]),
+    cif: new FormControl('', [Validators.required, this._utils.identificadorEspanolValidator()]),
     descuento: new FormControl(0, Validators.pattern(/^-?\d+(\.\d+)?$/)),
     fecha_alta: new FormControl('', Validators.required),
   });

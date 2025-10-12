@@ -65,6 +65,12 @@
                             <input matInput formControlName="cif" (input)="editarCampo('cif')">
                             <mat-error *ngIf="formProveedor?.get('cif')?.errors?.['required']">El CIF es
                                 obligatorio</mat-error>
+                            <mat-error *ngIf="formProveedor?.get('cif')?.errors?.['formatoInvalido']">El formato es
+                                inválido</mat-error>
+                            <mat-error *ngIf="formProveedor?.get('cif')?.errors?.['letraIncorrecta']">La letra es
+                                incorrecta</mat-error>
+                            <mat-error *ngIf="formProveedor?.get('cif')?.errors?.['digitoControlIncorrecto']">El dígito
+                                de control es incorrecto</mat-error>
                         </mat-form-field>
                     </fieldset>
                 </div>
