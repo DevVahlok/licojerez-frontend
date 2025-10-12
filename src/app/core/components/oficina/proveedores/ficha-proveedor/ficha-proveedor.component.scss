@@ -152,12 +152,16 @@
                     display: flex;
                     flex-flow: column nowrap;
                     justify-content: flex-start;
-                    height: 170px;
+                    height: 200px;
 
                     .fila-direccion {
                         display: flex;
                         flex-flow: row nowrap;
                         justify-content: flex-start;
+
+                        &:first-of-type {
+                            min-height: 120px;
+                        }
                     }
                 }
 
