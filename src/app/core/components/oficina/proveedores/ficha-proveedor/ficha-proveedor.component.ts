@@ -54,7 +54,7 @@ export class FichaProveedorComponent {
 
     if (changes['indexTabs']?.currentValue !== null) {
       if (this.indexTabs === 0) {
-        this._title.setTitle(this.proveedor?.nombre);
+        this._title.setTitle(`Licojerez - ${this.proveedor?.nombre}`);
       }
     }
   }
@@ -100,7 +100,7 @@ export class FichaProveedorComponent {
       this.proveedor = data;
 
       if (this.indexTabs === 0) {
-        this._title.setTitle(this.proveedor.nombre);
+        this._title.setTitle(`Licojerez - ${this.proveedor.nombre}`);
       }
 
       const datosForm = this.tratamientoPreFormulario();
@@ -156,7 +156,7 @@ export class FichaProveedorComponent {
   async empezarNuevoProveedor() {
     this.nuevoProveedor = true;
 
-    this._title.setTitle('Creación Proveedor');
+    this._title.setTitle('Licojerez - Creación Proveedor');
 
     this.formProveedor.reset();
 

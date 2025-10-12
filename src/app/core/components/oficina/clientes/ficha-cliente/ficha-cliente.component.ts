@@ -76,7 +76,7 @@ export class FichaClienteComponent {
 
     if (changes['indexTabs']?.currentValue !== null) {
       if (this.indexTabs === 0) {
-        this._title.setTitle(this.cliente?.nombre);
+        this._title.setTitle(`Licojerez - ${this.cliente?.nombre}`);
       }
     }
   }
@@ -130,7 +130,7 @@ export class FichaClienteComponent {
       this.cliente = data;
 
       if (this.indexTabs === 0) {
-        this._title.setTitle(this.cliente.nombre);
+        this._title.setTitle(`Licojerez - ${this.cliente.nombre}`);
       }
 
       const datosForm = this.tratamientoPreFormulario();
@@ -196,7 +196,7 @@ export class FichaClienteComponent {
   async empezarNuevoCliente() {
     this.nuevoCliente = true;
 
-    this._title.setTitle('Creación Cliente');
+    this._title.setTitle('Licojerez - Creación Cliente');
 
     this.formCliente.reset();
 

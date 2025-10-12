@@ -34,7 +34,7 @@ export class ProveedoresComponent {
   constructor(private _title: Title, private _supabase: SupabaseService) { }
 
   ngOnInit() {
-    this._title.setTitle('Listado de Proveedores');
+    this._title.setTitle('Licojerez - Listado de Proveedores');
     this.activarListenerInputBuscador();
   }
 
@@ -102,7 +102,7 @@ export class ProveedoresComponent {
 
     switch (index) {
       case 1:
-        this._title.setTitle('Listado de Proveedores')
+        this._title.setTitle('Licojerez - Listado de Proveedores')
         break;
     }
   }

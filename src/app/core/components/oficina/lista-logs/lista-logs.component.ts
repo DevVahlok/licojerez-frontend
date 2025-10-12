@@ -32,7 +32,7 @@ export class ListaLogsComponent {
   constructor(private _title: Title, private _supabase: SupabaseService, public _dialog: MatDialog, private _utils: UtilsService) { }
 
   ngOnInit() {
-    this._title.setTitle('Logs');
+    this._title.setTitle('Licojerez - Logs');
     this.cargarListaLogs();
   }
 

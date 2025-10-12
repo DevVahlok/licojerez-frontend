@@ -107,7 +107,7 @@ export class FichaArticuloComponent {
 
     if (changes['indexTabs']?.currentValue !== null) {
       if (this.indexTabs === 0) {
-        this._title.setTitle(this.articulo?.nombre);
+        this._title.setTitle(`Licojerez - ${this.articulo?.nombre}`);
       }
     }
   }
@@ -226,7 +226,7 @@ export class FichaArticuloComponent {
       this.articulo = data;
 
       if (this.indexTabs === 0) {
-        this._title.setTitle(this.articulo.nombre);
+        this._title.setTitle(`Licojerez - ${this.articulo.nombre}`);
       }
 
       const datosForm = this.tratamientoPreFormulario();
@@ -580,7 +580,7 @@ export class FichaArticuloComponent {
     this.nuevoArticulo = true;
     this.comisionesVendedoresNuevoArticulo = [];
 
-    this._title.setTitle('Creación Artículo');
+    this._title.setTitle('Licojerez - Creación Artículo');
 
     this.formArticulo.reset();
     this.listaVendedores = [];

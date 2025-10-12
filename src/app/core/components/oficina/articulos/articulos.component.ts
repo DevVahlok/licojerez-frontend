@@ -45,7 +45,7 @@ export class ArticulosComponent {
   constructor(private _title: Title, private _supabase: SupabaseService) { }
 
   ngOnInit() {
-    this._title.setTitle('Listado de Artículos');
+    this._title.setTitle('Licojerez - Listado de Artículos');
     this.activarListenerInputBuscador();
   }
 
@@ -127,7 +127,7 @@ export class ArticulosComponent {
 
     switch (index) {
       case 1:
-        this._title.setTitle('Listado de Artículos')
+        this._title.setTitle('Licojerez - Listado de Artículos')
         break;
     }
   }

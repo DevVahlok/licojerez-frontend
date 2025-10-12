@@ -23,7 +23,7 @@ export class PrincipalComponent {
   constructor(private _title: Title, private _router: Router, private _supabase: SupabaseService) { }
 
   async ngOnInit() {
-    this._title.setTitle('Menú principal');
+    this._title.setTitle('Licojerez - Menú principal');
     this.user = await this._supabase.getUser();
     this.getOpcionesMenu();
   }
