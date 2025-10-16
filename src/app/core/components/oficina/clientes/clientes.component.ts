@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Renderer2, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { MatAutocomplete } from '@angular/material/autocomplete';
 import { Title } from '@angular/platform-browser';
 import { SupabaseService } from 'src/app/core/services/supabase/supabase.service';
 
@@ -28,10 +29,38 @@ export class ClientesComponent {
   public opcionesBuscadorClientes: opcionBuscadorCliente[] = [];
   public opcionesBuscadorClientesFiltrado: opcionBuscadorCliente[] = [];
   private timer: NodeJS.Timeout;
-  public hasActiveOption = false;
+  public opcionActiva = false;
   public mostrarInactivos = false;
+  public spinner: boolean = false;
+  @ViewChild(MatAutocomplete) auto!: MatAutocomplete;
 
-  constructor(private _title: Title, private _supabase: SupabaseService) { }
+  constructor(private _title: Title, private _supabase: SupabaseService, private _renderer: Renderer2) { }
+
+  ngAfterViewInit() {
+    this.auto.opened.subscribe(() => {
+      setTimeout(() => this.posicionarAutocomplete(), 0);
+    });
+  }
+
+  onPanelOpened() {
+    setTimeout(() => {
+      this.posicionarAutocomplete();
+    });
+  }
+
+  posicionarAutocomplete() {
+    const overlayBox = document.querySelector('.cdk-overlay-connected-position-bounding-box');
+    if (overlayBox) {
+      this._renderer.setStyle(overlayBox, 'display', 'flex');
+      this._renderer.setStyle(overlayBox, 'flex-flow', 'row nowrap');
+      this._renderer.setStyle(overlayBox, 'justify-content', 'center');
+      const hijo = overlayBox.querySelector('.cdk-overlay-pane')
+      if (hijo) {
+        this._renderer.removeStyle(hijo, 'left')
+        this._renderer.removeStyle(hijo, 'right')
+      }
+    }
+  }
 
   ngOnInit() {
     this._title.setTitle('Licojerez - Listado de Clientes');
@@ -49,12 +78,12 @@ export class ClientesComponent {
     if (opciones.length > 0) this.abrirFicha(opciones[0].id_cliente)
   }
 
-  onOptionActivated(event: any) {
-    this.hasActiveOption = !!event.option;
+  alActivarOpcion(event: any) {
+    this.opcionActiva = !!event.option;
   }
 
   onEnter(event: any) {
-    if (this.hasActiveOption) return;
+    if (this.opcionActiva) return;
     event.preventDefault();
     this.seleccionarPrimero();
   }
@@ -67,7 +96,7 @@ export class ClientesComponent {
       value = value.replace(/,/g, ' ');
 
       this.timer = setTimeout(async () => {
-
+        this.spinner = true;
         if (value === '') {
           this.opcionesBuscadorClientesFiltrado = [];
         } else {
@@ -91,7 +120,7 @@ export class ClientesComponent {
 
           this.opcionesBuscadorClientesFiltrado = resultado;
         }
-
+        this.spinner = false;
       }, 200);
 
     });

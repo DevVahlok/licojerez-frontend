@@ -1,7 +1,10 @@
-import { Component } from '@angular/core';
+import { Overlay } from '@angular/cdk/overlay';
+import { Component, Renderer2, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { Title } from '@angular/platform-browser';
 import { SupabaseService } from 'src/app/core/services/supabase/supabase.service';
+import { UtilsService } from 'src/app/core/services/utils-v2/utils.service';
 
 export interface ElementoDesplegable {
   codigo: string,
@@ -28,10 +31,37 @@ export class ProveedoresComponent {
   public opcionesBuscadorProveedores: opcionBuscadorProveedor[] = [];
   public opcionesBuscadorProveedoresFiltrado: opcionBuscadorProveedor[] = [];
   private timer: NodeJS.Timeout;
-  public hasActiveOption = false;
+  public opcionActiva = false;
   public mostrarInactivos = false;
+  public spinner: boolean = false;
+  @ViewChild(MatAutocomplete) auto!: MatAutocomplete;
+  constructor(private _title: Title, private _supabase: SupabaseService, private _renderer: Renderer2) { }
 
-  constructor(private _title: Title, private _supabase: SupabaseService) { }
+  ngAfterViewInit() {
+    this.auto.opened.subscribe(() => {
+      setTimeout(() => this.posicionarAutocomplete(), 0);
+    });
+  }
+
+  onPanelOpened() {
+    setTimeout(() => {
+      this.posicionarAutocomplete();
+    });
+  }
+
+  posicionarAutocomplete() {
+    const overlayBox = document.querySelector('.cdk-overlay-connected-position-bounding-box');
+    if (overlayBox) {
+      this._renderer.setStyle(overlayBox, 'display', 'flex');
+      this._renderer.setStyle(overlayBox, 'flex-flow', 'row nowrap');
+      this._renderer.setStyle(overlayBox, 'justify-content', 'center');
+      const hijo = overlayBox.querySelector('.cdk-overlay-pane')
+      if (hijo) {
+        this._renderer.removeStyle(hijo, 'left')
+        this._renderer.removeStyle(hijo, 'right')
+      }
+    }
+  }
 
   ngOnInit() {
     this._title.setTitle('Licojerez - Listado de Proveedores');
@@ -49,12 +79,12 @@ export class ProveedoresComponent {
     if (opciones.length > 0) this.abrirFicha(opciones[0].id_proveedor)
   }
 
-  onOptionActivated(event: any) {
-    this.hasActiveOption = !!event.option;
+  alActivarOpcion(event: any) {
+    this.opcionActiva = !!event.option;
   }
 
   onEnter(event: any) {
-    if (this.hasActiveOption) return;
+    if (this.opcionActiva) return;
     event.preventDefault();
     this.seleccionarPrimero();
   }
@@ -67,7 +97,7 @@ export class ProveedoresComponent {
       value = value.replace(/,/g, ' ');
 
       this.timer = setTimeout(async () => {
-
+        this.spinner = true;
         if (value === '') {
           this.opcionesBuscadorProveedoresFiltrado = [];
         } else {
@@ -90,8 +120,9 @@ export class ProveedoresComponent {
           }
 
           this.opcionesBuscadorProveedoresFiltrado = resultado;
+          setTimeout(() => this.posicionarAutocomplete(), 1);
         }
-
+        this.spinner = false;
       }, 200);
 
     });

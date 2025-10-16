@@ -20,8 +20,7 @@
         </div>
 
         <div *ngIf="!firstLoad" class="component-loaded__component-loading-manager">
-            <mat-progress-bar
-                [ngStyle]="progress < 100 && progress >= 0 ? {'visibility':'visible'} : {'visibility':'hidden'}"
+            <mat-progress-bar [ngStyle]="{'visibility': (progress < 100 && progress >= 0) ? 'visible' : 'hidden'}"
                 mode="determinate" [value]="progress">
             </mat-progress-bar>
             <div class="container-template__component-loading-manager">

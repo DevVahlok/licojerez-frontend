@@ -1,13 +1,19 @@
 <div class="container-general__proveedores">
 
     <div class="toolbar">
+        <mat-spinner [diameter]="30" [ngStyle]="{'visibility': spinner ? 'visible' : 'hidden'}"></mat-spinner>
         <mat-form-field>
             <mat-label>Buscar proveedor</mat-label>
             <input type="text" matInput [formControl]="buscadorProveedor" [matAutocomplete]="auto"
                 (keydown.enter)="onEnter($event)">
             <mat-autocomplete #auto="matAutocomplete" (optionSelected)="abrirFicha($event.option.value)"
-                (optionActivated)="onOptionActivated($event)"
+                (optionActivated)="alActivarOpcion($event)" (opened)="onPanelOpened()"
                 class="lista-autocompletar-buscador autocompletar-proveedores">
+                <mat-option
+                    *ngIf="opcionesBuscadorProveedoresFiltrado?.length! === 0 && buscadorProveedor.value !=='' && !spinner"
+                    class="sin-resultados">
+                    <div>No hay resultados</div>
+                </mat-option>
                 <div class="cabecera-autocompletar mat-mdc-option"
                     *ngIf="opcionesBuscadorProveedoresFiltrado?.length! > 0">
                     <span class="campo-id">Código</span>

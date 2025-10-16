@@ -1,13 +1,19 @@
 <div class="container-general__articulos">
 
     <div class="toolbar">
+        <mat-spinner [diameter]="30" [ngStyle]="{'visibility': spinner ? 'visible' : 'hidden'}"></mat-spinner>
         <mat-form-field>
             <mat-label>Buscar artículo</mat-label>
             <input type="text" matInput [formControl]="buscadorArticulo" [matAutocomplete]="auto"
                 (keydown.enter)="onEnter($event)">
             <mat-autocomplete #auto="matAutocomplete" (optionSelected)="abrirFicha($event.option.value)"
-                (optionActivated)="onOptionActivated($event)"
+                (optionActivated)="alActivarOpcion($event)" (opened)="onPanelOpened()"
                 class="lista-autocompletar-buscador autocompletar-articulos">
+                <mat-option
+                    *ngIf="opcionesBuscadorArticulosFiltrado?.length! === 0 && buscadorArticulo.value !=='' && !spinner"
+                    class="sin-resultados">
+                    <div>No hay resultados</div>
+                </mat-option>
                 <div class="cabecera-autocompletar mat-mdc-option"
                     *ngIf="opcionesBuscadorArticulosFiltrado?.length! > 0">
                     <span class="campo-id">Código</span>

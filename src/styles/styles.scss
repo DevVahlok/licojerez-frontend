@@ -64,7 +64,6 @@ body {
 .lista-autocompletar-buscador {
     max-height: 80vh !important;
     padding-top: 0 !important;
-    transform: translateX(-40%) !important;
 
     .mat-mdc-option,
     .mdc-list-item__primary-text {
@@ -141,7 +140,6 @@ body {
     }
 
     &.autocompletar-clientes {
-        transform: translateX(40%) !important;
 
         .campo-nombre,
         .campo-nombre_comercial,
@@ -152,6 +150,11 @@ body {
             overflow: hidden;
             margin-right: 10px;
         }
+    }
+
+    .sin-resultados {
+        pointer-events: none;
+        padding-top: 8px !important;
     }
 
     .cabecera-autocompletar {
