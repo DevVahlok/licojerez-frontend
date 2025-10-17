@@ -1,0 +1,48 @@
+<div class="container-general__buscador">
+
+    <div class="buscador">
+        <mat-spinner [diameter]="30" [ngStyle]="{'visibility': spinner ? 'visible' : 'hidden'}"></mat-spinner>
+        <mat-form-field>
+            <mat-label>Buscar {{elemento}}</mat-label>
+            <input type="text" matInput [formControl]="buscadorArticulo" (input)="actualizarBuscador()"
+                (keydown)="teclaPulsada($event)">
+        </mat-form-field>
+        <mat-slide-toggle [(ngModel)]="mostrarInactivos" (change)="actualizarBuscador()">Mostrar
+            inactivos</mat-slide-toggle>
+    </div>
+
+    <div class="encapsulador-resultados" *ngIf="listaResultados && !spinner && buscadorArticulo.value !== ''">
+        <div class="resultados">
+
+            <div *ngIf="listaResultados.length === 0 && buscadorArticulo.value !== '' && !spinner"
+                class="resultado-vacio">
+                <span>No hay resultados</span>
+            </div>
+
+            <div *ngIf="listaResultados.length > 0" class="encapsulador-lista-resultados">
+
+                <div class="cabecera-autocompletar" *ngIf="listaResultados?.length! > 0">
+                    <ng-container *ngFor="let cabecera of listaColumnas">
+                        <span [ngClass]="'campo-'+cabecera.field">{{cabecera.title}}</span>
+                    </ng-container>
+                </div>
+
+                <div class="lista-resultados" [ngClass]="'encapsulador-'+clasePadre">
+                    <ng-container *ngFor="let articulo of listaResultados; let index = index">
+                        <div [ngClass]="index % 2 === 0 ? 'par' : 'impar'" (click)="seleccionarFila(articulo)">
+                            <ng-container *ngFor="let cabecera of listaColumnas">
+                                <span [ngClass]="'campo-'+cabecera.field"
+                                    [class.fila-seleccionada]="indiceSeleccionado === index"
+                                    class="campo">{{articulo[cabecera.field]}}
+                                    {{cabecera.unidad ? ' '+cabecera.unidad : ''}}</span>
+                            </ng-container>
+                        </div>
+                    </ng-container>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>

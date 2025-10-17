@@ -1,39 +1,9 @@
 <div class="container-general__articulos">
 
     <div class="toolbar">
-        <mat-spinner [diameter]="30" [ngStyle]="{'visibility': spinner ? 'visible' : 'hidden'}"></mat-spinner>
-        <mat-form-field>
-            <mat-label>Buscar artículo</mat-label>
-            <input type="text" matInput [formControl]="buscadorArticulo" [matAutocomplete]="auto"
-                (keydown.enter)="onEnter($event)">
-            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="abrirFicha($event.option.value)"
-                (optionActivated)="alActivarOpcion($event)" (opened)="onPanelOpened()"
-                class="lista-autocompletar-buscador autocompletar-articulos">
-                <mat-option
-                    *ngIf="opcionesBuscadorArticulosFiltrado?.length! === 0 && buscadorArticulo.value !=='' && !spinner"
-                    class="sin-resultados">
-                    <div>No hay resultados</div>
-                </mat-option>
-                <div class="cabecera-autocompletar mat-mdc-option"
-                    *ngIf="opcionesBuscadorArticulosFiltrado?.length! > 0">
-                    <span class="campo-id">Código</span>
-                    <span class="campo-nombre">Nombre</span>
-                    <span class="campo-stock">Stock</span>
-                    <span class="campo-precio-sin-iva">Precio venta</span>
-                    <span class="campo-precio-con-iva">Precio + IVA</span>
-                </div>
-                <ng-container *ngFor="let articulo of opcionesBuscadorArticulosFiltrado; let index = index">
-                    <mat-option [value]="articulo.id_articulo" [ngClass]="index % 2 === 0 ? 'par' : 'impar'">
-                        <span class="campo-id">{{articulo.id_articulo}}</span>
-                        <span class="campo-nombre">{{articulo.nombre}}</span>
-                        <span class="campo-stock">{{articulo.stock}}</span>
-                        <span class="campo-precio-sin-iva">{{articulo.precio_sin_iva}}€</span>
-                        <span class="campo-precio-con-iva">{{articulo.precio_venta}}€</span>
-                    </mat-option>
-                </ng-container>
-            </mat-autocomplete>
-        </mat-form-field>
-        <mat-slide-toggle [(ngModel)]="mostrarInactivos">Mostrar inactivos</mat-slide-toggle>
+        <app-buscador #buscador (input)="cargarBuscador($event)" [listaResultados]="listaResultadosBuscador"
+            [listaColumnas]="listaColumnasBuscador" [clasePadre]="'articulos'" [elemento]="'artículo'"
+            (seleccionado)="abrirFicha($event.id_articulo)"></app-buscador>
     </div>
 
     <mat-tab-group [(selectedIndex)]="indexTabs" (selectedIndexChange)="cambiarTab($event)">

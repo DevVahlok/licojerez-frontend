@@ -1,35 +1,9 @@
 <div class="container-general__proveedores">
 
     <div class="toolbar">
-        <mat-spinner [diameter]="30" [ngStyle]="{'visibility': spinner ? 'visible' : 'hidden'}"></mat-spinner>
-        <mat-form-field>
-            <mat-label>Buscar proveedor</mat-label>
-            <input type="text" matInput [formControl]="buscadorProveedor" [matAutocomplete]="auto"
-                (keydown.enter)="onEnter($event)">
-            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="abrirFicha($event.option.value)"
-                (optionActivated)="alActivarOpcion($event)" (opened)="onPanelOpened()"
-                class="lista-autocompletar-buscador autocompletar-proveedores">
-                <mat-option
-                    *ngIf="opcionesBuscadorProveedoresFiltrado?.length! === 0 && buscadorProveedor.value !=='' && !spinner"
-                    class="sin-resultados">
-                    <div>No hay resultados</div>
-                </mat-option>
-                <div class="cabecera-autocompletar mat-mdc-option"
-                    *ngIf="opcionesBuscadorProveedoresFiltrado?.length! > 0">
-                    <span class="campo-id">Código</span>
-                    <span class="campo-nombre">Nombre</span>
-                    <span class="campo-direccion">Dirección</span>
-                </div>
-                <ng-container *ngFor="let proveedor of opcionesBuscadorProveedoresFiltrado;let index = index">
-                    <mat-option [value]="proveedor.id_proveedor" [ngClass]="index % 2 === 0 ? 'par' : 'impar'">
-                        <span class="campo-id"> {{proveedor.id_proveedor}}</span>
-                        <span class="campo-nombre"> {{proveedor.nombre}}</span>
-                        <span class="campo-direccion"> {{proveedor.direccion}}</span>
-                    </mat-option>
-                </ng-container>
-            </mat-autocomplete>
-        </mat-form-field>
-        <mat-slide-toggle [(ngModel)]="mostrarInactivos">Mostrar inactivos</mat-slide-toggle>
+        <app-buscador #buscador (input)="cargarBuscador($event)" [listaResultados]="listaResultadosBuscador"
+            [listaColumnas]="listaColumnasBuscador" [clasePadre]="'proveedores'" [elemento]="'proveedor'"
+            (seleccionado)="abrirFicha($event.id_proveedor)"></app-buscador>
     </div>
 
     <mat-tab-group [(selectedIndex)]="indexTabs" (selectedIndexChange)="cambiarTab($event)">

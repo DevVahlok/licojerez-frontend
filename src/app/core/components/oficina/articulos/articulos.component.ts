@@ -1,10 +1,8 @@
-import { Overlay } from '@angular/cdk/overlay';
-import { Component, Renderer2, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { Component, ViewChild } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { SupabaseService } from 'src/app/core/services/supabase/supabase.service';
 import { IVA } from 'src/app/models/oficina';
+import { BuscadorComponent } from 'src/app/shared/components/buscador/buscador.component';
 
 export interface ElementoDesplegable {
   codigo: string,
@@ -37,119 +35,61 @@ export class ArticulosComponent {
 
   public idArticulo: number;
   public indexTabs = 0;
-  public buscadorArticulo = new FormControl('');
-  public opcionesBuscadorArticulos: opcionBuscadorArticulo[] = [];
-  public opcionesBuscadorArticulosFiltrado: opcionBuscadorArticulo[] = [];
-  private timer: NodeJS.Timeout;
-  public opcionActiva = false;
-  public mostrarInactivos = false;
-  public spinner: boolean = false;
-  @ViewChild(MatAutocomplete) auto!: MatAutocomplete;
+  public listaResultadosBuscador: opcionBuscadorArticulo[] | null = null;
+  public listaColumnasBuscador: { title: string, field: string, unidad?: string }[] = [{ title: 'Código', field: 'id_articulo' }, { title: 'Nombre', field: 'nombre' }, { title: 'Stock', field: 'stock' }, { title: 'Precio venta', field: 'precio_sin_iva', unidad: '€' }, { title: 'Precio + IVA', field: 'precio_venta', unidad: '€' }]
+  @ViewChild('buscador') buscador: BuscadorComponent;
+  public listaIvas: { id_iva: number, valor_iva: number }[];
 
-  constructor(private _title: Title, private _supabase: SupabaseService, private _renderer: Renderer2) { }
-
-  ngAfterViewInit() {
-    this.auto.opened.subscribe(() => {
-      setTimeout(() => this.posicionarAutocomplete(), 0);
-    });
-  }
-
-  onPanelOpened() {
-    setTimeout(() => {
-      this.posicionarAutocomplete();
-    });
-  }
-
-  posicionarAutocomplete() {
-    const overlayBox = document.querySelector('.cdk-overlay-connected-position-bounding-box');
-    if (overlayBox) {
-      this._renderer.setStyle(overlayBox, 'display', 'flex');
-      this._renderer.setStyle(overlayBox, 'flex-flow', 'row nowrap');
-      this._renderer.setStyle(overlayBox, 'justify-content', 'center');
-      const hijo = overlayBox.querySelector('.cdk-overlay-pane')
-      if (hijo) {
-        this._renderer.removeStyle(hijo, 'left')
-        this._renderer.removeStyle(hijo, 'right')
-      }
-    }
-  }
+  constructor(private _title: Title, private _supabase: SupabaseService) { }
 
   ngOnInit() {
     this._title.setTitle('Licojerez - Listado de Artículos');
-    this.activarListenerInputBuscador();
+    this.inicializarBuscador();
   }
 
   abrirFicha(id: number) {
-    this.buscadorArticulo.setValue('');
     this.indexTabs = 0;
     this.idArticulo = id;
   }
 
-  seleccionarPrimero() {
-    const opciones = this.opcionesBuscadorArticulosFiltrado;
-    if (opciones.length > 0) this.abrirFicha(opciones[0].id_articulo)
-  }
-
-  alActivarOpcion(event: any) {
-    this.opcionActiva = !!event.option;
-  }
-
-  onEnter(event: any) {
-    if (this.opcionActiva) return;
-    event.preventDefault();
-    this.seleccionarPrimero();
-  }
-
-  async activarListenerInputBuscador() {
-
+  async inicializarBuscador() {
     const { data, error } = await this._supabase.supabase.from<any, IVA[]>('ivas').select('*');
+    this.listaIvas = data?.map(iva => { return { id_iva: iva.id_iva, valor_iva: iva.valor_iva } })!
+  }
 
-    const listaIvas = data?.map(iva => { return { id_iva: iva.id_iva, valor_iva: iva.valor_iva } })
+  async cargarBuscador(value: string) {
 
-    this.buscadorArticulo.valueChanges.subscribe(async value => {
-      clearTimeout(this.timer);
+    this.buscador.spinner = true;
 
-      if (!value) value = '';
-      value = value.replace(/,/g, ' ');
+    let query = this._supabase.supabase.from('articulos_busqueda').select('*').or(`nombre.ilike.%${value}%, id_articulo.ilike.%${value}%, ean13_1.ilike.%${value}%, ean13_2.ilike.%${value}%, ean13_3.ilike.%${value}%, ean13_4.ilike.%${value}%, ean13_5.ilike.%${value}%`).order('nombre');
 
-      this.timer = setTimeout(async () => {
-        this.spinner = true;
-        if (value === '') {
-          this.opcionesBuscadorArticulosFiltrado = [];
-        } else {
+    if (!this.buscador.mostrarInactivos) {
+      query.eq('activo', true);
+    }
 
-          let query = this._supabase.supabase.from('articulos_busqueda').select('*').or(`nombre.ilike.%${value}%, id_articulo.ilike.%${value}%, ean13_1.ilike.%${value}%, ean13_2.ilike.%${value}%, ean13_3.ilike.%${value}%, ean13_4.ilike.%${value}%, ean13_5.ilike.%${value}%`).order('nombre');
+    const { data } = await query;
 
-          if (!this.mostrarInactivos) {
-            query.eq('activo', true);
-          }
-
-          const { data } = await query;
-
-          let resultado = data!?.map(articulo => {
-            return {
-              id_articulo: articulo.id_articulo,
-              nombre: articulo.nombre,
-              ean13: [articulo.ean13_1, articulo.ean13_2, articulo.ean13_3, articulo.ean13_4, articulo.ean13_5],
-              stock: articulo.stock,
-              precio_venta: (Math.trunc(articulo.precio_venta * 100) / 100).toFixed(4),
-              precio_sin_iva: (Math.trunc((articulo.precio_venta / (1 + listaIvas!.find(iva => iva.id_iva === articulo.id_iva)?.valor_iva / 100) * 100)) / 100).toFixed(4)
-            }
-          });
-
-          const indexCodigoIdentico = resultado.findIndex(articulo => articulo.id_articulo === value);
-
-          if (!(indexCodigoIdentico <= 0 || indexCodigoIdentico >= resultado.length)) {
-            const elemento = resultado.splice(indexCodigoIdentico, 1)[0];
-            resultado.unshift(elemento);
-          }
-
-          this.opcionesBuscadorArticulosFiltrado = resultado;
-        }
-        this.spinner = false;
-      }, 200);
-
+    let resultado = data!?.map(articulo => {
+      return {
+        id_articulo: articulo.id_articulo,
+        nombre: articulo.nombre,
+        ean13: [articulo.ean13_1, articulo.ean13_2, articulo.ean13_3, articulo.ean13_4, articulo.ean13_5],
+        stock: articulo.stock,
+        precio_venta: (Math.trunc(articulo.precio_venta * 100) / 100).toFixed(4),
+        precio_sin_iva: (Math.trunc((articulo.precio_venta / (1 + this.listaIvas!.find(iva => iva.id_iva === articulo.id_iva)?.valor_iva! / 100) * 100)) / 100).toFixed(4)
+      }
     });
+
+    const indexCodigoIdentico = resultado.findIndex(articulo => articulo.id_articulo === value);
+
+    if (!(indexCodigoIdentico <= 0 || indexCodigoIdentico >= resultado.length)) {
+      const elemento = resultado.splice(indexCodigoIdentico, 1)[0];
+      resultado.unshift(elemento);
+    }
+
+    this.listaResultadosBuscador = resultado;
+
+    this.buscador.spinner = false;
   }
 
   cambiarTab(index: number) {

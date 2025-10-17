@@ -1,0 +1,181 @@
+@import '../../../../styles/variables';
+
+.container-general__buscador {
+
+    .buscador {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+        position: relative;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        mat-slide-toggle {
+            position: absolute;
+            left: 50%;
+            transform: translateX(calc(100% + 1rem));
+            white-space: nowrap;
+            margin-left: 70px;
+        }
+
+        .mat-mdc-progress-spinner {
+            margin-right: 10px;
+            margin-left: -20px;
+        }
+    }
+
+    .encapsulador-resultados {
+        position: absolute;
+        width: 100%;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: center;
+        z-index: 9999;
+        left: 0;
+        pointer-events: none;
+
+        .resultados {
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: flex-start;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            width: fit-content;
+            background-color: $texto_alt;
+            pointer-events: auto;
+
+            .resultado-vacio {
+                display: flex;
+                flex-flow: row nowrap;
+                justify-content: center;
+                padding: 15px;
+            }
+
+            .encapsulador-lista-resultados {
+
+                .cabecera-autocompletar {
+                    display: flex;
+                    flex-flow: row nowrap;
+                    justify-content: flex-start;
+
+                    span {
+                        padding: 10px 15px 5px 15px;
+
+                        &:not(:last-of-type) {
+                            border-right: 1px solid $texto;
+                        }
+                    }
+                }
+
+                .lista-resultados {
+                    max-height: 75vh;
+                    overflow-y: auto;
+
+                    .par,
+                    .impar {
+                        display: flex;
+                        flex-flow: row nowrap;
+                        justify-content: flex-start;
+                        cursor: pointer;
+
+                        span {
+                            padding-right: 15px;
+                            padding-left: 15px;
+                        }
+                    }
+
+                    .fila-seleccionada {
+                        background-color: $fondo_alt;
+                    }
+
+                    .par {
+                        background-color: $buscador_fila_par;
+                    }
+
+                    .impar {
+                        background-color: $buscador_fila_impar;
+                    }
+
+                    .campo {
+                        height: 20px;
+                        max-height: 20px;
+
+                        &:not(:last-of-type) {
+                            border-right: 1px solid $texto;
+                        }
+                    }
+                }
+
+                .encapsulador-articulos,
+                .cabecera-autocompletar {
+
+                    .campo-id_articulo {
+                        display: block;
+                        width: 60px;
+                        text-align: end;
+                    }
+
+                    .campo-nombre {
+                        width: 450px;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        overflow: hidden;
+                    }
+
+                    .campo-stock {
+                        width: 60px;
+                        text-align: end;
+                    }
+
+                    .campo-precio_sin_iva,
+                    .campo-precio_venta {
+                        width: 120px;
+                        text-align: end;
+                    }
+
+                    .campo-precio_venta {
+                        margin-right: 15px;
+                    }
+                }
+
+                .encapsulador-proveedores,
+                .cabecera-autocompletar {
+
+                    .campo-id_proveedor {
+                        display: block;
+                        width: 60px;
+                        text-align: end;
+                    }
+
+                    .campo-nombre,
+                    .campo-direccion {
+                        width: 450px;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        overflow: hidden;
+                    }
+                }
+
+                .encapsulador-clientes,
+                .cabecera-autocompletar {
+
+                    .campo-id_cliente {
+                        display: block;
+                        width: 60px;
+                        text-align: end;
+                    }
+
+                    .campo-nombre,
+                    .campo-nombre_comercial,
+                    .campo-domicilio {
+                        width: 450px;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                        overflow: hidden;
+                    }
+                }
+            }
+        }
+    }
+}

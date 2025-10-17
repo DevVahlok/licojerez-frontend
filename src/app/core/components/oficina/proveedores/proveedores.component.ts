@@ -1,10 +1,7 @@
-import { Overlay } from '@angular/cdk/overlay';
-import { Component, Renderer2, ViewChild } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { MatAutocomplete, MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { Component, ViewChild } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { SupabaseService } from 'src/app/core/services/supabase/supabase.service';
-import { UtilsService } from 'src/app/core/services/utils-v2/utils.service';
+import { BuscadorComponent } from 'src/app/shared/components/buscador/buscador.component';
 
 export interface ElementoDesplegable {
   codigo: string,
@@ -27,105 +24,45 @@ export class ProveedoresComponent {
 
   public idProveedor: number;
   public indexTabs = 0;
-  public buscadorProveedor = new FormControl('');
-  public opcionesBuscadorProveedores: opcionBuscadorProveedor[] = [];
-  public opcionesBuscadorProveedoresFiltrado: opcionBuscadorProveedor[] = [];
-  private timer: NodeJS.Timeout;
-  public opcionActiva = false;
-  public mostrarInactivos = false;
-  public spinner: boolean = false;
-  @ViewChild(MatAutocomplete) auto!: MatAutocomplete;
-  constructor(private _title: Title, private _supabase: SupabaseService, private _renderer: Renderer2) { }
+  public listaResultadosBuscador: opcionBuscadorProveedor[] | null = null;
+  public listaColumnasBuscador: { title: string, field: string, unidad?: string }[] = [{ title: 'Código', field: 'id_proveedor' }, { title: 'Nombre', field: 'nombre' }, { title: 'Dirección', field: 'direccion' }]
+  @ViewChild('buscador') buscador: BuscadorComponent;
 
-  ngAfterViewInit() {
-    this.auto.opened.subscribe(() => {
-      setTimeout(() => this.posicionarAutocomplete(), 0);
-    });
-  }
-
-  onPanelOpened() {
-    setTimeout(() => {
-      this.posicionarAutocomplete();
-    });
-  }
-
-  posicionarAutocomplete() {
-    const overlayBox = document.querySelector('.cdk-overlay-connected-position-bounding-box');
-    if (overlayBox) {
-      this._renderer.setStyle(overlayBox, 'display', 'flex');
-      this._renderer.setStyle(overlayBox, 'flex-flow', 'row nowrap');
-      this._renderer.setStyle(overlayBox, 'justify-content', 'center');
-      const hijo = overlayBox.querySelector('.cdk-overlay-pane')
-      if (hijo) {
-        this._renderer.removeStyle(hijo, 'left')
-        this._renderer.removeStyle(hijo, 'right')
-      }
-    }
-  }
+  constructor(private _title: Title, private _supabase: SupabaseService) { }
 
   ngOnInit() {
     this._title.setTitle('Licojerez - Listado de Proveedores');
-    this.activarListenerInputBuscador();
   }
 
   abrirFicha(id: number) {
-    this.buscadorProveedor.setValue('');
     this.indexTabs = 0;
     this.idProveedor = id;
   }
 
-  seleccionarPrimero() {
-    const opciones = this.opcionesBuscadorProveedoresFiltrado;
-    if (opciones.length > 0) this.abrirFicha(opciones[0].id_proveedor)
-  }
+  async cargarBuscador(value: string) {
 
-  alActivarOpcion(event: any) {
-    this.opcionActiva = !!event.option;
-  }
+    this.buscador.spinner = true;
 
-  onEnter(event: any) {
-    if (this.opcionActiva) return;
-    event.preventDefault();
-    this.seleccionarPrimero();
-  }
+    let query = this._supabase.supabase.from('proveedores_busqueda').select('*').or(`nombre.ilike.%${value}%, id_proveedor.ilike.%${value}%, cif.ilike.%${value}%`).order('nombre');
 
-  activarListenerInputBuscador() {
-    this.buscadorProveedor.valueChanges.subscribe(async value => {
-      clearTimeout(this.timer);
+    if (!this.buscador.mostrarInactivos) {
+      query.eq('activo', true);
+    }
 
-      if (!value) value = '';
-      value = value.replace(/,/g, ' ');
+    const { data } = await query;
 
-      this.timer = setTimeout(async () => {
-        this.spinner = true;
-        if (value === '') {
-          this.opcionesBuscadorProveedoresFiltrado = [];
-        } else {
+    let resultado = data!?.map(proveedor => { return { id_proveedor: proveedor.id_proveedor, nombre: proveedor.nombre, cif: proveedor.cif, direccion: proveedor.direccion } });
 
-          let query = this._supabase.supabase.from('proveedores_busqueda').select('*').or(`nombre.ilike.%${value}%, id_proveedor.ilike.%${value}%, cif.ilike.%${value}%`).order('nombre');
+    const indexCodigoIdentico = resultado.findIndex(proveedor => proveedor.id_proveedor === value);
 
-          if (!this.mostrarInactivos) {
-            query.eq('activo', true);
-          }
+    if (!(indexCodigoIdentico <= 0 || indexCodigoIdentico >= resultado.length)) {
+      const elemento = resultado.splice(indexCodigoIdentico, 1)[0];
+      resultado.unshift(elemento);
+    }
 
-          const { data } = await query;
+    this.listaResultadosBuscador = resultado;
 
-          let resultado = data!?.map(proveedor => { return { id_proveedor: proveedor.id_proveedor, nombre: proveedor.nombre, cif: proveedor.cif, direccion: proveedor.direccion } });
-
-          const indexCodigoIdentico = resultado.findIndex(proveedor => proveedor.id_proveedor === value);
-
-          if (!(indexCodigoIdentico <= 0 || indexCodigoIdentico >= resultado.length)) {
-            const elemento = resultado.splice(indexCodigoIdentico, 1)[0];
-            resultado.unshift(elemento);
-          }
-
-          this.opcionesBuscadorProveedoresFiltrado = resultado;
-          setTimeout(() => this.posicionarAutocomplete(), 1);
-        }
-        this.spinner = false;
-      }, 200);
-
-    });
+    this.buscador.spinner = false;
   }
 
   cambiarTab(index: number) {

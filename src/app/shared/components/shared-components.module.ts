@@ -7,13 +7,15 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { ClipboardModule } from '@angular/cdk/clipboard';
+import { BuscadorComponent } from './buscador/buscador.component';
 
 
 
 @NgModule({
   declarations: [
     TablaTabulatorComponent,
-    ComponentLoadingManagerComponent
+    ComponentLoadingManagerComponent,
+    BuscadorComponent
   ],
   imports: [
     CommonModule,
@@ -26,7 +28,8 @@ import { ClipboardModule } from '@angular/cdk/clipboard';
   ],
   exports: [
     TablaTabulatorComponent,
-    ComponentLoadingManagerComponent
+    ComponentLoadingManagerComponent,
+    BuscadorComponent
   ]
 })
 export class SharedComponentsModule { }
