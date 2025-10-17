@@ -205,6 +205,8 @@ export class FichaClienteComponent {
     this.formCliente.get('activo')!.setValue(true);
     this.formCliente.get('descuento')!.setValue(0);
     this.formCliente.get('fecha_alta')!.setValue(moment().format('DD/MM/yyyy'));
+
+    this.listaCentros = [];
   }
 
   editarCampo<K extends keyof Cliente>(campo: K) {
