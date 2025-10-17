@@ -82,7 +82,8 @@
                 </div>
 
                 <div class="fila">
-                    <fieldset class="seccion-direccion">
+                    <fieldset class="seccion-direccion"
+                        [ngClass]="(!formCliente.get('domicilio')?.valid || !formCliente.get('codigo_postal')?.valid || !formCliente.get('localidad')?.valid || !formCliente.get('id_vendedor')?.valid) ? 'faltan-campos' : ''">
                         <legend>Dirección</legend>
 
                         <div class="fila-direccion">
@@ -90,6 +91,8 @@
                             <mat-form-field>
                                 <mat-label>Domicilio</mat-label>
                                 <input matInput formControlName="domicilio" (input)="editarCampo('domicilio')">
+                                <mat-error *ngIf="formCliente?.get('domicilio')?.errors?.['required']">El domicilio es
+                                    obligatorio</mat-error>
                             </mat-form-field>
 
                             <mat-form-field>
@@ -107,11 +110,15 @@
                                 <input matInput formControlName="codigo_postal" (input)="editarCampo('codigo_postal')">
                                 <mat-error *ngIf="formCliente?.get('codigo_postal')?.errors?.['pattern']">El código
                                     postal no es válido.</mat-error>
+                                <mat-error *ngIf="formCliente?.get('codigo_postal')?.errors?.['required']">El código
+                                    postal es obligatorio</mat-error>
                             </mat-form-field>
 
                             <mat-form-field>
                                 <mat-label>Localidad</mat-label>
                                 <input matInput formControlName="localidad" (input)="editarCampo('localidad')">
+                                <mat-error *ngIf="formCliente?.get('localidad')?.errors?.['required']">La localidad es
+                                    obligatoria</mat-error>
                                 <mat-error *ngIf="formCliente?.get('localidad')?.errors?.['required']">La localidad es
                                     obligatoria</mat-error>
                             </mat-form-field>
@@ -129,6 +136,9 @@
                                             <mat-option [value]="vendedor.codigo">{{vendedor.nombre}}</mat-option>
                                         </ng-container>
                                     </mat-select>
+                                    <mat-error *ngIf="formCliente?.get('id_vendedor')?.errors?.['required']">El venedor
+                                        es
+                                        obligatorio</mat-error>
                                 </mat-form-field>
                                 <mat-spinner [diameter]="35" *ngIf="!listaDesplegableVendedor"></mat-spinner>
                             </div>
