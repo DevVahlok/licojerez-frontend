@@ -71,6 +71,7 @@
                 .lista-resultados {
                     max-height: 75vh;
                     overflow-y: auto;
+                    scroll-behavior: smooth;
 
                     .par,
                     .impar {
@@ -169,11 +170,23 @@
                     .campo-nombre,
                     .campo-nombre_comercial,
                     .campo-domicilio {
-                        width: 450px;
                         text-overflow: ellipsis;
                         white-space: nowrap;
                         overflow: hidden;
                     }
+
+                    .campo-nombre {
+                        width: 300px;
+                    }
+
+                    .campo-nombre_comercial {
+                        width: 600px;
+                    }
+
+                    .campo-domicilio {
+                        width: 450px;
+                    }
+
                 }
             }
         }

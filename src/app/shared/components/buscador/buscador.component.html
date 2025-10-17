@@ -27,7 +27,7 @@
                     </ng-container>
                 </div>
 
-                <div class="lista-resultados" [ngClass]="'encapsulador-'+clasePadre">
+                <div class="lista-resultados" [ngClass]="'encapsulador-'+clasePadre" id="lista-filas">
                     <ng-container *ngFor="let articulo of listaResultados; let index = index">
                         <div [ngClass]="index % 2 === 0 ? 'par' : 'impar'" (click)="seleccionarFila(articulo)">
                             <ng-container *ngFor="let cabecera of listaColumnas">

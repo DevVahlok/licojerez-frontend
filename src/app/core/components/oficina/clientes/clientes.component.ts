@@ -50,7 +50,7 @@ export class ClientesComponent {
 
     const { data } = await query;
 
-    let resultado = data!?.map(cliente => { return { id_cliente: cliente.id_cliente, nombre: cliente.nombre, nombre_comercial: `${cliente.nombre_comercial} ${cliente.nombres_centros ? '(' + cliente.nombres_centros + ')' : ''}`, domicilio: cliente.domicilio, cif: cliente.cif } });
+    let resultado = data!?.map(cliente => { return { id_cliente: cliente.id_cliente, nombre: cliente.nombre, nombre_comercial: `${cliente.nombre_comercial ? cliente.nombre_comercial : ''}${cliente.nombres_centros ? ' (' + cliente.nombres_centros + ')' : ''}`, domicilio: cliente.domicilio, cif: cliente.cif } });
 
     const indexCodigoIdentico = resultado.findIndex(cliente => cliente.id_cliente === value);
 

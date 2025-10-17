@@ -38,16 +38,23 @@ export class BuscadorComponent {
 
       if (event.key === 'ArrowDown') {
         event.preventDefault();
-        this.indiceSeleccionado =
-          this.indiceSeleccionado < lastIndex ? this.indiceSeleccionado + 1 : 0;
+        this.indiceSeleccionado = this.indiceSeleccionado < lastIndex ? this.indiceSeleccionado + 1 : 0;
+        this.scrollear();
       } else if (event.key === 'ArrowUp') {
         event.preventDefault();
-        this.indiceSeleccionado =
-          this.indiceSeleccionado > 0 ? this.indiceSeleccionado - 1 : lastIndex;
+        this.indiceSeleccionado = this.indiceSeleccionado > 0 ? this.indiceSeleccionado - 1 : lastIndex;
+        this.scrollear();
       } else if (event.key === 'Enter' && this.indiceSeleccionado >= 0) {
         this.seleccionarFila(this.listaResultados[this.indiceSeleccionado]);
       }
     }
+  }
+
+  private scrollear() {
+    setTimeout(() => {
+      const active = document.querySelector('#lista-filas .fila-seleccionada');
+      active?.scrollIntoView({ block: 'nearest' });
+    });
   }
 
   actualizarBuscador() {
