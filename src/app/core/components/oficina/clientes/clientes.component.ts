@@ -25,7 +25,7 @@ export class ClientesComponent {
   public idCliente: number;
   public indexTabs = 0;
   public listaResultadosBuscador: opcionBuscadorCliente[] | null = null;
-  public listaColumnasBuscador: { title: string, field: string, unidad?: string }[] = [{ title: 'Código', field: 'id_cliente' }, { title: 'Nombre Fiscal', field: 'nombre' }, { title: 'Nombre Comercial', field: 'nombre_comercial' }, { title: 'Domicilio', field: 'domicilio' }]
+  public listaColumnasBuscador: { title: string, field: string, unidad?: string }[] = [{ title: 'Código', field: 'id_cliente' }, { title: 'Nombre Fiscal', field: 'nombre' }, { title: 'Nombre Comercial', field: 'nombre_comercial' }, { title: 'Domicilio', field: 'domicilio' }, { title: 'CIF', field: 'cif' }]
   @ViewChild('buscador') buscador: BuscadorComponent;
 
   constructor(private _title: Title, private _supabase: SupabaseService) { }
@@ -42,7 +42,7 @@ export class ClientesComponent {
   async cargarBuscador(value: string) {
     this.buscador.spinner = true;
 
-    let query = this._supabase.supabase.from('clientes_busqueda').select('*').or(`nombre.ilike.%${value}%, id_cliente.ilike.%${value}%`).order('nombre');
+    let query = this._supabase.supabase.from('clientes_busqueda').select('*').or(`nombre.ilike.%${value}%, id_cliente.ilike.%${value}%, nombre_comercial.ilike.%${value}%, domicilio.ilike.%${value}%, cif.ilike.%${value}%, nombres_centros.ilike.%${value}%`).order('nombre');
 
     if (!this.buscador.mostrarInactivos) {
       query.eq('activo', true);
@@ -50,7 +50,7 @@ export class ClientesComponent {
 
     const { data } = await query;
 
-    let resultado = data!?.map(cliente => { return { id_cliente: cliente.id_cliente, nombre: cliente.nombre, nombre_comercial: cliente.nombre_comercial, domicilio: cliente.domicilio } });
+    let resultado = data!?.map(cliente => { return { id_cliente: cliente.id_cliente, nombre: cliente.nombre, nombre_comercial: `${cliente.nombre_comercial} ${cliente.nombres_centros ? '(' + cliente.nombres_centros + ')' : ''}`, domicilio: cliente.domicilio, cif: cliente.cif } });
 
     const indexCodigoIdentico = resultado.findIndex(cliente => cliente.id_cliente === value);
 
