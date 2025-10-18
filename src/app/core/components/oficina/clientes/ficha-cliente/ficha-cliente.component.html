@@ -36,63 +36,87 @@
                 <div class="fila">
                     <fieldset class="encapsulacion-datos-principales"
                         [ngClass]="((formCliente.get('id_cliente')?.status !== 'DISABLED' && formCliente.get('id_cliente')?.status !== 'VALID')  || !formCliente.get('nombre')?.valid || !formCliente.get('cif')?.valid) ? 'faltan-campos' : ''">
-                        <legend>Datos principales</legend>
+                        <legend>Datos fiscales</legend>
 
-                        <mat-form-field class="campo-codigo">
-                            <mat-label>Código</mat-label>
-                            <input matInput formControlName="id_cliente" (input)="editarCampo('id_cliente')">
-                        </mat-form-field>
+                        <div class="fila">
+                            <mat-form-field class="campo-codigo">
+                                <mat-label>Código</mat-label>
+                                <input matInput formControlName="id_cliente" (input)="editarCampo('id_cliente')">
+                            </mat-form-field>
 
-                        <mat-form-field class="campo-nombre">
-                            <mat-label>Nombre</mat-label>
-                            <input matInput formControlName="nombre" (input)="editarCampo('nombre')">
-                            <mat-error *ngIf="formCliente?.get('nombre')?.errors?.['required']">El nombre es
-                                obligatorio</mat-error>
-                        </mat-form-field>
+                            <mat-form-field class="campo-nombre">
+                                <mat-label>Nombre</mat-label>
+                                <input matInput formControlName="nombre" (input)="editarCampo('nombre')">
+                                <mat-error *ngIf="formCliente?.get('nombre')?.errors?.['required']">El nombre es
+                                    obligatorio</mat-error>
+                            </mat-form-field>
 
-                        <mat-form-field>
-                            <mat-label>Nombre Comercial</mat-label>
-                            <input matInput formControlName="nombre_comercial"
-                                (input)="editarCampo('nombre_comercial')">
-                        </mat-form-field>
+                            <mat-form-field>
+                                <mat-label>Fecha alta</mat-label>
+                                <input matInput formControlName="fecha_alta">
+                            </mat-form-field>
 
-                        <mat-form-field>
-                            <mat-label>Fecha alta</mat-label>
-                            <input matInput formControlName="fecha_alta">
-                        </mat-form-field>
+                            <div class="container-switch">
+                                <mat-slide-toggle formControlName="activo"
+                                    (change)="editarCampo('activo')">Activo</mat-slide-toggle>
+                            </div>
 
-                        <div class="container-switch">
-                            <mat-slide-toggle formControlName="activo"
-                                (change)="editarCampo('activo')">Activo</mat-slide-toggle>
+                            <mat-form-field class="campo-cif">
+                                <mat-label>DNI / CIF</mat-label>
+                                <input matInput formControlName="cif" (input)="editarCampo('cif')">
+                                <mat-error *ngIf="formCliente?.get('cif')?.errors?.['required']">El DNI / CIF es
+                                    obligatorio</mat-error>
+                                <mat-error *ngIf="formCliente?.get('cif')?.errors?.['formatoInvalido']">El formato es
+                                    inválido</mat-error>
+                                <mat-error *ngIf="formCliente?.get('cif')?.errors?.['letraIncorrecta']">La letra es
+                                    incorrecta</mat-error>
+                                <mat-error *ngIf="formCliente?.get('cif')?.errors?.['digitoControlIncorrecto']">El
+                                    dígito
+                                    de control es incorrecto</mat-error>
+                            </mat-form-field>
                         </div>
 
-                        <mat-form-field class="campo-cif">
-                            <mat-label>DNI / CIF</mat-label>
-                            <input matInput formControlName="cif" (input)="editarCampo('cif')">
-                            <mat-error *ngIf="formCliente?.get('cif')?.errors?.['required']">El DNI / CIF es
-                                obligatorio</mat-error>
-                            <mat-error *ngIf="formCliente?.get('cif')?.errors?.['formatoInvalido']">El formato es
-                                inválido</mat-error>
-                            <mat-error *ngIf="formCliente?.get('cif')?.errors?.['letraIncorrecta']">La letra es
-                                incorrecta</mat-error>
-                            <mat-error *ngIf="formCliente?.get('cif')?.errors?.['digitoControlIncorrecto']">El dígito
-                                de control es incorrecto</mat-error>
-                        </mat-form-field>
+                        <div class="fila">
+                            <mat-form-field>
+                                <mat-label>Domicilio</mat-label>
+                                <input matInput formControlName="domicilio" (input)="editarCampo('domicilio')">
+                                <mat-error *ngIf="formCliente?.get('domicilio')?.errors?.['required']">El domicilio es
+                                    obligatorio</mat-error>
+                            </mat-form-field>
+
+                            <mat-form-field>
+                                <mat-label>Localidad</mat-label>
+                                <input matInput formControlName="localidad" (input)="editarCampo('localidad')">
+                                <mat-error *ngIf="formCliente?.get('localidad')?.errors?.['required']">La localidad es
+                                    obligatoria</mat-error>
+                                <mat-error *ngIf="formCliente?.get('localidad')?.errors?.['required']">La localidad es
+                                    obligatoria</mat-error>
+                            </mat-form-field>
+
+                            <mat-form-field class="campo-codigo-postal">
+                                <mat-label>Código Postal</mat-label>
+                                <input matInput formControlName="codigo_postal" (input)="editarCampo('codigo_postal')">
+                                <mat-error *ngIf="formCliente?.get('codigo_postal')?.errors?.['pattern']">El código
+                                    postal no es válido.</mat-error>
+                                <mat-error *ngIf="formCliente?.get('codigo_postal')?.errors?.['required']">El código
+                                    postal es obligatorio</mat-error>
+                            </mat-form-field>
+                        </div>
+
                     </fieldset>
                 </div>
 
                 <div class="fila">
                     <fieldset class="seccion-direccion"
                         [ngClass]="(!formCliente.get('domicilio')?.valid || !formCliente.get('codigo_postal')?.valid || !formCliente.get('localidad')?.valid || !formCliente.get('id_vendedor')?.valid) ? 'faltan-campos' : ''">
-                        <legend>Dirección</legend>
+                        <legend>Datos comerciales</legend>
 
                         <div class="fila-direccion">
 
                             <mat-form-field>
-                                <mat-label>Domicilio</mat-label>
-                                <input matInput formControlName="domicilio" (input)="editarCampo('domicilio')">
-                                <mat-error *ngIf="formCliente?.get('domicilio')?.errors?.['required']">El domicilio es
-                                    obligatorio</mat-error>
+                                <mat-label>Nombre Comercial</mat-label>
+                                <input matInput formControlName="nombre_comercial"
+                                    (input)="editarCampo('nombre_comercial')">
                             </mat-form-field>
 
                             <mat-form-field>
@@ -104,24 +128,6 @@
                         </div>
 
                         <div class="fila-direccion">
-
-                            <mat-form-field class="campo-codigo-postal">
-                                <mat-label>Código Postal</mat-label>
-                                <input matInput formControlName="codigo_postal" (input)="editarCampo('codigo_postal')">
-                                <mat-error *ngIf="formCliente?.get('codigo_postal')?.errors?.['pattern']">El código
-                                    postal no es válido.</mat-error>
-                                <mat-error *ngIf="formCliente?.get('codigo_postal')?.errors?.['required']">El código
-                                    postal es obligatorio</mat-error>
-                            </mat-form-field>
-
-                            <mat-form-field>
-                                <mat-label>Localidad</mat-label>
-                                <input matInput formControlName="localidad" (input)="editarCampo('localidad')">
-                                <mat-error *ngIf="formCliente?.get('localidad')?.errors?.['required']">La localidad es
-                                    obligatoria</mat-error>
-                                <mat-error *ngIf="formCliente?.get('localidad')?.errors?.['required']">La localidad es
-                                    obligatoria</mat-error>
-                            </mat-form-field>
 
                             <div class="container-selector">
                                 <mat-form-field class="campo-vendedor">
